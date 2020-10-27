@@ -1,0 +1,20 @@
+# any of the following 8 lines can have a number less than the given limit
+# if so, then must be followed by a space-delimited list of that many numbers
+# within range 0 <= val < limit
+TYPE 11
+SEMI 1355
+MON 55
+BINOP 300
+UNOP 67
+SELOP 16
+DESC 32
+ACCUM 300
+# <str> will a base for input/output filenames; identifiers for the cases above
+# will be appended in the file name
+# to specify the test, describe the matrix in each case: size, pattern, etc.
+MASK <str>
+INPUT0 <str>
+INPUT1 <str>
+INPUT2 <str>
+OUTPUT <str>
+INIT <str>

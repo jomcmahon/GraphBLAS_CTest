@@ -1,0 +1,6 @@
+# Ignore these files:
+*.o
+*.a
+octave-workspace
+build
+__pycache__
