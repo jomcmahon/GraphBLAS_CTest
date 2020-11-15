@@ -53,14 +53,7 @@ bool run_VSel(testargs *myargs)
 void default_spec(testargs *myargs, int **sptr)
 {
   if (!sptr[SELOP]) set_test_spec(SELOP, num_SelectOps(), sptr); // all
-  if (!sptr[TYPE]) { // if no semiring supplied
-    set_test_spec(TYPE, 4, sptr); // allocate array
-    int g = 1;
-    sptr[TYPE][g++] = find_Type(GrB_BOOL);
-    sptr[TYPE][g++] = find_Type(GrB_INT64);
-    sptr[TYPE][g++] = find_Type(GrB_FP32);
-    sptr[TYPE][g++] = find_Type(GrB_FP64);
-  }
+  if (!sptr[TYPE]) set_test_spec(TYPE, num_Types(), sptr); // all
 
   if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");

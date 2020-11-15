@@ -29,7 +29,7 @@ bool run_RAssn(testargs *myargs)
 
   GrB_Matrix C = NULL; // inputs and outputs
   GrB_Vector A = NULL, M = NULL;
-  TEST_OK(read_typed_vector(myargs->inbase, myargs->input0, thetype, &A));
+  TEST_OK(read_matlab_vector(myargs->inbase, myargs->input0, thetype, &A));
   TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
@@ -51,7 +51,7 @@ void default_spec(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testCExtr/C");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "CE");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "A_col");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "A");
@@ -61,7 +61,7 @@ void default_specA(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testCExtr/CA");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "CEA");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "ALL");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CA");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "A");
@@ -71,7 +71,7 @@ void default_specR(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testCExtr/CR");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "CER");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_RANGE");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CR");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "A");
@@ -81,7 +81,7 @@ void default_specS(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testCExtr/CS");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "CES");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_STRIDE");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CS");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "A");
@@ -91,7 +91,7 @@ void default_specB(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testCExtr/CB");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "CEB");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_BACK");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CB");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "A");

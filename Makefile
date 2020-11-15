@@ -34,14 +34,12 @@ LOADLIBS ?= -lm $(GBDIR)/build/libgraphblas.a
 
 N ?= read
 SRCS = $(wildcard test*.c)
-P1SRCS = $(wildcard test*Extr.c)
-GENSRCS = $(wildcard testmxm.c testmxv.c testvxm.c teste*.c test*Assn.c test*SubA.c test*Sel.c test*Appl.c test*Red.c testtran.c testkron.c)
-
-# assign and subassign use extract outputs, need a second pass for gen
 EXES = $(SRCS:%.c=%)
-P1EXES = $(P1SRCS:%.c=%)
-GENEXES = $(GENSRCS:%.c=%)
 UNITS = testBinary testDesc testMatrix testMonoid testScalar testSelect testSemi testTypes testUnary testVector
+
+empty :=
+space := $(empty) $(empty)
+fstr = $(subst $(space),$(empty),$(INPUTS))
 
 default: test$(N)
 
@@ -59,17 +57,15 @@ run: test$(N)
 	./test$(N) $(INPUTS)
 
 gen: test$(N)
-	./test$(N) -g $(INPUTS)
+	mkdir -p ./data/test$(N)
+	./test$(N) -g $(INPUTS) > data/test$(N)/test$(N)$(fstr).out
 
 runall: $(EXES)
 	for x in $(EXES); do ./$$x; done
 
-genall: $(P1EXES) $(GENEXES)
-	for x in $(P1EXES); do mkdir -p ./data/$$x ; done
-	for x in $(P1EXES); do ./$$x -g > ./data/$$x/$$x.out ; done
-	cd data/testread && for x in $(P1EXES); do ln -s ../$$x ; done
-	for x in $(GENEXES); do mkdir -p ./data/$$x ; done
-	for x in $(GENEXES); do ./$$x -g > ./data/$$x/$$x.out ; done
+genall: $(EXES)
+	for x in $(EXES); do mkdir -p ./data/$$x ; done
+	for x in $(EXES); do ./$$x -g > ./data/$$x/$$x.out ; done
 
 unit: $(UNITS)
 	for x in $(UNITS); do ./$$x; done

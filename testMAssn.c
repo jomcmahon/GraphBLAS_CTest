@@ -29,7 +29,7 @@ bool run_MAssn(testargs *myargs)
   TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj));
 
   GrB_Matrix A = NULL, C = NULL, M = NULL; // inputs and outputs
-  TEST_OK(read_typed_matrix(myargs->inbase, myargs->input0, thetype, &A));
+  TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, thetype, &A));
   TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_matrix(myargs->inbase, myargs->mask, GrB_BOOL, &M));
@@ -52,7 +52,7 @@ void default_spec(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testMExtr/C");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "ME");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "A_row");
   if (strlen(myargs->input2) == 0) strcpy(myargs->input2, "A_col");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
@@ -63,7 +63,7 @@ void default_specA(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testMExtr/CA");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "MEA");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "ALL");
   if (strlen(myargs->input2) == 0) strcpy(myargs->input2, "ALL");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CA");
@@ -74,7 +74,7 @@ void default_specR(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testMExtr/CR");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "MER");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_RANGE");
   if (strlen(myargs->input2) == 0) strcpy(myargs->input2, "I_RANGE");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CR");
@@ -85,7 +85,7 @@ void default_specS(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testMExtr/CS");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "MES");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_STRIDE");
   if (strlen(myargs->input2) == 0) strcpy(myargs->input2, "I_STRIDE");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CS");
@@ -96,7 +96,7 @@ void default_specB(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testMExtr/CB");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "MEB");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_BACK");
   if (strlen(myargs->input2) == 0) strcpy(myargs->input2, "I_BACK");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CB");

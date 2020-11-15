@@ -17,8 +17,8 @@ void approx_equal_d(void *zin, const void *xin, const void *yin)
 {
   bool *z = (bool *)zin;
   if (zin == NULL) return;
-  if (xin == yin) *z = true;
-  if ((xin == NULL) || (yin == NULL)) *z = false;
+  if (xin == yin) { *z = true; return; }
+  if ((xin == NULL) || (yin == NULL)) { *z = false; return; }
 
   double xval = *(double *)xin;
   double yval = *(double *)yin;
@@ -39,8 +39,8 @@ void approx_equal_f(void *zin, const void *xin, const void *yin)
 {
   bool *z = (bool *)zin;
   if (zin == NULL) return;
-  if (xin == yin) *z = true;
-  if ((xin == NULL) || (yin == NULL)) *z = false;
+  if (xin == yin) { *z = true; return; }
+  if ((xin == NULL) || (yin == NULL)) { *z = false; return; }
 
   float xval = *(float *)xin;
   float yval = *(float *)yin;
@@ -72,34 +72,25 @@ bool is_approx_equal_mat(GrB_Matrix A, GrB_Matrix B)
     // check the type of A and B
     OK (GxB_Matrix_type (&atype, A)) ;
     OK (GxB_Matrix_type (&btype, B)) ;
-    if (atype != btype) {
-		printf("Error: atype != btype\n");
-		return false;
-	}
+    if (atype != btype)
+      { printf(" type"); return false; }
 
     // check the size of A and B
     OK (GrB_Matrix_nrows (&nrows1, A)) ;
     OK (GrB_Matrix_nrows (&nrows2, B)) ;
-    if (nrows1 != nrows2) {
-		printf("Error: anrows != bnrows\n");
-		return false;
-	}
+    if (nrows1 != nrows2)
+      { printf(" nrows %ld %ld", nrows1, nrows2); return false; }
 
     OK (GrB_Matrix_ncols (&ncols1, A)) ;
     OK (GrB_Matrix_ncols (&ncols2, B)) ;
-    if (ncols1 != ncols2) {
-		printf("Error: ancols != bncols\n");
-		return false;
-	}
+    if (ncols1 != ncols2)
+      { printf(" ncols %ld %ld", ncols1, ncols2); return false; }
 
     // check the # entries in A and B
     OK (GrB_Matrix_nvals (&nvals1, A)) ;
     OK (GrB_Matrix_nvals (&nvals2, B)) ;
-    if (nvals1 != nvals2) {
-		printf("Error: anvals != bnvals: %ld %ld\n", nvals1, nvals2);
-		fflush(stdout);
-		return false;
-	}
+    if (nvals1 != nvals2)
+      {	printf(" nvals %ld %ld", nvals1, nvals2); return false; }
 
     // C = A .* B, where the pattern of C is the intersection of A and B
     OK (GrB_Matrix_new (&C, GrB_BOOL, nrows1, ncols1)) ;
@@ -123,7 +114,7 @@ bool is_approx_equal_mat(GrB_Matrix A, GrB_Matrix B)
     // ensure C has the same number of entries as A and B
     OK (GrB_Matrix_nvals (&nvals, C)) ;
     if (nvals != nvals1) { // pattern of A and B are different
-	  printf("A and B have different patterns\n");
+      printf(" patterns %ld %ld", nvals, nvals1);
       GrB_free (&C) ;
       return false;
     }
@@ -152,17 +143,20 @@ bool is_approx_equal_vec(GrB_Vector A, GrB_Vector B)
     // check the type of A and B
     OK (GxB_Vector_type (&atype, A)) ;
     OK (GxB_Vector_type (&btype, B)) ;
-    if (atype != btype) return false;
+    if (atype != btype)
+      { printf(" type"); return false; }
 
     // check the size of A and B
     OK (GrB_Vector_size (&ncols1, A)) ;
     OK (GrB_Vector_size (&ncols2, B)) ;
-    if (ncols1 != ncols2) return false;
+    if (ncols1 != ncols2)
+      { printf(" ncols %ld %ld", ncols1, ncols2); return false; }
 
     // check the # entries in A and B
     OK (GrB_Vector_nvals (&nvals1, A)) ;
     OK (GrB_Vector_nvals (&nvals2, B)) ;
-    if (nvals1 != nvals2) return false;
+    if (nvals1 != nvals2)
+      {	printf(" nvals %ld %ld", nvals1, nvals2); return false; }
 
     // C = A .* B, where the pattern of C is the intersection of A and B
     OK (GrB_Vector_new (&C, GrB_BOOL, ncols1)) ;
@@ -186,6 +180,7 @@ bool is_approx_equal_vec(GrB_Vector A, GrB_Vector B)
     // ensure C has the same number of entries as A and B
     OK (GrB_Vector_nvals (&nvals, C)) ;
     if (nvals != nvals1) { // pattern of A and B are different
+      printf(" patterns %ld %ld", nvals, nvals1);
       GrB_free (&C) ;
       return false;
     }

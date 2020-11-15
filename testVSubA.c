@@ -28,7 +28,7 @@ bool run_VSubA(testargs *myargs)
   TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
 
   GrB_Vector A = NULL, C = NULL, M = NULL; // inputs and outputs
-  TEST_OK(read_typed_vector(myargs->inbase, myargs->input0, thetype, &A));
+  TEST_OK(read_matlab_vector(myargs->inbase, myargs->input0, thetype, &A));
   TEST_OK(read_matlab_vector(myargs->inbase, myargs->initvals, thetype, &C));
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
@@ -50,7 +50,7 @@ void default_spec(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testVExtr/C");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "VE");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "V1_ind");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "V1");
@@ -60,7 +60,7 @@ void default_specA(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testVExtr/CA");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "VEA");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "ALL");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CA");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "V1");
@@ -70,7 +70,7 @@ void default_specR(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testVExtr/CR");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "VER");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_RANGE");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CR");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "V1");
@@ -80,7 +80,7 @@ void default_specS(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testVExtr/CS");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "VES");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_STRIDE");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CS");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "V1");
@@ -90,7 +90,7 @@ void default_specB(testargs *myargs, int **specptr)
 {
   if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "testVExtr/CB");
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "VEB");
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_BACK");
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "CB");
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "V1");

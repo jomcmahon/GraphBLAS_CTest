@@ -102,11 +102,10 @@ int **get_test_spec(testargs *myargs, void (*f)(testargs *, int**))
 {
   int **myspec = malloc(TOTAL * sizeof(int *)); // fill test spec from args
   for (int j = 0; j < TOTAL; j++) { // initialize test spec
-    int lower = (j == DESC) ? 1 : 0;
     if (myargs->specobj[j] >= spec_limits(j)) { // one value for whole range
       myspec[j] = malloc(sizeof(int));
       myspec[j][0] = spec_limits(j);
-    } else if (myargs->specobj[j] >= lower) { // one value in array from args
+    } else if (myargs->specobj[j] >= 0) { // one value in array from args
       myspec[j] = malloc(2 * sizeof(int));
       myspec[j][0] = 1; myspec[j][1] = myargs->specobj[j];
     } else myspec[j] = NULL; // no iteration for that spec category
