@@ -11,6 +11,22 @@
 #include "GraphBLAS.h"
 #include "test_utils.h"
 
+// string for spec, used for spec file output
+void spec_string(spec inspec, char *instr)
+{
+  switch (inspec) {
+  case TYPE: strcpy(instr, "TYPE"); break;
+  case SEMI: strcpy(instr, "SEMI"); break;
+  case MON: strcpy(instr, "MON"); break;
+  case BINOP: strcpy(instr, "BINOP"); break;
+  case UNOP: strcpy(instr, "UNOP"); break;
+  case SELOP: strcpy(instr, "SELOP"); break;
+  case DESC: strcpy(instr, "DESC"); break;
+  case ACCUM: strcpy(instr, "ACCUM"); break;
+  default: break;
+  }
+}
+
 // limits for built-in object arrays
 int spec_limits(spec inspec)
 {
@@ -113,7 +129,7 @@ int **get_test_spec(testargs *myargs, void (*f)(testargs *, int**))
 
   if (strlen(myargs->spectest) > 0) { // if spec file supplied
     char specname[256]; // base name, test spec file
-    sprintf(specname, "data/%s/%s", myargs->inbase, myargs->spectest);
+    sprintf(specname, "%s", myargs->spectest);
     FILE *infp; // if no file, run the default function and return spec
     if ((infp = fopen(specname, "r")))  { // if spec file opened
       char str[64];
@@ -132,12 +148,38 @@ int **get_test_spec(testargs *myargs, void (*f)(testargs *, int**))
 	else if (!strcmp(str, "INPUT2")) read_filename(infp, myargs->input2);
 	else if (!strcmp(str, "OUTPUT")) read_filename(infp, myargs->output);
 	else if (!strcmp(str, "INIT")) read_filename(infp, myargs->initvals);
-	else { fgets(str, 256, infp); continue; } // comment
+	else  fgets(str, 256, infp); // comment
       }
       fclose(infp);
     }
   }
   f(myargs, myspec); // default spec for test
+  if (myargs->generate) { // if generating, write a spec file
+    FILE *outfp = fopen(myargs->spectest, "w");
+    for (int i = 0; i < TOTAL; i++) {
+      if (myspec[i]) {
+	char ss[64];
+	spec_string(i, ss);
+	fprintf(outfp, "%s %d", ss, myspec[i][0]);
+	for (int j = 1; j <= myspec[i][0]; j++)
+	  fprintf(outfp, " %d", myspec[i][j]);
+	fprintf(outfp, "\n");
+      }
+    }
+    if (strlen(myargs->input0) > 0)
+      fprintf(outfp, "INPUT0 %s\n", myargs->input0);
+    if (strlen(myargs->input1) > 0)
+      fprintf(outfp, "INPUT1 %s\n", myargs->input1);
+    if (strlen(myargs->input2) > 0)
+      fprintf(outfp, "INPUT2 %s\n", myargs->input2);
+    if (strlen(myargs->mask) > 0)
+      fprintf(outfp, "MASK %s\n", myargs->mask);
+    if (strlen(myargs->initvals) > 0)
+      fprintf(outfp, "INIT %s\n", myargs->initvals);
+    if (strlen(myargs->output) > 0)
+      fprintf(outfp, "OUTPUT %s\n", myargs->output);
+    fclose(outfp);
+  }
   return myspec;
 }
 
@@ -156,6 +198,7 @@ testargs *get_test_args(int argc, char **argv)
   myargs->spectest[0] = '\0';
   strcpy(myargs->inbase, "testread"); // default input directory
   strcpy(myargs->testbase, basename(argv[0])); // default output directory
+  sprintf(myargs->spectest, "specfiles/%s.def", myargs->testbase);
 
   if (argc == 1) return myargs; // no arguments or options
 
