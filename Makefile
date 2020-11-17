@@ -64,6 +64,7 @@ runall: $(EXES)
 	for x in $(EXES); do ./$$x; done
 
 genall: $(EXES)
+	mkdir -p ./data/specfiles
 	for x in $(EXES); do mkdir -p ./data/$$x ; done
 	for x in $(EXES); do ./$$x -g > ./data/$$x/$$x.out ; done
 
