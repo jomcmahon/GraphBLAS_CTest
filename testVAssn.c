@@ -108,10 +108,15 @@ int main(int argc, char * argv[])
   memcpy(&myargsR, myargs, sizeof(testargs));
   memcpy(&myargsS, myargs, sizeof(testargs));
   memcpy(&myargsB, myargs, sizeof(testargs));
+  sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
   int **specptr = get_test_spec(myargs, default_spec);
+  sprintf(myargsA.spectest, "data/specfiles/%s.A", myargs->testbase);
   int **specptrA = get_test_spec(&myargsA, default_specA);
+  sprintf(myargsR.spectest, "data/specfiles/%s.R", myargs->testbase);
   int **specptrR = get_test_spec(&myargsR, default_specR);
+  sprintf(myargsS.spectest, "data/specfiles/%s.S", myargs->testbase);
   int **specptrS = get_test_spec(&myargsS, default_specS);
+  sprintf(myargsB.spectest, "data/specfiles/%s.B", myargs->testbase);
   int **specptrB = get_test_spec(&myargsB, default_specB);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);

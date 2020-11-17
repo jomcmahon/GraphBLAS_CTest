@@ -46,7 +46,7 @@ typedef struct testargs {
   char initvals[MATNAME_SIZE];
   char testbase[MATNAME_SIZE];
   char inbase[MATNAME_SIZE];
-  char spectest[MATNAME_SIZE];
+  char spectest[256];
 } testargs;
 
 // methods for built-ins
@@ -74,10 +74,12 @@ void get_SelectOp(int, GxB_SelectOp *);
 
 // methods for argument and spec manipulation
 void print_args(testargs *, GrB_Descriptor, GrB_BinaryOp);
-void print_test_spec(int **);
+void print_test_spec(int **, testargs *);
 void set_test_spec(spec, int, int **);
 int **get_test_spec(testargs *, void (*f)(testargs *, int **));
 testargs *get_test_args(int argc, char **argv);
+bool get_spec_list(testargs *, spec, void (*f)(testargs *, int**),
+		   bool (*g)(testargs *));
 bool test_L_DA_loop(testargs *, spec, int **, bool (*f)(testargs *));
 bool test_L_TDA_loop(testargs *, spec, int **, bool (*f)(testargs *));
 

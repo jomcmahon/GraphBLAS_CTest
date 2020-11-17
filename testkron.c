@@ -84,6 +84,7 @@ int main(int argc, char * argv[])
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
+  sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
   int **specptr = get_test_spec(myargs, default_spec);
   bool testerror = false;
 

@@ -83,12 +83,10 @@ int main(int argc, char * argv[])
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
-  int **specptr = get_test_spec(myargs, default_spec);
-  bool testerror = false;
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
-  testerror = test_L_DA_loop(myargs, SEMI, specptr, run_mxm);
+  bool testerror = get_spec_list(myargs, SEMI, default_spec, run_mxm);
 
   OK(GrB_finalize());
   return testerror;
