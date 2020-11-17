@@ -82,13 +82,22 @@ int main(int argc, char * argv[])
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
-  sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
-  int **specptr = get_test_spec(myargs, default_spec);
-  bool testerror = false;
+
+  if (myargs->generate) { // create spec files
+    sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
+    write_test_spec(myargs, default_spec);
+    char lfname[256];
+    sprintf(lfname, "data/specfiles/%s.spec", myargs->testbase);
+    FILE *outfp = fopen(lfname, "w"); // file with list of spec files
+    if (outfp) {
+      fprintf(outfp, "data/specfiles/%s.def\n", myargs->testbase);
+      fclose(outfp);
+    }
+  }
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
-  testerror = test_L_DA_loop(myargs, BINOP, specptr, run_eMultV);
+  bool testerror = get_spec_list(myargs, BINOP, run_eMultV);
 
   OK(GrB_finalize());
   return testerror;

@@ -84,9 +84,21 @@ int main(int argc, char * argv[])
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
+  if (myargs->generate) { // create spec files
+    sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
+    write_test_spec(myargs, default_spec);
+    char lfname[256];
+    sprintf(lfname, "data/specfiles/%s.spec", myargs->testbase);
+    FILE *outfp = fopen(lfname, "w"); // file with list of spec files
+    if (outfp) {
+      fprintf(outfp, "data/specfiles/%s.def\n", myargs->testbase);
+      fclose(outfp);
+    }
+  }
+
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
-  bool testerror = get_spec_list(myargs, SEMI, default_spec, run_mxv);
+  bool testerror = get_spec_list(myargs, SEMI, run_mxv);
 
   OK(GrB_finalize());
   return testerror;

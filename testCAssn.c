@@ -101,32 +101,41 @@ int main(int argc, char * argv[])
 {
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
-  bool testerror = false;
-
-  testargs myargsA, myargsR, myargsS, myargsB; // additions to default
   testargs *myargs = get_test_args(argc, argv);
-  memcpy(&myargsA, myargs, sizeof(testargs));
-  memcpy(&myargsR, myargs, sizeof(testargs));
-  memcpy(&myargsS, myargs, sizeof(testargs));
-  memcpy(&myargsB, myargs, sizeof(testargs));
-  sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
-  int **specptr = get_test_spec(myargs, default_spec);
-  sprintf(myargsA.spectest, "data/specfiles/%s.A", myargs->testbase);
-  int **specptrA = get_test_spec(&myargsA, default_specA);
-  sprintf(myargsR.spectest, "data/specfiles/%s.R", myargs->testbase);
-  int **specptrR = get_test_spec(&myargsR, default_specR);
-  sprintf(myargsS.spectest, "data/specfiles/%s.S", myargs->testbase);
-  int **specptrS = get_test_spec(&myargsS, default_specS);
-  sprintf(myargsB.spectest, "data/specfiles/%s.B", myargs->testbase);
-  int **specptrB = get_test_spec(&myargsB, default_specB);
+
+  if (myargs->generate) { // create spec files
+    testargs *myargsC = malloc(sizeof(testargs));
+    memcpy(myargsC, myargs, sizeof(testargs));
+    sprintf(myargsC->spectest, "data/specfiles/%s.def", myargsC->testbase);
+    write_test_spec(myargsC, default_spec);
+    memcpy(myargsC, myargs, sizeof(testargs));
+    sprintf(myargsC->spectest, "data/specfiles/%s.A", myargsC->testbase);
+    write_test_spec(myargsC, default_specA);
+    memcpy(myargsC, myargs, sizeof(testargs));
+    sprintf(myargsC->spectest, "data/specfiles/%s.R", myargsC->testbase);
+    write_test_spec(myargsC, default_specR);
+    memcpy(myargsC, myargs, sizeof(testargs));
+    sprintf(myargsC->spectest, "data/specfiles/%s.S", myargsC->testbase);
+    write_test_spec(myargsC, default_specS);
+    memcpy(myargsC, myargs, sizeof(testargs));
+    sprintf(myargsC->spectest, "data/specfiles/%s.B", myargsC->testbase);
+    write_test_spec(myargsC, default_specB);
+    char lfname[256];
+    sprintf(lfname, "data/specfiles/%s.spec", myargs->testbase);
+    FILE *outfp = fopen(lfname, "w"); // file with list of spec files
+    if (outfp) {
+      fprintf(outfp, "data/specfiles/%s.def\n", myargs->testbase);
+      fprintf(outfp, "data/specfiles/%s.A\n", myargs->testbase);
+      fprintf(outfp, "data/specfiles/%s.R\n", myargs->testbase);
+      fprintf(outfp, "data/specfiles/%s.S\n", myargs->testbase);
+      fprintf(outfp, "data/specfiles/%s.B\n", myargs->testbase);
+      fclose(outfp);
+    }
+  }
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
-  testerror = test_L_DA_loop(myargs, TYPE, specptr, run_CAssn);
-  testerror |= test_L_DA_loop(&myargsA, TYPE, specptrA, run_CAssn);
-  testerror |= test_L_DA_loop(&myargsR, TYPE, specptrR, run_CAssn);
-  testerror |= test_L_DA_loop(&myargsS, TYPE, specptrS, run_CAssn);
-  testerror |= test_L_DA_loop(&myargsB, TYPE, specptrB, run_CAssn);
+  bool testerror = get_spec_list(myargs, TYPE, run_CAssn);
 
   OK(GrB_finalize());
   return testerror;
