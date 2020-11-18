@@ -9,7 +9,7 @@
 
 // test argument parsing
 typedef enum { TYPE_I, MON_I, ANY_I, PAIR_I, PLUS_I, MIN_I, MINV_I, EADDM_I,
-	       SELOP_I, TOTAL_I } iter_spec;
+	       SELOP_I, SEMI_I, TOTAL_I } iter_spec;
 
 void semi_iteration_plus_times(int **sptr);
 void accum_iteration_plus(int **sptr);
@@ -19,6 +19,5 @@ void binop_iteration_pair(int **sptr);
 void binop_iteration_plus(int **sptr);
 void binop_iteration_min(int **sptr);
 void eAddM_iteration(int **sptr);
-void iterate_defs(testargs *, char *, char *, iter_spec);
-void matmul_defs(testargs *, char *, char *, char *, char *);
+void iterate_defs(testargs *, char *, char *, char *, char *, iter_spec);
 void index_defs(testargs *, char *, char *, char *, char *, bool);

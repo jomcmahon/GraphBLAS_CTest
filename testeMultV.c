@@ -61,7 +61,7 @@ int main(int argc, char * argv[])
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
-  iterate_defs(myargs, "V1", "V2", ANY_I);
+  iterate_defs(myargs, "V1", "V2", "", "", ANY_I);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 

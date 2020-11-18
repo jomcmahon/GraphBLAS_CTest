@@ -158,7 +158,8 @@ void eAddM_iteration(int **sptr)
   sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_FP64);
 }
 
-void iterate_defs(testargs *myargs, char *i0, char *i1, iter_spec iter_sel)
+void iterate_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
+		  iter_spec iter_sel)
 {
   if (strlen(myargs->input0) == 0) strcpy(myargs->input0, i0);
   if (strlen(myargs->input1) == 0) strcpy(myargs->input1, i1);
@@ -177,38 +178,30 @@ void iterate_defs(testargs *myargs, char *i0, char *i1, iter_spec iter_sel)
     case EADDM_I: eAddM_iteration(myspec); break; // eAddM
     case SELOP_I: set_test_spec(TYPE, num_Types(), myspec); // all types
       set_test_spec(SELOP, num_SelectOps(), myspec); break; // all selops
+    case SEMI_I: semi_iteration_plus_times(myspec); break; // semirings
     default: break;
     }
 
     testargs *myargsC = malloc(sizeof(testargs)); // copy args
     memcpy(myargsC, myargs, sizeof(testargs));
     print_test_spec(myargsC, myspec, "D"); // default
-    free(myargsC); free_test_spec(myspec);
-  }
-}
-
-void matmul_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv)
-{
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, i0);
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, i1);
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
-  if (myargs->generate) { // create spec files
-    int **myspec = spec_from_args(myargs); // args
-    semi_iteration_plus_times(myspec); // whole iteration for gen
-    testargs *myargsC = malloc(sizeof(testargs)); // copy rgs
-    memcpy(myargsC, myargs, sizeof(testargs));
-    print_test_spec(myargsC, myspec, "D"); // default
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->mask, m);
-    print_test_spec(myargsC, myspec, "M"); // with mask
-    accum_iteration_plus(myspec);
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->initvals, iv);
-    print_test_spec(myargsC, myspec, "A"); // with accums
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->mask, m);
-    strcpy(myargsC->initvals, iv);
-    print_test_spec(myargsC, myspec, "B"); // with mask and accum
+    if (strlen(m) > 0) {
+      memcpy(myargsC, myargs, sizeof(testargs));
+      strcpy(myargsC->mask, m);
+      print_test_spec(myargsC, myspec, "M"); // with mask
+    }
+    if (strlen(iv) > 0) {
+      accum_iteration_plus(myspec); // add accumulators to spec
+      memcpy(myargsC, myargs, sizeof(testargs));
+      strcpy(myargsC->initvals, iv);
+      print_test_spec(myargsC, myspec, "A"); // with accums
+      if (strlen(m) > 0) {
+	memcpy(myargsC, myargs, sizeof(testargs));
+	strcpy(myargsC->mask, m);
+	strcpy(myargsC->initvals, iv);
+	print_test_spec(myargsC, myspec, "B"); // with mask and accum
+      }
+    }
     free(myargsC); free_test_spec(myspec);
   }
 }
@@ -229,19 +222,23 @@ void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *iv,
     print_test_spec(myargsC, myspec, "D");
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->input0, i0); if (A_flag) strcat(myargsC->input0, "A");
-    strcpy(myargsC->input1, "ALL"); strcpy(myargsC->input2, "ALL");
+    strcpy(myargsC->input1, "ALL");
+    if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "ALL");
     print_test_spec(myargsC, myspec, "A");
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->input0, i0); if (A_flag) strcat(myargsC->input0, "R");
-    strcpy(myargsC->input1, "I_RANGE"); strcpy(myargsC->input2, "I_RANGE");
+    strcpy(myargsC->input1, "I_RANGE");
+    if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_RANGE");
     print_test_spec(myargsC, myspec, "R");
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->input0, i0); if (A_flag) strcat(myargsC->input0, "S");
-    strcpy(myargsC->input1, "I_STRIDE"); strcpy(myargsC->input2, "I_STRIDE");
+    strcpy(myargsC->input1, "I_STRIDE");
+    if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_STRIDE");
     print_test_spec(myargsC, myspec, "S");
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->input0, i0); if (A_flag) strcat(myargsC->input0, "B");
-    strcpy(myargsC->input1, "I_BACK"); strcpy(myargsC->input2, "I_BACK");
+    strcpy(myargsC->input1, "I_BACK");
+    if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_BACK");
     print_test_spec(myargsC, myspec, "B");
     free(myargsC); free_test_spec(myspec);
   }

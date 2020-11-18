@@ -61,7 +61,7 @@ int main(int argc, char * argv[])
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
-  matmul_defs(myargs, "V1", "A", "V1", "V2");
+  iterate_defs(myargs, "V1", "A", "V1", "V2", SEMI_I);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
