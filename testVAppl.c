@@ -9,6 +9,7 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
+#include "gen_default.h"
 
 bool run_VAppl(testargs *myargs)
 {
@@ -50,46 +51,13 @@ bool run_VAppl(testargs *myargs)
   return testerror;
 }
 
-bool find_in_list(int *list, int f, int size)
-{
-  for (int i = 0; i < size; i++) if (f == list[i]) return true;
-  return false;
-}
-
-void spec_iteration(int **specptr)
-{
-  int b = 0, *blocked = malloc(9 * sizeof(int));
-  blocked[b++] = find_UnaryOp(GrB_MINV_BOOL); // dont test MINV_BOOL
-  blocked[b++] = find_UnaryOp(GrB_MINV_INT8); // dont test MINV_BOOL
-  blocked[b++] = find_UnaryOp(GrB_MINV_UINT8); // dont test MINV_BOOL
-  blocked[b++] = find_UnaryOp(GrB_MINV_INT16); // dont test MINV_BOOL
-  blocked[b++] = find_UnaryOp(GrB_MINV_UINT16); // dont test MINV_BOOL
-  blocked[b++] = find_UnaryOp(GrB_MINV_INT32); // dont test MINV_BOOL
-  blocked[b++] = find_UnaryOp(GrB_MINV_UINT32); // dont test MINV_BOOL
-  blocked[b++] = find_UnaryOp(GrB_MINV_INT64); // dont test MINV_BOOL
-  blocked[b++] = find_UnaryOp(GrB_MINV_UINT64); // dont test MINV_BOOL
-
-  set_test_spec(UNOP, num_UnaryOps() - 9, specptr);
-  for (int i = 0, actual = 1; i < num_UnaryOps(); i++)
-    if (!find_in_list(blocked, i, 9)) specptr[UNOP][actual++] = i;
-}
-
 int main(int argc, char * argv[])
 {
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
-  if (myargs->generate) { // create spec files
-    int **myspec = spec_from_args(myargs); // args
-    spec_iteration(myspec); // whole iteration for gen
-    testargs *myargsC = malloc(sizeof(testargs)); // copy rgs
-    memcpy(myargsC, myargs, sizeof(testargs));
-    print_test_spec(myargsC, myspec, "D"); // default
-    free(myargsC); free_test_spec(myspec);
-  }
+  iterate_defs(myargs, "V1", "", MINV_I);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 

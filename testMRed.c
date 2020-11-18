@@ -9,6 +9,7 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
+#include "gen_default.h"
 
 bool run_MRed(testargs *myargs)
 {
@@ -51,39 +52,13 @@ bool run_MRed(testargs *myargs)
   return testerror;
 }
 
-void spec_iteration(int **sptr)
-{
-  set_test_spec(BINOP, num_Types(), sptr); // allocate array
-  int g = 1;
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_BOOL);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_INT8);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_UINT8);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_INT16);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_UINT16);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_INT32);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_UINT32);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_INT64);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_UINT64);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_FP32);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_FP64);
-}
-
 int main(int argc, char * argv[])
 {
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "A");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
-  if (myargs->generate) { // create spec files
-    int **myspec = spec_from_args(myargs); // args
-    spec_iteration(myspec); // whole iteration for gen
-    testargs *myargsC = malloc(sizeof(testargs)); // copy rgs
-    memcpy(myargsC, myargs, sizeof(testargs));
-    print_test_spec(myargsC, myspec, "D"); // default
-    free(myargsC); free_test_spec(myspec);
-  }
+  iterate_defs(myargs, "A", "", MIN_I);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 

@@ -9,6 +9,7 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
+#include "gen_default.h"
 
 bool run_eMultV(testargs *myargs)
 {
@@ -54,40 +55,13 @@ bool run_eMultV(testargs *myargs)
   return testerror;
 }
 
-void spec_iteration(int **sptr)
-{
-  set_test_spec(BINOP, num_Types(), sptr); // allocate array
-  int g = 1;
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_BOOL);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_INT8);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_UINT8);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_INT16);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_UINT16);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_INT32);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_UINT32);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_INT64);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_UINT64);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_FP32);
-  sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_FP64);
-}
-
 int main(int argc, char * argv[])
 {
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "V2");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
-  if (myargs->generate) { // create spec files
-    int **myspec = spec_from_args(myargs); // args
-    spec_iteration(myspec); // whole iteration for gen
-    testargs *myargsC = malloc(sizeof(testargs)); // copy rgs
-    memcpy(myargsC, myargs, sizeof(testargs));
-    print_test_spec(myargsC, myspec, "D"); // default
-    free(myargsC); free_test_spec(myspec);
-  }
+  iterate_defs(myargs, "V1", "V2", ANY_I);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 

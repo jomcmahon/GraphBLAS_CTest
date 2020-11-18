@@ -9,6 +9,7 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
+#include "gen_default.h"
 
 bool run_MSel(testargs *myargs)
 {
@@ -56,17 +57,7 @@ int main(int argc, char * argv[])
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "A");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
-  if (myargs->generate) { // create spec files
-    int **myspec = spec_from_args(myargs); // args
-    set_test_spec(SELOP, num_SelectOps(), myspec); // all
-    set_test_spec(TYPE, num_Types(), myspec); // whole iteration for gen
-    testargs *myargsC = malloc(sizeof(testargs));
-    memcpy(myargsC, myargs, sizeof(testargs));
-    print_test_spec(myargsC, myspec, "D");
-    free(myargsC); free_test_spec(myspec);
-  }
+  iterate_defs(myargs, "A", "", SELOP_I);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 

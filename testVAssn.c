@@ -9,6 +9,7 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
+#include "gen_default.h"
 
 bool run_VAssn(testargs *myargs)
 {
@@ -52,34 +53,7 @@ int main(int argc, char * argv[])
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
-  if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, "V1");
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "VE");
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "V1_ind");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
-  if (myargs->generate) { // create spec files
-    int **myspec = spec_from_args(myargs); // args
-    set_test_spec(TYPE, num_Types(), myspec); // whole iteration for gen
-    testargs *myargsC = malloc(sizeof(testargs));
-    memcpy(myargsC, myargs, sizeof(testargs));
-    print_test_spec(myargsC, myspec, "D");
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->input0, "VEA");
-    strcpy(myargsC->input1, "ALL");
-    print_test_spec(myargsC, myspec, "A");
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->input0, "VER");
-    strcpy(myargsC->input1, "I_RANGE");
-    print_test_spec(myargsC, myspec, "R");
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->input0, "VES");
-    strcpy(myargsC->input1, "I_STRIDE");
-    print_test_spec(myargsC, myspec, "S");
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->input0, "VEB");
-    strcpy(myargsC->input1, "I_BACK");
-    print_test_spec(myargsC, myspec, "B");
-    free(myargsC); free_test_spec(myspec);
-  }
+  index_defs(myargs, "VE", "V1_ind", "", "V1", true);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
