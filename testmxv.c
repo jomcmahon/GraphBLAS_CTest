@@ -31,6 +31,7 @@ bool run_mxv(testargs *myargs)
   GrB_Vector B = NULL, C = NULL, M = NULL;
   TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, xtype, &A));
   TEST_OK(read_matlab_vector(myargs->inbase, myargs->input1, ytype, &B));
+
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 
@@ -54,28 +55,39 @@ bool run_mxv(testargs *myargs)
   return testerror;
 }
 
-void default_spec(testargs *myargs, int **sptr)
+void spec_iteration(int **sptr)
 {
-  if (!sptr[DESC]) set_test_spec(DESC, 4, sptr); // first four
-  if (!sptr[SEMI]) { // if no semiring supplied
-    set_test_spec(SEMI, num_Types(), sptr); // allocate array
-    int g = 1;
-    sptr[SEMI][g++] = find_Semiring(GxB_ANY_PAIR_BOOL);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_INT8);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT8);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_INT16);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT16);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_INT32);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT32);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_INT64);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT64);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_FP32);
-    sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_FP64);
-  }
+  set_test_spec(DESC, 4, sptr); // first four
+  set_test_spec(SEMI, num_Types(), sptr); // allocate array
+  int g = 1;
+  sptr[SEMI][g++] = find_Semiring(GxB_ANY_PAIR_BOOL);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_INT8);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT8);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_INT16);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT16);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_INT32);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT32);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_INT64);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT64);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_FP32);
+  sptr[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_FP64);
+}
 
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "A");
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "V2");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
+void add_accums(int **sptr)
+{
+  set_test_spec(ACCUM, num_Types(), sptr); // allocate array
+  int g = 1;
+  sptr[ACCUM][g++] = find_BinaryOp(GxB_ANY_BOOL);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_INT8);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_UINT8);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_INT16);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_UINT16);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_INT32);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_UINT32);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_INT64);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_UINT64);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_FP32);
+  sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_FP64);
 }
 
 int main(int argc, char * argv[])
@@ -84,16 +96,28 @@ int main(int argc, char * argv[])
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "A");
+  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "V2");
+  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
   if (myargs->generate) { // create spec files
-    sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
-    write_test_spec(myargs, default_spec);
-    char lfname[256];
-    sprintf(lfname, "data/specfiles/%s.spec", myargs->testbase);
-    FILE *outfp = fopen(lfname, "w"); // file with list of spec files
-    if (outfp) {
-      fprintf(outfp, "data/specfiles/%s.def\n", myargs->testbase);
-      fclose(outfp);
-    }
+    int **myspec = spec_from_args(myargs); // args
+    spec_iteration(myspec); // whole iteration for gen
+    testargs *myargsC = malloc(sizeof(testargs)); // copy rgs
+    memcpy(myargsC, myargs, sizeof(testargs));
+    print_test_spec(myargsC, myspec, "D"); // default
+    memcpy(myargsC, myargs, sizeof(testargs));
+    strcpy(myargsC->mask, "V1");
+    print_test_spec(myargsC, myspec, "M"); // with mask
+    add_accums(myspec);
+    memcpy(myargsC, myargs, sizeof(testargs));
+    strcpy(myargsC->initvals, "V2");
+    print_test_spec(myargsC, myspec, "A"); // with accums
+    memcpy(myargsC, myargs, sizeof(testargs));
+    strcpy(myargsC->mask, "V1");
+    strcpy(myargsC->initvals, "V2");
+    add_accums(myspec);
+    print_test_spec(myargsC, myspec, "B"); // with mask and accum
+    free(myargsC); free_test_spec(myspec);
   }
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);

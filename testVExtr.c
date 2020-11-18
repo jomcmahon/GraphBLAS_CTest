@@ -54,85 +54,34 @@ bool run_VExtr(testargs *myargs)
   return testerror;
 }
 
-void default_spec(testargs *myargs, int **specptr)
-{
-  if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
-
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "V1_ind");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
-}
-
-void default_specA(testargs *myargs, int **specptr)
-{
-  if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
-
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "ALL");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "CA");
-}
-
-void default_specR(testargs *myargs, int **specptr)
-{
-  if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
-
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_RANGE");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "CR");
-}
-
-void default_specS(testargs *myargs, int **specptr)
-{
-  if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
-
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_STRIDE");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "CS");
-}
-
-void default_specB(testargs *myargs, int **specptr)
-{
-  if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
-
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
-  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "I_BACK");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "CB");
-}
-
 int main(int argc, char * argv[])
 {
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
+  if (strlen(myargs->input1) == 0) strcpy(myargs->input1, "V1_ind");
+  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
   if (myargs->generate) { // create spec files
+    int **myspec = spec_from_args(myargs); // args
+    set_test_spec(TYPE, num_Types(), myspec); // whole iteration for gen
     testargs *myargsC = malloc(sizeof(testargs));
     memcpy(myargsC, myargs, sizeof(testargs));
-    sprintf(myargsC->spectest, "data/specfiles/%s.def", myargsC->testbase);
-    write_test_spec(myargsC, default_spec);
+    print_test_spec(myargsC, myspec, "D");
     memcpy(myargsC, myargs, sizeof(testargs));
-    sprintf(myargsC->spectest, "data/specfiles/%s.A", myargsC->testbase);
-    write_test_spec(myargsC, default_specA);
+    strcpy(myargsC->input1, "ALL");
+    print_test_spec(myargsC, myspec, "A");
     memcpy(myargsC, myargs, sizeof(testargs));
-    sprintf(myargsC->spectest, "data/specfiles/%s.R", myargsC->testbase);
-    write_test_spec(myargsC, default_specR);
+    strcpy(myargsC->input1, "I_RANGE");
+    print_test_spec(myargsC, myspec, "R");
     memcpy(myargsC, myargs, sizeof(testargs));
-    sprintf(myargsC->spectest, "data/specfiles/%s.S", myargsC->testbase);
-    write_test_spec(myargsC, default_specS);
+    strcpy(myargsC->input1, "I_STRIDE");
+    print_test_spec(myargsC, myspec, "S");
     memcpy(myargsC, myargs, sizeof(testargs));
-    sprintf(myargsC->spectest, "data/specfiles/%s.B", myargsC->testbase);
-    write_test_spec(myargsC, default_specB);
-    char lfname[256];
-    sprintf(lfname, "data/specfiles/%s.spec", myargs->testbase);
-    FILE *outfp = fopen(lfname, "w"); // file with list of spec files
-    if (outfp) {
-      fprintf(outfp, "data/specfiles/%s.def\n", myargs->testbase);
-      fprintf(outfp, "data/specfiles/%s.A\n", myargs->testbase);
-      fprintf(outfp, "data/specfiles/%s.R\n", myargs->testbase);
-      fprintf(outfp, "data/specfiles/%s.S\n", myargs->testbase);
-      fprintf(outfp, "data/specfiles/%s.B\n", myargs->testbase);
-      fclose(outfp);
-    }
+    strcpy(myargsC->input1, "I_BACK");
+    print_test_spec(myargsC, myspec, "B");
+    free(myargsC); free_test_spec(myspec);
   }
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);

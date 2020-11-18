@@ -78,18 +78,22 @@ void read_params(FILE *infp, spec inspec, int **myspec)
   int lim, rval;
   assert (fscanf(infp, "%d", &lim) == 1); // get number of values
 
-  if (myspec[inspec]) { // already set, just read values to advance pointer
-    for (int i = 0; i < lim; i++) // read values but don't set
-      assert (fscanf(infp, "%d", &rval) == 1);
-  } else if (lim >= spec_limits(inspec)) { // one value for whole range
-    myspec[inspec] = malloc(sizeof(int));
-    myspec[inspec][0] = spec_limits(inspec);
-  } else if (lim > 0) { // read values
-    int *read_vals = malloc((lim + 1) * sizeof(int));
-    for (int i = 0; i < lim; i++) // read values and set
-      assert (fscanf(infp, "%d", &read_vals[i + 1]) == 1);
-    read_vals[0] = lim; // first elt is number elts
-    myspec[inspec] = read_vals;
+  if (lim >= spec_limits(inspec)) { // one value for whole range
+    if (!myspec[inspec]) {
+      myspec[inspec] = malloc(sizeof(int));
+      myspec[inspec][0] = spec_limits(inspec);
+    }
+  } else if (lim > 0) {
+    int *read_vals;
+    if (!myspec[inspec]) {
+      read_vals = malloc((lim + 1) * sizeof(int)); read_vals[0] = lim;
+      for (int i = 0; i < lim; i++) // read values and set
+	assert (fscanf(infp, "%d", &read_vals[i + 1]) == 1);
+      myspec[inspec] = read_vals;
+    } else {
+      for (int i = 0; i < lim; i++) // read values but don't set
+	assert (fscanf(infp, "%d", &rval) == 1);
+    }
   }
 }
 
@@ -98,7 +102,7 @@ void read_filename(FILE *infp, char *carray)
 {
   char str[128];
   assert (fscanf(infp, "%s", str) == 1); // scan the filename base
-  if (strlen(carray) == 0) strcpy(carray, str); // if not already given
+  strcpy(carray, str); // if not already given
 }
 
 // get spec from input options
@@ -118,40 +122,46 @@ int **spec_from_args(testargs *myargs)
 }
 
 // apply a spec function and write to spec file
-void write_test_spec(testargs *myargs, void (*f)(testargs *, int**))
+void print_test_spec(testargs *myargs, int **myspec, char *str)
 {
-  int **myspec = spec_from_args(myargs);
-  f(myargs, myspec); // default spec for test
-  if (strlen(myargs->spectest) == 0) return; // do nothing if no file given
-  FILE *outfp = fopen(myargs->spectest, "w");
-  if (!outfp) return; // do nothing if can't open file
+  strcat(myargs->output, str); // output name with string to identify sub-test
+  sprintf(myargs->spectest, "data/specfiles/%s%s.spec", myargs->testbase,
+	  myargs->output); // spec output file
+  FILE *outfp = fopen(myargs->spectest, "r"); // attempt to read spec
+  if (outfp) { fclose(outfp); return; } // do nothing if file already exists
+  char lfname[256]; // list output file
+  sprintf(lfname, "data/specfiles/%s.list", myargs->testbase);
+  FILE *listfp = fopen(lfname, "a"); // open list file for append
+  if (listfp) // write spec name to list file if exists
+    { fprintf(listfp, "%s\n", myargs->spectest); fclose(listfp); }
+
+  FILE *specfp = fopen(myargs->spectest, "w"); // open spec file for writing
+  if (!specfp) return; // do nothing if can't open file
   for (int i = 0; i < TOTAL; i++) {
     if (myspec[i]) {
       char ss[64];
       spec_string(i, ss);
-      fprintf(outfp, "%s %d", ss, myspec[i][0]);
+      fprintf(specfp, "%s %d", ss, myspec[i][0]);
       if (myspec[i][0] < spec_limits(i)) {
 	for (int j = 1; j <= myspec[i][0]; j++)
-	  fprintf(outfp, " %d", myspec[i][j]);
+	  fprintf(specfp, " %d", myspec[i][j]);
       }
-      fprintf(outfp, "\n");
+      fprintf(specfp, "\n");
     }
   }
   if (strlen(myargs->input0) > 0)
-    fprintf(outfp, "INPUT0 %s\n", myargs->input0);
+    fprintf(specfp, "INPUT0 %s\n", myargs->input0);
   if (strlen(myargs->input1) > 0)
-    fprintf(outfp, "INPUT1 %s\n", myargs->input1);
+    fprintf(specfp, "INPUT1 %s\n", myargs->input1);
   if (strlen(myargs->input2) > 0)
-    fprintf(outfp, "INPUT2 %s\n", myargs->input2);
+    fprintf(specfp, "INPUT2 %s\n", myargs->input2);
   if (strlen(myargs->mask) > 0)
-    fprintf(outfp, "MASK %s\n", myargs->mask);
+    fprintf(specfp, "MASK %s\n", myargs->mask);
   if (strlen(myargs->initvals) > 0)
-    fprintf(outfp, "INIT %s\n", myargs->initvals);
+    fprintf(specfp, "INIT %s\n", myargs->initvals);
   if (strlen(myargs->output) > 0)
-    fprintf(outfp, "OUTPUT %s\n", myargs->output);
-  fclose(outfp);
-  for (int j = 0; j < TOTAL; j++) if (myspec[j]) free(myspec[j]);
-  free(myspec);
+    fprintf(specfp, "OUTPUT %s\n", myargs->output);
+  fclose(specfp);
 }
 
 // read test spec from file
@@ -251,6 +261,13 @@ bool test_L_TDA_loop(testargs *myargs, spec inspec, int **specptr,
   return testerror;
 }
 
+// free test spec
+void free_test_spec(int **myspec)
+{
+  for (int j = 0; j < TOTAL; j++) if (myspec[j]) free(myspec[j]);
+  free(myspec);
+}
+
 // if select, loop over type for each select operator
 bool test_loop(testargs *myargs, spec inspec, bool (*g)(testargs *))
 {
@@ -258,8 +275,7 @@ bool test_loop(testargs *myargs, spec inspec, bool (*g)(testargs *))
   bool testerror;
   if (inspec == SELOP) testerror = test_L_TDA_loop(myargs, inspec, myspec, g);
   else testerror = test_L_DA_loop(myargs, inspec, myspec, g); // run test
-  for (int j = 0; j < TOTAL; j++) if (myspec[j]) free(myspec[j]);
-  free(myspec);
+  free_test_spec(myspec);
   return testerror;
 }
 
@@ -267,7 +283,7 @@ bool test_loop(testargs *myargs, spec inspec, bool (*g)(testargs *))
 bool get_spec_list(testargs *myargs, spec inspec, bool (*g)(testargs *))
 {
   char lfname[256];
-  sprintf(lfname, "data/specfiles/%s.spec", myargs->testbase);
+  sprintf(lfname, "data/specfiles/%s.list", myargs->testbase);
   FILE *infp; // file with list of spec files
 
   if ((strlen(myargs->spectest) == 0) && (infp = fopen(lfname, "r"))) {

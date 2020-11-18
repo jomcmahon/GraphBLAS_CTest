@@ -56,7 +56,7 @@ bool find_in_list(int *list, int f, int size)
   return false;
 }
 
-void default_spec(testargs *myargs, int **specptr)
+void spec_iteration(int **specptr)
 {
   int b = 0, *blocked = malloc(9 * sizeof(int));
   blocked[b++] = find_UnaryOp(GrB_MINV_BOOL); // dont test MINV_BOOL
@@ -69,14 +69,9 @@ void default_spec(testargs *myargs, int **specptr)
   blocked[b++] = find_UnaryOp(GrB_MINV_INT64); // dont test MINV_BOOL
   blocked[b++] = find_UnaryOp(GrB_MINV_UINT64); // dont test MINV_BOOL
 
-  if (!specptr[UNOP]) {
-    set_test_spec(UNOP, num_UnaryOps() - 9, specptr);
-    for (int i = 0, actual = 1; i < num_UnaryOps(); i++)
-      if (!find_in_list(blocked, i, 9)) specptr[UNOP][actual++] = i;
-  }
-
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
+  set_test_spec(UNOP, num_UnaryOps() - 9, specptr);
+  for (int i = 0, actual = 1; i < num_UnaryOps(); i++)
+    if (!find_in_list(blocked, i, 9)) specptr[UNOP][actual++] = i;
 }
 
 int main(int argc, char * argv[])
@@ -85,16 +80,15 @@ int main(int argc, char * argv[])
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "V1");
+  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
   if (myargs->generate) { // create spec files
-    sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
-    write_test_spec(myargs, default_spec);
-    char lfname[256];
-    sprintf(lfname, "data/specfiles/%s.spec", myargs->testbase);
-    FILE *outfp = fopen(lfname, "w"); // file with list of spec files
-    if (outfp) {
-      fprintf(outfp, "data/specfiles/%s.def\n", myargs->testbase);
-      fclose(outfp);
-    }
+    int **myspec = spec_from_args(myargs); // args
+    spec_iteration(myspec); // whole iteration for gen
+    testargs *myargsC = malloc(sizeof(testargs)); // copy rgs
+    memcpy(myargsC, myargs, sizeof(testargs));
+    print_test_spec(myargsC, myspec, "D"); // default
+    free(myargsC); free_test_spec(myspec);
   }
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);

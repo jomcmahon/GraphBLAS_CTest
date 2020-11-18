@@ -47,30 +47,21 @@ bool run_tran(testargs *myargs)
   return testerror;
 }
 
-void default_spec(testargs *myargs, int **specptr)
-{
-  if (!specptr[TYPE]) set_test_spec(TYPE, num_Types(), specptr); // all types
-
-  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "A");
-  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
-}
-
 int main(int argc, char * argv[])
 {
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
+  if (strlen(myargs->input0) == 0) strcpy(myargs->input0, "A");
+  if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
   if (myargs->generate) { // create spec files
-    sprintf(myargs->spectest, "data/specfiles/%s.def", myargs->testbase);
-    write_test_spec(myargs, default_spec);
-    char lfname[256];
-    sprintf(lfname, "data/specfiles/%s.spec", myargs->testbase);
-    FILE *outfp = fopen(lfname, "w"); // file with list of spec files
-    if (outfp) {
-      fprintf(outfp, "data/specfiles/%s.def\n", myargs->testbase);
-      fclose(outfp);
-    }
+    int **myspec = spec_from_args(myargs); // args
+    set_test_spec(TYPE, num_Types(), myspec); // whole iteration for gen
+    testargs *myargsC = malloc(sizeof(testargs));
+    memcpy(myargsC, myargs, sizeof(testargs));
+    print_test_spec(myargsC, myspec, "D");
+    free(myargsC); free_test_spec(myspec);
   }
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
