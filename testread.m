@@ -9,6 +9,7 @@ inputs
 
 mkdir("data") ;
 mkdir("data/testread") ;
+mkdir("data/specfiles") ;
 mmwrite("data/testread/A.mm", A) ;
 mmwrite("data/testread/B.mm", B) ;
 mmwrite("data/testread/M.mm", Mask) ;
