@@ -65,13 +65,17 @@ runall: $(EXES)
 
 genall: $(EXES)
 	mkdir -p ./data/specfiles
+	./testinit -g
 	for x in $(EXES); do mkdir -p ./data/$$x ; done
 	for x in $(EXES); do ./$$x -g > ./data/$$x/$$x.out ; done
 
 unit: $(UNITS)
 	for x in $(UNITS); do ./$$x; done
 
-test%: test%.o gen_default.o $(UTILLIB)
+testinit: testinit.o gen_default.o $(UTILLIB)
+	$(CXX) $(CXXFLAGS) $^ $(LOADLIBS) -o $@
+
+test%: test%.o $(UTILLIB)
 	$(CXX) $(CXXFLAGS) $^ $(LOADLIBS) -o $@
 
 $(UTILLIB): $(UTILOBJ)

@@ -9,7 +9,6 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
-#include "gen_default.h"
 
 bool run_MSel(testargs *myargs)
 {
@@ -56,8 +55,6 @@ int main(int argc, char * argv[])
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
-
-  iterate_defs(myargs, "A", "", "", "", SELOP_I);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 

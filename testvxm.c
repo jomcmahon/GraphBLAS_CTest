@@ -9,7 +9,6 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
-#include "gen_default.h"
 
 bool run_vxm(testargs *myargs)
 {
@@ -60,8 +59,6 @@ int main(int argc, char * argv[])
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
-
-  iterate_defs(myargs, "V1", "A", "V1", "V2", SEMI_I);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 

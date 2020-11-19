@@ -9,7 +9,9 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
-#include "gen_default.h"
+
+typedef enum { TYPE_I, MON_I, ANY_I, PAIR_I, PLUS_I, MIN_I, MINV_I, EADDM_I,
+	       SELOP_I, SEMI_I, TOTAL_I } iter_spec;
 
 bool find_in_list(int *list, int f, int size)
 {
@@ -215,31 +217,118 @@ void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *iv,
   if (strlen(myargs->input2) == 0) strcpy(myargs->input2, i2);
   if (strlen(myargs->output) == 0) strcpy(myargs->output, "C");
   if (myargs->generate) { // create spec files
-    int **myspec = spec_from_args(myargs); // args
-    set_test_spec(TYPE, num_Types(), myspec); // whole iteration for gen
-    testargs *myargsC = malloc(sizeof(testargs));
+    testargs *myargsC = malloc(sizeof(testargs)); // copy args
     memcpy(myargsC, myargs, sizeof(testargs));
-    print_test_spec(myargsC, myspec, "D");
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->input0, i0); if (A_flag) strcat(myargsC->input0, "A");
+
+    char i0str[64], ostr[64];
+    strcpy(i0str, myargsC->input0); strcpy(ostr, myargsC->output);
+    sprintf(myargsC->output, "%sD", ostr);
+    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+
+    sprintf(myargsC->output, "%sA", ostr);
+    if (A_flag) sprintf(myargsC->input0, "%sA", i0str);
     strcpy(myargsC->input1, "ALL");
     if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "ALL");
-    print_test_spec(myargsC, myspec, "A");
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->input0, i0); if (A_flag) strcat(myargsC->input0, "R");
+    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+
+    sprintf(myargsC->output, "%sR", ostr);
+    if (A_flag) sprintf(myargsC->input0, "%sR", i0str);
     strcpy(myargsC->input1, "I_RANGE");
     if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_RANGE");
-    print_test_spec(myargsC, myspec, "R");
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->input0, i0); if (A_flag) strcat(myargsC->input0, "S");
+    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+
+    sprintf(myargsC->output, "%sS", ostr);
+    if (A_flag) sprintf(myargsC->input0, "%sS", i0str);
     strcpy(myargsC->input1, "I_STRIDE");
     if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_STRIDE");
-    print_test_spec(myargsC, myspec, "S");
-    memcpy(myargsC, myargs, sizeof(testargs));
-    strcpy(myargsC->input0, i0); if (A_flag) strcat(myargsC->input0, "B");
+    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+
+    sprintf(myargsC->output, "%sB", ostr);
+    if (A_flag) sprintf(myargsC->input0, "%sB", i0str);
     strcpy(myargsC->input1, "I_BACK");
     if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_BACK");
-    print_test_spec(myargsC, myspec, "B");
-    free(myargsC); free_test_spec(myspec);
+    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
   }
+}
+
+void clear_args(testargs *myargs, char *testbasestr)
+{
+  for (int i = 0; i < TOTAL; i++) myargs->specobj[i] = -1;
+  myargs->mask[0] = '\0'; // empty strings for filenames
+  myargs->input0[0] = '\0';
+  myargs->input1[0] = '\0';
+  myargs->input2[0] = '\0';
+  myargs->initvals[0] = '\0';
+  myargs->output[0] = '\0';
+  myargs->spectest[0] = '\0';
+  strcpy(myargs->inbase, "testread"); // default input directory
+  strcpy(myargs->testbase, testbasestr);
+}
+
+void gen_all_defaults()
+{
+  testargs *myargs = malloc(sizeof(testargs));
+  myargs->generate = true;
+  clear_args(myargs, "testeAddM");
+  iterate_defs(myargs, "A", "B", "", "", EADDM_I);
+  clear_args(myargs, "testeAddV");
+  iterate_defs(myargs, "V1", "V2", "", "", PAIR_I);
+  clear_args(myargs, "testeMultM");
+  iterate_defs(myargs, "A", "B", "", "", ANY_I);
+  clear_args(myargs, "testeMultV");
+  iterate_defs(myargs, "V1", "V2", "", "", ANY_I);
+  clear_args(myargs, "testkron");
+  iterate_defs(myargs, "A", "B", "", "", PLUS_I);
+  clear_args(myargs, "testMAppl");
+  iterate_defs(myargs, "A", "", "", "", MINV_I);
+  clear_args(myargs, "testMRed");
+  iterate_defs(myargs, "A", "", "", "", MIN_I);
+  clear_args(myargs, "testMSel");
+  iterate_defs(myargs, "A", "", "", "", SELOP_I);
+  clear_args(myargs, "testMTRed");
+  iterate_defs(myargs, "A", "", "", "", MON_I);
+  clear_args(myargs, "testmxm");
+  iterate_defs(myargs, "A", "B", "M", "A", SEMI_I);
+  clear_args(myargs, "testmxv");
+  iterate_defs(myargs, "A", "V2", "V1", "V2", SEMI_I);
+  clear_args(myargs, "testtran");
+  iterate_defs(myargs, "A", "", "", "", TYPE_I);
+  clear_args(myargs, "testVAppl");
+  iterate_defs(myargs, "V1", "", "", "", MINV_I);
+  clear_args(myargs, "testVSel");
+  iterate_defs(myargs, "V1", "", "", "", SELOP_I);
+  clear_args(myargs, "testVTRed");
+  iterate_defs(myargs, "V1", "", "", "", MON_I);
+  clear_args(myargs, "testvxm");
+  iterate_defs(myargs, "V1", "A", "V1", "V2", SEMI_I);
+  clear_args(myargs, "testCAssn");
+  index_defs(myargs, "CE", "A_row", "", "A", true);
+  clear_args(myargs, "testCExtr");
+  index_defs(myargs, "A", "A_row", "", "", false);
+  clear_args(myargs, "testCSubA");
+  index_defs(myargs, "CE", "A_row", "", "A", true);
+  clear_args(myargs, "testMAssn");
+  index_defs(myargs, "ME", "A_row", "A_col", "A", true);
+  clear_args(myargs, "testMExtr");
+  index_defs(myargs, "A", "A_row", "A_col", "", false);
+  clear_args(myargs, "testMSubA");
+  index_defs(myargs, "ME", "A_row", "A_col", "A", true);
+  clear_args(myargs, "testMTAssn");
+  index_defs(myargs, "", "A_row", "A_col", "A", false);
+  clear_args(myargs, "testMTSubA");
+  index_defs(myargs, "", "A_row", "A_col", "A", false);
+  clear_args(myargs, "testRAssn");
+  index_defs(myargs, "CE", "A_col", "", "A", true);
+  clear_args(myargs, "testRSubA");
+  index_defs(myargs, "CE", "A_col", "", "A", true);
+  clear_args(myargs, "testVAssn");
+  index_defs(myargs, "VE", "V1_ind", "", "V1", true);
+  clear_args(myargs, "testVExtr");
+  index_defs(myargs, "V1", "V1_ind", "", "", false);
+  clear_args(myargs, "testVSubA");
+  index_defs(myargs, "VE", "V1_ind", "", "V1", true);
+  clear_args(myargs, "testVTAssn");
+  index_defs(myargs, "", "V1_ind", "", "V1", false);
+  clear_args(myargs, "testVTSubA");
+  index_defs(myargs, "", "V1_ind", "", "V1", false);
 }

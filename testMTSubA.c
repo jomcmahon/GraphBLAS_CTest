@@ -9,7 +9,6 @@
 
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
-#include "gen_default.h"
 
 bool run_MTSubA(testargs *myargs)
 {
@@ -68,8 +67,6 @@ int main(int argc, char * argv[])
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
-
-  index_defs(myargs, "", "A_row", "A_col", "A", false);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
