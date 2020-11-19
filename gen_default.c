@@ -208,7 +208,7 @@ void iterate_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
   }
 }
 
-void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *iv,
+void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *m, char *iv,
 		bool A_flag)
 {
   if (strlen(myargs->initvals) == 0) strcpy(myargs->initvals, iv);
@@ -223,31 +223,31 @@ void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *iv,
     char i0str[64], ostr[64];
     strcpy(i0str, myargsC->input0); strcpy(ostr, myargsC->output);
     sprintf(myargsC->output, "%sD", ostr);
-    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+    iterate_defs(myargsC, i0, i1, m, "", TYPE_I);
 
     sprintf(myargsC->output, "%sA", ostr);
     if (A_flag) sprintf(myargsC->input0, "%sA", i0str);
     strcpy(myargsC->input1, "ALL");
     if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "ALL");
-    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+    iterate_defs(myargsC, i0, i1, m, "", TYPE_I);
 
     sprintf(myargsC->output, "%sR", ostr);
     if (A_flag) sprintf(myargsC->input0, "%sR", i0str);
     strcpy(myargsC->input1, "I_RANGE");
     if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_RANGE");
-    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+    iterate_defs(myargsC, i0, i1, m, "", TYPE_I);
 
     sprintf(myargsC->output, "%sS", ostr);
     if (A_flag) sprintf(myargsC->input0, "%sS", i0str);
     strcpy(myargsC->input1, "I_STRIDE");
     if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_STRIDE");
-    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+    iterate_defs(myargsC, i0, i1, m, "", TYPE_I);
 
     sprintf(myargsC->output, "%sB", ostr);
     if (A_flag) sprintf(myargsC->input0, "%sB", i0str);
     strcpy(myargsC->input1, "I_BACK");
     if (strlen(myargsC->input2) > 0) strcpy(myargsC->input2, "I_BACK");
-    iterate_defs(myargsC, i0, i1, "", "", TYPE_I);
+    iterate_defs(myargsC, i0, i1, m, "", TYPE_I);
   }
 }
 
@@ -302,33 +302,33 @@ void gen_all_defaults()
   clear_args(myargs, "testvxm");
   iterate_defs(myargs, "V1", "A", "V1", "V2", SEMI_I);
   clear_args(myargs, "testCAssn");
-  index_defs(myargs, "CE", "A_row", "", "A", true);
+  index_defs(myargs, "CE", "A_row", "", "", "A", true);
   clear_args(myargs, "testCExtr");
-  index_defs(myargs, "A", "A_row", "", "", false);
+  index_defs(myargs, "A", "A_row", "", "", "", false);
   clear_args(myargs, "testCSubA");
-  index_defs(myargs, "CE", "A_row", "", "A", true);
+  index_defs(myargs, "CE", "A_row", "", "", "A", true);
   clear_args(myargs, "testMAssn");
-  index_defs(myargs, "ME", "A_row", "A_col", "A", true);
+  index_defs(myargs, "ME", "A_row", "A_col", "", "A", true);
   clear_args(myargs, "testMExtr");
-  index_defs(myargs, "A", "A_row", "A_col", "", false);
+  index_defs(myargs, "A", "A_row", "A_col", "", "", false);
   clear_args(myargs, "testMSubA");
-  index_defs(myargs, "ME", "A_row", "A_col", "A", true);
+  index_defs(myargs, "ME", "A_row", "A_col", "", "A", true);
   clear_args(myargs, "testMTAssn");
-  index_defs(myargs, "", "A_row", "A_col", "A", false);
+  index_defs(myargs, "", "A_row", "A_col", "", "A", false);
   clear_args(myargs, "testMTSubA");
-  index_defs(myargs, "", "A_row", "A_col", "A", false);
+  index_defs(myargs, "", "A_row", "A_col", "", "A", false);
   clear_args(myargs, "testRAssn");
-  index_defs(myargs, "CE", "A_col", "", "A", true);
+  index_defs(myargs, "CE", "A_col", "", "", "A", true);
   clear_args(myargs, "testRSubA");
-  index_defs(myargs, "CE", "A_col", "", "A", true);
+  index_defs(myargs, "CE", "A_col", "", "", "A", true);
   clear_args(myargs, "testVAssn");
-  index_defs(myargs, "VE", "V1_ind", "", "V1", true);
+  index_defs(myargs, "VE", "V1_ind", "", "", "V1", true);
   clear_args(myargs, "testVExtr");
-  index_defs(myargs, "V1", "V1_ind", "", "", false);
+  index_defs(myargs, "V1", "V1_ind", "", "", "", false);
   clear_args(myargs, "testVSubA");
-  index_defs(myargs, "VE", "V1_ind", "", "V1", true);
+  index_defs(myargs, "VE", "V1_ind", "", "", "V1", true);
   clear_args(myargs, "testVTAssn");
-  index_defs(myargs, "", "V1_ind", "", "V1", false);
+  index_defs(myargs, "", "V1_ind", "", "", "V1", false);
   clear_args(myargs, "testVTSubA");
-  index_defs(myargs, "", "V1_ind", "", "V1", false);
+  index_defs(myargs, "", "V1_ind", "", "", "V1", false);
 }
