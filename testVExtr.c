@@ -28,7 +28,7 @@ bool run_VExtr(testargs *myargs)
   GrB_Vector A = NULL, C = NULL, M = NULL; // inputs and outputs
   TEST_OK(read_matlab_vector(myargs->inbase, myargs->input0, thetype, &A));
 
-  GrB_Index vsize, *I = NULL, ni = 0; // default for GrB_ALL
+  GrB_Index vsize = 0, *I = NULL, ni = 0; // default for GrB_ALL
   TEST_OK(GrB_Vector_size(&vsize, A)); // default for GrB_ALL
   TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
 
