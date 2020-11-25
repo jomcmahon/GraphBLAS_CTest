@@ -12,20 +12,23 @@
 
 bool run_MRed(testargs *myargs)
 {
+  bool testerror = false;
+  GrB_Info info = GrB_SUCCESS; // reset for next sub-test
   GrB_BinaryOp binop; get_BinaryOp(myargs->specobj[BINOP], &binop);
-  if (!binop) return false; // required
+  GrB_Monoid mon; get_Monoid(myargs->specobj[MON], &mon);
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
+
+  if ((!binop) && (!mon)) return false; // required
 
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
     GxB_print(binop, GxB_SUMMARY);
   }
 
-  bool testerror = false;
-  GrB_Info info = GrB_SUCCESS; // reset for next sub-test
-  GrB_Type xtype = NULL, ytype = NULL, ztype = NULL; // types defined by monoid
-  TEST_OK(get_types_binop(binop, &xtype, &ytype, &ztype));
+  GrB_Type xtype = NULL, ytype = NULL, ztype = NULL; // types defined by ops
+  if (binop) TEST_OK(get_types_binop(binop, &xtype, &ytype, &ztype));
+  else TEST_OK(get_types_monoid(mon, &xtype, &ytype, &ztype));
 
   GrB_Matrix A = NULL;
   GrB_Vector C = NULL, M = NULL;
@@ -39,7 +42,8 @@ bool run_MRed(testargs *myargs)
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 
-  TEST_OK(GrB_reduce(C, M, accum, binop, A, desc)); // do the operation
+  if (binop) TEST_OK(GrB_reduce(C, M, accum, binop, A, desc));
+  else TEST_OK(GrB_reduce(C, M, accum, mon, A, desc)); // do the operation
 
   if (myargs->generate) // if generating, write to file
     TEST_OK(write_typed_vector(myargs->testbase, myargs->output, ztype, C));

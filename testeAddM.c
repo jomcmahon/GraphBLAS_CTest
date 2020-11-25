@@ -14,22 +14,25 @@ bool run_eAddM(testargs *myargs)
 {
   bool testerror = false;
   GrB_Info info = GrB_SUCCESS; // reset for next sub-test
-  GrB_Type xtype, ytype, ztype; // types defined by semiring or binary op
-  GrB_BinaryOp binop = NULL;
+  GrB_BinaryOp binop; get_BinaryOp(myargs->specobj[BINOP], &binop);
+  GrB_Monoid mon; get_Monoid(myargs->specobj[MON], &mon);
   GrB_Semiring semi; get_Semiring(myargs->specobj[SEMI], &semi);
-  if (!semi) { // if no semiring, try binop
-    get_BinaryOp(myargs->specobj[BINOP], &binop);
-    if (!binop) return false; // semi or binaryop is required
-    TEST_OK(get_types_binop(binop, &xtype, &ytype, &ztype));
-  } else TEST_OK(get_types_semiring(semi, &xtype, &ytype, &ztype));
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
+
+  if ((!binop) && (!mon) && (!semi)) return false; // must have one of these
+  if (semi) TEST_OK(GxB_Semiring_add(&mon, semi));
+  if (mon) TEST_OK(GxB_Monoid_operator(&binop, mon));
 
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
     if (semi) GxB_print(semi, GxB_SUMMARY);
+    else if (mon) GxB_print(mon, GxB_SUMMARY);
     else GxB_print(binop, GxB_SUMMARY);
   }
+
+  GrB_Type xtype = NULL, ytype = NULL, ztype = NULL; // binary op defines type
+  TEST_OK(get_types_binop(binop, &xtype, &ytype, &ztype));
 
   GrB_Matrix A = NULL, B = NULL, C = NULL, M = NULL; // inputs and outputs
   TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, xtype, &A));
@@ -48,6 +51,7 @@ bool run_eAddM(testargs *myargs)
 			       &C));
 
   if (semi) TEST_OK(GrB_eWiseAdd(C, M, accum, semi, A, B, desc));
+  else if (mon) TEST_OK(GrB_eWiseAdd(C, M, accum, mon, A, B, desc));
   else TEST_OK(GrB_eWiseAdd(C, M, accum, binop, A, B, desc));
 
   if (myargs->generate) // if generating, write to file

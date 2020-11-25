@@ -10,31 +10,30 @@
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
 
-void fdiff(void *z, const void *x, const void *y) {
-  float delta = (* ((float *) x)) - (* ((float *) y)) ;
-  (*((float *) z)) = delta * delta ;
-}
-
 bool run_eAddV(testargs *myargs)
 {
+  bool testerror = false;
+  GrB_Info info = GrB_SUCCESS; // reset for next sub-test
   GrB_BinaryOp binop; get_BinaryOp(myargs->specobj[BINOP], &binop);
-  if (!binop) return false; // required
+  GrB_Monoid mon; get_Monoid(myargs->specobj[MON], &mon);
+  GrB_Semiring semi; get_Semiring(myargs->specobj[SEMI], &semi);
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
 
+  if ((!binop) && (!mon) && (!semi)) return false; // must have one of these
+  if (semi) TEST_OK(GxB_Semiring_add(&mon, semi));
+  if (mon) TEST_OK(GxB_Monoid_operator(&binop, mon));
+
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
-    GxB_print(binop, GxB_SUMMARY);
+    if (semi) GxB_print(semi, GxB_SUMMARY);
+    else if (mon) GxB_print(mon, GxB_SUMMARY);
+    else GxB_print(binop, GxB_SUMMARY);
   }
 
-  bool testerror = false;
-  GrB_Info info = GrB_SUCCESS; // reset for next sub-test
   GrB_Type xtype = NULL, ytype = NULL, ztype = NULL; // binary op defines type
   TEST_OK(get_types_binop(binop, &xtype, &ytype, &ztype));
 
-  if (ztype == GrB_FP32) // use user-defined for F32 type
-    TEST_OK(GrB_BinaryOp_new(&binop, fdiff, GrB_FP32, GrB_FP32, GrB_FP32));
-    
   GrB_Vector A = NULL, B = NULL, C = NULL, M = NULL; // inputs and outputs
   TEST_OK(read_matlab_vector(myargs->inbase, myargs->input0, xtype, &A));
   TEST_OK(read_matlab_vector(myargs->inbase, myargs->input1, ytype, &B));
@@ -48,7 +47,9 @@ bool run_eAddV(testargs *myargs)
   else // read initvals if file name specified
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->initvals, ztype, &C));
 
-  TEST_OK(GrB_eWiseAdd(C, M, accum, binop, A, B, desc)); // do the operation
+  if (semi) TEST_OK(GrB_eWiseAdd(C, M, accum, semi, A, B, desc));
+  else if (mon) TEST_OK(GrB_eWiseAdd(C, M, accum, mon, A, B, desc));
+  else TEST_OK(GrB_eWiseAdd(C, M, accum, binop, A, B, desc));
 
   if (myargs->generate) // if generating, write to file
     TEST_OK(write_typed_vector(myargs->testbase, myargs->output, ztype, C));

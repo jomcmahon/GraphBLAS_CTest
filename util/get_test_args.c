@@ -314,6 +314,9 @@ testargs *get_test_args(int argc, char **argv)
   strcpy(myargs->inbase, "testread"); // default input directory
   strcpy(myargs->testbase, basename(argv[0])); // default output directory
 
+  for (int i = strlen(myargs->testbase) - 1; i >= 0; i--)
+    if (myargs->testbase[i] == '.') myargs->testbase[i] = '\0';
+
   if (argc == 1) return myargs; // no arguments or options
 
   int c, ui, ni, li, ti, bi, si, di, ai; // default no spec
