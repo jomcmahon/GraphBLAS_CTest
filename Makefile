@@ -72,9 +72,6 @@ genall: $(EXES)
 unit: $(UNITS)
 	for x in $(UNITS); do ./$$x; done
 
-testinit: testinit.o gen_default.o $(UTILLIB)
-	$(CXX) $(CXXFLAGS) $^ $(LOADLIBS) -o $@
-
 test%: test%.o $(UTILLIB)
 	$(CXX) $(CXXFLAGS) $^ $(LOADLIBS) -o $@
 

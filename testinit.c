@@ -16,11 +16,8 @@ int main(int argc, char * argv[])
 {
   GrB_Info info;
   OK(GrB_init(GrB_BLOCKING));
-  testargs *myargs = get_test_args(argc, argv);
 
   printf("init: PASSED\n");
-
-  if (myargs->generate) gen_all_defaults();
 
   OK(GrB_finalize());
   printf("finalize: PASSED\n");

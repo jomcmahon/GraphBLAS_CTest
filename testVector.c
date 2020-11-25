@@ -138,7 +138,7 @@ int main(int argc, char * argv[])
   TEST_COND(testok, "unit test vector user-defined type");
 #endif
 
-  OK(GrB_finalize());
   free(I); free(Xspace);
+  OK(GrB_finalize());
   return testerror;
 }

@@ -74,10 +74,6 @@ void get_SelectOp(int, GxB_SelectOp *);
 
 // methods for argument and spec manipulation
 void print_args(testargs *, GrB_Descriptor, GrB_BinaryOp);
-void free_test_spec(int **);
-int **spec_from_args(testargs *);
-void print_test_spec(testargs *, int **, char *);
-void set_test_spec(spec, int, int **);
 testargs *get_test_args(int argc, char **argv);
 bool get_spec_list(testargs *, spec, bool (*g)(testargs *));
 
