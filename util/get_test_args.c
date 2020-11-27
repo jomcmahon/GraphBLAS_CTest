@@ -136,7 +136,7 @@ int **new_spec()
 // get spec from input options
 int **spec_from_args(testargs *myargs)
 {
-  int **myspec = malloc(TOTAL * sizeof(int *)); // fill test spec from args
+  int **myspec = new_spec();
   for (int j = 0; j < TOTAL; j++) { // initialize test spec
     if (myargs->specobj[j] >= spec_limits(j)) { // one value for whole range
       myspec[j] = malloc(sizeof(int));
@@ -144,7 +144,7 @@ int **spec_from_args(testargs *myargs)
     } else if (myargs->specobj[j] >= 0) { // one value in array from args
       myspec[j] = malloc(2 * sizeof(int));
       myspec[j][0] = 1; myspec[j][1] = myargs->specobj[j];
-    } else myspec[j] = NULL; // no iteration for that spec category
+    }
   }
   return myspec;
 }
@@ -273,6 +273,7 @@ bool get_spec_list(testargs *myargs, spec inspec, bool (*g)(testargs *))
     gen_default(myargs->testbase); // defaults
     int **myspec = spec_from_args(myargs);
     if (strlen(myargs->spectest) > 0) print_spec(myargs, myspec);
+    free_test_spec(myspec);
   }
 
   char lfname[256];
