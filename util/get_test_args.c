@@ -264,13 +264,10 @@ bool test_loop(testargs *myargs, bool (*g)(testargs *))
   return testerror;
 }
 
-void gen_default(char *);
-
 // read default file for list of spec files
 bool test_spec_loop(testargs *myargs, bool (*g)(testargs *))
 {
   if (myargs->generate) { // if spec file given, generate it
-    gen_default(myargs->testbase); // defaults
     int **myspec = spec_from_args(myargs);
     if (strlen(myargs->spectest) > 0) print_spec(myargs, myspec);
     free_test_spec(myspec);

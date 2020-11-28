@@ -72,6 +72,9 @@ genall: $(EXES)
 unit: $(UNITS)
 	for x in $(UNITS); do ./$$x; done
 
+spec: testspec
+	for x in $(EXES); do ./testspec -g $$x; done
+
 test%: test%.o $(UTILLIB)
 	$(CXX) $(CXXFLAGS) $^ $(LOADLIBS) -o $@
 
