@@ -16,7 +16,7 @@ void print_spec(testargs *, int **);
 testargs *new_args(char *);
 int **new_spec();
 
-typedef enum { TYPE_I, MON_I, ANY_I, PAIR_I, PLUS_I, MIN_I, MINV_I, EADDM_I,
+typedef enum { TYPE_I, MON_I, ANY_I, PAIR_I, PLUS_I, MIN_I, MINV_I, E1_I, E2_I,
 	       SELOP_I, SEMI_I, TOTAL_I } iter_spec;
 
 bool find_in_list(int *list, int f, int size)
@@ -180,11 +180,16 @@ void binop_iteration_min(int **sptr)
   sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_FP64);
 }
 
-void eAddM_iteration(int **sptr)
+void eWise1_iteration(int **sptr)
 {
   set_test_spec(DESC, 4, sptr); // first four
   set_test_spec(SEMI, 1, sptr); // allocate array
   sptr[SEMI][1] = find_Semiring(GxB_ANY_PAIR_BOOL);
+}
+
+void eWise2_iteration(int **sptr)
+{
+  set_test_spec(DESC, 4, sptr); // first four
   set_test_spec(BINOP, num_Types() - 1, sptr); // allocate array
   int g = 1;
   sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_INT8);
@@ -216,7 +221,8 @@ void defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
   case PLUS_I: binop_iteration_plus(myspec); break; // PLUS binops
   case MIN_I: binop_iteration_min(myspec); break; // PLUS binops
   case MINV_I: unop_iteration_minv(myspec); break; // MINV unops
-  case EADDM_I: eAddM_iteration(myspec); break; // eAddM
+  case E1_I: eWise1_iteration(myspec); break; // eAddM
+  case E2_I: eWise2_iteration(myspec); break; // eAddM
   case SELOP_I: set_test_spec(TYPE, num_Types(), myspec); // all types
     set_test_spec(SELOP, num_SelectOps(), myspec); break; // all selops
   case SEMI_I: semi_iteration_plus_times(myspec); break; // semirings
@@ -277,6 +283,12 @@ void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
   defs(myargsC, i0str, "I_BACK", i2str, m, "", "CB", TYPE_I);
 }
 
+void ewise_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv)
+{
+  defs(myargs, i0, i1, "", m, iv, "CS", E1_I);
+  defs(myargs, i0, i1, "", m, iv, "CB", E2_I);
+}
+
 void iterate_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
                  iter_spec iter_sel)
 {
@@ -287,7 +299,7 @@ void gen_default(char *testbase)
 {
   testargs *myargs = new_args(testbase);
   if (strcmp(testbase, "testeAddM") == 0)
-    iterate_defs(myargs, "A", "B", "", "", EADDM_I);
+    ewise_defs(myargs, "A", "B", "", "");
   else if (strcmp(testbase, "testeAddV") == 0)
     iterate_defs(myargs, "V1", "V2", "", "", PAIR_I);
   else if (strcmp(testbase, "testeAddVU") == 0)

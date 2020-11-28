@@ -52,14 +52,5 @@ bool run_VSel(testargs *myargs)
 
 int main(int argc, char * argv[])
 {
-  GrB_Info info;
-  OK(GrB_init(GrB_BLOCKING));
-  testargs *myargs = get_test_args(argc, argv);
-
-  printf("Running %s:\n", myargs->testbase); fflush(stdout);
-
-  bool testerror = get_spec_list(myargs, SELOP, run_VSel);
-
-  OK(GrB_finalize());
-  return testerror;
+  return run_test(argc, argv, run_VSel);
 }

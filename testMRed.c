@@ -23,12 +23,13 @@ bool run_MRed(testargs *myargs)
 
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
-    GxB_print(binop, GxB_SUMMARY);
+    if (mon) GxB_print(mon, GxB_SUMMARY);
+    else GxB_print(binop, GxB_SUMMARY);
   }
 
   GrB_Type xtype = NULL, ytype = NULL, ztype = NULL; // types defined by ops
-  if (binop) TEST_OK(get_types_binop(binop, &xtype, &ytype, &ztype));
-  else TEST_OK(get_types_monoid(mon, &xtype, &ytype, &ztype));
+  if (mon) TEST_OK(get_types_monoid(mon, &xtype, &ytype, &ztype));
+  else TEST_OK(get_types_binop(binop, &xtype, &ytype, &ztype));
 
   GrB_Matrix A = NULL;
   GrB_Vector C = NULL, M = NULL;
@@ -42,8 +43,8 @@ bool run_MRed(testargs *myargs)
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 
-  if (binop) TEST_OK(GrB_reduce(C, M, accum, binop, A, desc));
-  else TEST_OK(GrB_reduce(C, M, accum, mon, A, desc)); // do the operation
+  if (mon) TEST_OK(GrB_reduce(C, M, accum, mon, A, desc)); // do the operation
+  else TEST_OK(GrB_reduce(C, M, accum, binop, A, desc));
 
   if (myargs->generate) // if generating, write to file
     TEST_OK(write_typed_vector(myargs->testbase, myargs->output, ztype, C));
@@ -57,14 +58,5 @@ bool run_MRed(testargs *myargs)
 
 int main(int argc, char * argv[])
 {
-  GrB_Info info;
-  OK(GrB_init(GrB_BLOCKING));
-  testargs *myargs = get_test_args(argc, argv);
-
-  printf("Running %s:\n", myargs->testbase); fflush(stdout);
-
-  bool testerror = get_spec_list(myargs, BINOP, run_MRed);
-
-  OK(GrB_finalize());
-  return testerror;
+  return run_test(argc, argv, run_MRed);
 }

@@ -52,6 +52,8 @@ bool run_VAppl(testargs *myargs)
     TEST_OK(GxB_Scalar_new(&scal, ytype));
     TEST_OK(GxB_Scalar_setElement(scal, 0));
     TEST_OK(GrB_apply(C, M, accum, binop, A, scal, desc));
+#else
+    return false;
 #endif
   }
 
@@ -67,14 +69,5 @@ bool run_VAppl(testargs *myargs)
 
 int main(int argc, char * argv[])
 {
-  GrB_Info info;
-  OK(GrB_init(GrB_BLOCKING));
-  testargs *myargs = get_test_args(argc, argv);
-
-  printf("Running %s:\n", myargs->testbase); fflush(stdout);
-
-  bool testerror = get_spec_list(myargs, UNOP, run_VAppl);
-
-  OK(GrB_finalize());
-  return testerror;
+  return run_test(argc, argv, run_VAppl);
 }

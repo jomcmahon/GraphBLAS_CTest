@@ -75,7 +75,7 @@ void get_SelectOp(int, GxB_SelectOp *);
 // methods for argument and spec manipulation
 void print_args(testargs *, GrB_Descriptor, GrB_BinaryOp);
 testargs *get_test_args(int argc, char **argv);
-bool get_spec_list(testargs *, spec, bool (*g)(testargs *));
+bool run_test(int, char **, bool (*g)(testargs *));
 
 // routines in separate files
 GrB_Info mm_matlab(GrB_Matrix *, FILE *, GrB_Type);

@@ -67,17 +67,5 @@ bool run_eAddM(testargs *myargs)
 
 int main(int argc, char * argv[])
 {
-  GrB_Info info;
-  OK(GrB_init(GrB_BLOCKING));
-  testargs *myargs = get_test_args(argc, argv);
-
-  printf("Running %s:\n", myargs->testbase); fflush(stdout);
-
-  testargs myargsC;
-  memcpy(&myargsC, myargs, sizeof(testargs));
-  bool testerror = get_spec_list(myargs, SEMI, run_eAddM);
-  testerror |= get_spec_list(&myargsC, BINOP, run_eAddM);
-
-  OK(GrB_finalize());
-  return testerror;
+  return run_test(argc, argv, run_eAddM);
 }

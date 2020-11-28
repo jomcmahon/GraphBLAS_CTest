@@ -201,10 +201,11 @@ bool test_D_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
 }
 
 // loop over object then descriptor and accumulator
-bool test_L_DA_loop(testargs *myargs, spec inspec, int **specptr,
-		    bool (*f)(testargs *))
+bool test_L_DA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
 {
-  if (!specptr[inspec]) return true; // error: must have outer loop
+  spec inspec = TOTAL;
+  for (int i = 0; i < TOTAL; i++) if (specptr[i]) { inspec = i; break; }
+  if (inspec == TOTAL) return true; // error: must have outer loop
   bool testerror = false;
   char bname[64]; strcpy(bname, myargs->output); // base from args
   int lim = specptr[inspec][0];
@@ -228,19 +229,18 @@ bool test_L_DA_loop(testargs *myargs, spec inspec, int **specptr,
 }
 
 // loop over object: type, descriptor and accumulator
-bool test_L_TDA_loop(testargs *myargs, spec inspec, int **specptr,
-		     bool (*f)(testargs *))
+bool test_L_TDA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
 {
-  assert (specptr[inspec]); // must have outer loop
+  assert (specptr[SELOP]); // must have outer loop
   bool testerror = false;
   char bname[64]; strcpy(bname, myargs->output); // base from args
-  int lim = specptr[inspec][0];
+  int lim = specptr[SELOP][0];
   for (int i = 0; i < lim; i++) { // outer loop
-    if (lim >= spec_limits(inspec)) myargs->specobj[inspec] = i; // whole range
-    else myargs->specobj[inspec] = specptr[inspec][i + 1]; // from spec
-    sprintf(myargs->output, "%s_%c%d", bname, fname_chars[inspec], // filename
-	    myargs->specobj[inspec]);
-    testerror |= test_L_DA_loop(myargs, TYPE, specptr, f);
+    if (lim >= spec_limits(SELOP)) myargs->specobj[SELOP] = i; // whole range
+    else myargs->specobj[SELOP] = specptr[SELOP][i + 1]; // from spec
+    sprintf(myargs->output, "%s_%c%d", bname, fname_chars[SELOP], // filename
+	    myargs->specobj[SELOP]);
+    testerror |= test_L_DA_loop(myargs, specptr, f);
   }
   strcpy(myargs->output, bname);
   return testerror;
@@ -254,12 +254,12 @@ void free_test_spec(int **myspec)
 }
 
 // if select, loop over type for each select operator
-bool test_loop(testargs *myargs, spec inspec, bool (*g)(testargs *))
+bool test_loop(testargs *myargs, bool (*g)(testargs *))
 {
   int **myspec = read_test_spec(myargs); // get the spec
   bool testerror;
-  if (inspec == SELOP) testerror = test_L_TDA_loop(myargs, inspec, myspec, g);
-  else testerror = test_L_DA_loop(myargs, inspec, myspec, g); // run test
+  if (myspec[SELOP]) testerror = test_L_TDA_loop(myargs, myspec, g);
+  else testerror = test_L_DA_loop(myargs, myspec, g); // run test
   free_test_spec(myspec);
   return testerror;
 }
@@ -267,7 +267,7 @@ bool test_loop(testargs *myargs, spec inspec, bool (*g)(testargs *))
 void gen_default(char *);
 
 // read default file for list of spec files
-bool get_spec_list(testargs *myargs, spec inspec, bool (*g)(testargs *))
+bool test_spec_loop(testargs *myargs, bool (*g)(testargs *))
 {
   if (myargs->generate) { // if spec file given, generate it
     gen_default(myargs->testbase); // defaults
@@ -285,11 +285,11 @@ bool get_spec_list(testargs *myargs, spec inspec, bool (*g)(testargs *))
     while (fscanf(infp, "%s", myargs->spectest) == 1) { // loop over lines
       testargs *myargsC = malloc(sizeof(testargs));
       memcpy(myargsC, myargs, sizeof(testargs));
-      testerror |= test_loop(myargsC, inspec, g);
+      testerror |= test_loop(myargsC, g);
       free(myargsC);
     }
     fclose(infp); return testerror;
-  } else return test_loop(myargs, inspec, g); // run test loop
+  } else return test_loop(myargs, g); // run test loop
 }
 
 // allocate and return clear args structure
@@ -349,4 +349,19 @@ testargs *get_test_args(int argc, char **argv)
     strcpy(myargs->testbase, argv[optind++]);
   }
   return myargs;
+}
+
+// read default file for list of spec files
+bool run_test(int argc, char **argv, bool (*g)(testargs *))
+{
+  GrB_Info info;
+  OK(GrB_init(GrB_BLOCKING));
+  testargs *myargs = get_test_args(argc, argv);
+
+  printf("Running %s:\n", myargs->testbase); fflush(stdout);
+
+  bool testerror = test_spec_loop(myargs, g);
+
+  OK(GrB_finalize());
+  return testerror;
 }
