@@ -16,9 +16,6 @@ void print_spec(testargs *, int **);
 testargs *new_args(char *);
 int **new_spec();
 
-typedef enum { TYPE_I, MON_I, ANY_I, PAIR_I, PLUS_I, MIN_I, MINV_I, E1_I, E2_I,
-	       SELOP_I, SEMI_I, TOTAL_I } iter_spec;
-
 bool find_in_list(int *list, int f, int size)
 {
   for (int i = 0; i < size; i++) if (f == list[i]) return true;
@@ -58,9 +55,32 @@ void set_test_spec(spec inspec, int lim, int **myspec)
   }
 }
 
-void semi_iteration_plus_times(int **sptr)
+// set spec to include all types
+void set_all_monoids(int **myspec)
 {
-  set_test_spec(DESC, 4, sptr); // first four
+  set_test_spec(MON, num_Monoids(), myspec);
+}
+
+// set spec to include all types
+void set_all_types(int **myspec)
+{
+  set_test_spec(TYPE, num_Types(), myspec);
+}
+
+// set spec to include all select ops
+void set_all_selops(int **myspec)
+{
+  set_test_spec(SELOP, num_SelectOps(), myspec);
+}
+
+// set spec to include first 4 descriptors
+void set_first_4_desc(int **myspec)
+{
+  set_test_spec(DESC, 4, myspec);
+}
+
+void semi_loop_plus_times(int **sptr)
+{
   set_test_spec(SEMI, num_Types(), sptr); // allocate array
   int g = 1;
   sptr[SEMI][g++] = find_Semiring(GxB_ANY_PAIR_BOOL);
@@ -93,9 +113,10 @@ void accum_iteration_plus(int **sptr)
   sptr[ACCUM][g++] = find_BinaryOp(GrB_PLUS_FP64);
 }
 
-void unop_iteration_minv(int **specptr)
+void unop_loop_no_minv(int **specptr)
 {
-  int b = 0, *blocked = malloc(9 * sizeof(int)); // don't test MINV ops
+  int num_b = 9;
+  int b = 0, *blocked = malloc(num_b * sizeof(int)); // don't test MINV ops
   blocked[b++] = find_UnaryOp(GrB_MINV_BOOL);
   blocked[b++] = find_UnaryOp(GrB_MINV_INT8);
   blocked[b++] = find_UnaryOp(GrB_MINV_UINT8);
@@ -106,14 +127,14 @@ void unop_iteration_minv(int **specptr)
   blocked[b++] = find_UnaryOp(GrB_MINV_INT64);
   blocked[b++] = find_UnaryOp(GrB_MINV_UINT64);
 
-  set_test_spec(UNOP, num_UnaryOps() - 9, specptr);
+  assert (b <= num_b);
+  set_test_spec(UNOP, num_UnaryOps() - b, specptr);
   for (int i = 0, actual = 1; i < num_UnaryOps(); i++)
-    if (!find_in_list(blocked, i, 9)) specptr[UNOP][actual++] = i;
+    if (!find_in_list(blocked, i, b)) specptr[UNOP][actual++] = i;
 }
 
-void binop_iteration_any(int **sptr)
+void binop_loop_any(int **sptr)
 {
-  set_test_spec(DESC, 4, sptr); // first four
   set_test_spec(BINOP, num_Types(), sptr); // allocate array
   int g = 1;
   sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_BOOL);
@@ -129,7 +150,7 @@ void binop_iteration_any(int **sptr)
   sptr[BINOP][g++] = find_BinaryOp(GxB_ANY_FP64);
 }
 
-void binop_iteration_pair(int **sptr)
+void binop_loop_pair(int **sptr)
 {
   set_test_spec(BINOP, num_Types(), sptr); // allocate array
   int g = 1;
@@ -146,7 +167,7 @@ void binop_iteration_pair(int **sptr)
   sptr[BINOP][g++] = find_BinaryOp(GxB_PAIR_FP64);
 }
 
-void binop_iteration_plus(int **sptr)
+void binop_loop_plus(int **sptr)
 {
   set_test_spec(BINOP, num_Types(), sptr); // allocate array
   int g = 1;
@@ -163,7 +184,7 @@ void binop_iteration_plus(int **sptr)
   sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_FP64);
 }
 
-void binop_iteration_min(int **sptr)
+void binop_loop_min(int **sptr)
 {
   set_test_spec(BINOP, num_Types(), sptr); // allocate array
   int g = 1;
@@ -180,54 +201,23 @@ void binop_iteration_min(int **sptr)
   sptr[BINOP][g++] = find_BinaryOp(GrB_MIN_FP64);
 }
 
-void eWise1_iteration(int **sptr)
+void select_defs(int **sptr)
 {
-  set_test_spec(DESC, 4, sptr); // first four
-  set_test_spec(SEMI, 1, sptr); // allocate array
-  sptr[SEMI][1] = find_Semiring(GxB_ANY_PAIR_BOOL);
+  set_all_selops(sptr);
+  set_all_types(sptr);
 }
 
-void eWise2_iteration(int **sptr)
-{
-  set_test_spec(DESC, 4, sptr); // first four
-  set_test_spec(BINOP, num_Types() - 1, sptr); // allocate array
-  int g = 1;
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_INT8);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_UINT8);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_INT16);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_UINT16);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_INT32);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_UINT32);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_INT64);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_UINT64);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_FP32);
-  sptr[BINOP][g++] = find_BinaryOp(GrB_PLUS_FP64);
-}
-
-void defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
-	  char *iv, char *out, iter_spec iter_sel)
+void loop_defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
+	       char *iv, char *out, void (*f)(int **))
 {
   strcpy(myargs->input0, i0);
   strcpy(myargs->input1, i1);
   strcpy(myargs->input2, i2);
   strcpy(myargs->output, out);
-  int **myspec = new_spec();
 
-  switch (iter_sel) {
-  case TYPE_I: set_test_spec(TYPE, num_Types(), myspec); break; // all types
-  case MON_I: set_test_spec(MON, num_Monoids(), myspec); break; // all monoids
-  case ANY_I: binop_iteration_any(myspec); break; // ANY binops
-  case PAIR_I: binop_iteration_pair(myspec); break; // PAIR binops
-  case PLUS_I: binop_iteration_plus(myspec); break; // PLUS binops
-  case MIN_I: binop_iteration_min(myspec); break; // PLUS binops
-  case MINV_I: unop_iteration_minv(myspec); break; // MINV unops
-  case E1_I: eWise1_iteration(myspec); break; // eAddM
-  case E2_I: eWise2_iteration(myspec); break; // eAddM
-  case SELOP_I: set_test_spec(TYPE, num_Types(), myspec); // all types
-    set_test_spec(SELOP, num_SelectOps(), myspec); break; // all selops
-  case SEMI_I: semi_iteration_plus_times(myspec); break; // semirings
-  default: break;
-  }
+  int **myspec = new_spec(); // create new spec
+  set_first_4_desc(myspec); // first four descriptors
+  f(myspec);
 
   testargs *myargsC = malloc(sizeof(testargs)); // copy args
   memcpy(myargsC, myargs, sizeof(testargs));
@@ -260,106 +250,132 @@ void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
   strcpy(myargs->initvals, iv);
 
   memcpy(myargsC, myargs, sizeof(testargs));
-  defs(myargsC, i0, i1, i2, m, "", "CD", TYPE_I);
+  loop_defs(myargsC, i0, i1, i2, m, iv, "CD", set_all_types);
 
   memcpy(myargsC, myargs, sizeof(testargs));
   if (A_flag) sprintf(i0str, "%sA", i0);
   if (strlen(i2) > 0) strcpy(i2str, "ALL");
-  defs(myargsC, i0str, "ALL", i2str, m, "", "CA", TYPE_I);
+  loop_defs(myargsC, i0str, "ALL", i2str, m, iv, "CA", set_all_types);
 
   memcpy(myargsC, myargs, sizeof(testargs));
   if (A_flag) sprintf(i0str, "%sR", i0);
   if (strlen(i2) > 0) strcpy(i2str, "I_RANGE");
-  defs(myargsC, i0str, "I_RANGE", i2str, m, "", "CR", TYPE_I);
+  loop_defs(myargsC, i0str, "I_RANGE", i2str, m, iv, "CR", set_all_types);
 
   memcpy(myargsC, myargs, sizeof(testargs));
   if (A_flag) sprintf(i0str, "%sS", i0);
   if (strlen(i2) > 0) strcpy(i2str, "I_STRIDE");
-  defs(myargsC, i0str, "I_STRIDE", i2str, m, "", "CS", TYPE_I);
+  loop_defs(myargsC, i0str, "I_STRIDE", i2str, m, iv, "CS", set_all_types);
 
   memcpy(myargsC, myargs, sizeof(testargs));
   if (A_flag) sprintf(i0str, "%sB", i0);
   if (strlen(i2) > 0) strcpy(i2str, "I_BACK");
-  defs(myargsC, i0str, "I_BACK", i2str, m, "", "CB", TYPE_I);
+  loop_defs(myargsC, i0str, "I_BACK", i2str, m, iv, "CB", set_all_types);
 }
 
-void ewise_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv)
+void unop_binop_defs(testargs *myargs, char *i0, char *m, char *iv)
 {
-  defs(myargs, i0, i1, "", m, iv, "CS", E1_I);
-  defs(myargs, i0, i1, "", m, iv, "CB", E2_I);
+  loop_defs(myargs, i0, "", "", m, iv, "CU", unop_loop_no_minv);
+#ifdef NOT_YET_SUPPORTED
+  loop_defs(myargs, i0, "", "", m, iv, "CB", binop_loop_min);
+#endif
 }
 
-void iterate_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
-                 iter_spec iter_sel)
+void two_op_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
+		 int op)
 {
-  defs(myargs, i0, i1, "", m, iv, "C", iter_sel);
+  if (op == 0) loop_defs(myargs, i0, i1, "", m, iv, "CB", binop_loop_plus);
+  else if (op == 1) loop_defs(myargs, i0, i1, "", m, iv, "CB", binop_loop_pair);
+  else if (op == 2) loop_defs(myargs, i0, i1, "", m, iv, "CB", binop_loop_any);
+  else loop_defs(myargs, i0, i1, "", m, iv, "CB", binop_loop_min);
+
+  loop_defs(myargs, i0, i1, "", m, iv, "CM", set_all_monoids);
+}
+
+void three_op_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
+		   int op)
+{
+  loop_defs(myargs, i0, i1, "", m, iv, "CS", semi_loop_plus_times);
+  two_op_defs(myargs, i0, i1, m, iv, op);
 }
 
 void gen_default(char *testbase)
 {
   testargs *myargs = new_args(testbase);
+
+  // operations that take three different op types
   if (strcmp(testbase, "testeAddM") == 0)
-    ewise_defs(myargs, "A", "B", "", "");
+    three_op_defs(myargs, "A", "B", "M", "A", 0); // use PLUS binops
   else if (strcmp(testbase, "testeAddV") == 0)
-    iterate_defs(myargs, "V1", "V2", "", "", PAIR_I);
+    three_op_defs(myargs, "V1", "V2", "V1", "V2", 1); // use PAIR binops
   else if (strcmp(testbase, "testeAddVU") == 0)
-    iterate_defs(myargs, "V1", "V2", "", "", PAIR_I);
+    three_op_defs(myargs, "V1", "V2", "V1", "V2", 1); // use PAIR binops
   else if (strcmp(testbase, "testeMultM") == 0)
-    iterate_defs(myargs, "A", "B", "", "", ANY_I);
+    three_op_defs(myargs, "A", "B", "M", "A", 2); // use ANY binops
   else if (strcmp(testbase, "testeMultV") == 0)
-    iterate_defs(myargs, "V1", "V2", "", "", ANY_I);
+    three_op_defs(myargs, "V1", "V2", "V1", "V2", 2); // use ANY binops
   else if (strcmp(testbase, "testkron") == 0)
-    iterate_defs(myargs, "A", "B", "", "", PLUS_I);
-  else if (strcmp(testbase, "testMAppl") == 0)
-    iterate_defs(myargs, "A", "", "", "", MINV_I);
+    three_op_defs(myargs, "A", "B", "M", "A", 0); // use PLUS binops
+
+  // operations that take two different op types
   else if (strcmp(testbase, "testMRed") == 0)
-    iterate_defs(myargs, "A", "", "", "", MIN_I);
-  else if (strcmp(testbase, "testMSel") == 0)
-    iterate_defs(myargs, "A", "", "", "", SELOP_I);
-  else if (strcmp(testbase, "testMTRed") == 0)
-    iterate_defs(myargs, "A", "", "", "", MON_I);
-  else if (strcmp(testbase, "testmxm") == 0)
-    iterate_defs(myargs, "A", "B", "M", "A", SEMI_I);
-  else if (strcmp(testbase, "testmxv") == 0)
-    iterate_defs(myargs, "A", "V2", "V1", "V2", SEMI_I);
-  else if (strcmp(testbase, "testtran") == 0)
-    iterate_defs(myargs, "A", "", "", "", TYPE_I);
+    two_op_defs(myargs, "A", "", "M", "A", 3); // use MIN binops
+
+  // operations that take unops or binops
+  else if (strcmp(testbase, "testMAppl") == 0)
+    unop_binop_defs(myargs, "A", "M", "A");
   else if (strcmp(testbase, "testVAppl") == 0)
-    iterate_defs(myargs, "V1", "", "", "", MINV_I);
+    unop_binop_defs(myargs, "V1", "V2", "V1");
+
+  // operations with a single object type
+  else if (strcmp(testbase, "testMSel") == 0)
+    loop_defs(myargs, "A", "", "", "M", "A", "C", select_defs);
   else if (strcmp(testbase, "testVSel") == 0)
-    iterate_defs(myargs, "V1", "", "", "", SELOP_I);
+    loop_defs(myargs, "V1", "", "", "V2", "V1", "C", select_defs);
+  else if (strcmp(testbase, "testMTRed") == 0)
+    loop_defs(myargs, "A", "", "", "M", "A", "C", set_all_monoids);
   else if (strcmp(testbase, "testVTRed") == 0)
-    iterate_defs(myargs, "V1", "", "", "", MON_I);
+    loop_defs(myargs, "V1", "", "", "V2", "V1", "C", set_all_monoids);
+  else if (strcmp(testbase, "testmxm") == 0)
+    loop_defs(myargs, "A", "B", "", "M", "A", "C", semi_loop_plus_times);
+  else if (strcmp(testbase, "testmxv") == 0)
+    loop_defs(myargs, "A", "V2", "", "V1", "V2", "C", semi_loop_plus_times);
   else if (strcmp(testbase, "testvxm") == 0)
-    iterate_defs(myargs, "V1", "A", "V1", "V2", SEMI_I);
-  else if (strcmp(testbase, "testCAssn") == 0)
-    index_defs(myargs, "CE", "A_row", "", "", "A", true);
+    loop_defs(myargs, "V1", "A", "", "V1", "V2", "C", semi_loop_plus_times);
+  else if (strcmp(testbase, "testtran") == 0)
+    loop_defs(myargs, "A", "", "", "", "", "C", set_all_types);
+
+  // operations that use different index patterns, any input is scalar
   else if (strcmp(testbase, "testCExtr") == 0)
-    index_defs(myargs, "A", "A_row", "", "", "", false);
-  else if (strcmp(testbase, "testCSubA") == 0)
-    index_defs(myargs, "CE", "A_row", "", "", "A", true);
-  else if (strcmp(testbase, "testMAssn") == 0)
-    index_defs(myargs, "ME", "A_row", "A_col", "", "A", true);
-  else if (strcmp(testbase, "testMExtr") == 0)
-    index_defs(myargs, "A", "A_row", "A_col", "", "", false);
-  else if (strcmp(testbase, "testMSubA") == 0)
-    index_defs(myargs, "ME", "A_row", "A_col", "", "A", true);
-  else if (strcmp(testbase, "testMTAssn") == 0)
-    index_defs(myargs, "", "A_row", "A_col", "", "A", false);
-  else if (strcmp(testbase, "testMTSubA") == 0)
-    index_defs(myargs, "", "A_row", "A_col", "", "A", false);
-  else if (strcmp(testbase, "testRAssn") == 0)
-    index_defs(myargs, "CE", "A_col", "", "", "A", true);
-  else if (strcmp(testbase, "testRSubA") == 0)
-    index_defs(myargs, "CE", "A_col", "", "", "A", true);
-  else if (strcmp(testbase, "testVAssn") == 0)
-    index_defs(myargs, "VE", "V1_ind", "", "", "V1", true);
+    index_defs(myargs, "A", "A_row", "", "M", "A", false);
   else if (strcmp(testbase, "testVExtr") == 0)
-    index_defs(myargs, "V1", "V1_ind", "", "", "", false);
-  else if (strcmp(testbase, "testVSubA") == 0)
-    index_defs(myargs, "VE", "V1_ind", "", "", "V1", true);
+    index_defs(myargs, "V1", "V1_ind", "", "V2", "V1", false);
+  else if (strcmp(testbase, "testMExtr") == 0)
+    index_defs(myargs, "A", "A_row", "A_col", "M", "A", false);
+  else if (strcmp(testbase, "testMTAssn") == 0)
+    index_defs(myargs, "", "A_row", "A_col", "M", "A", false);
+  else if (strcmp(testbase, "testMTSubA") == 0)
+    index_defs(myargs, "", "A_row", "A_col", "M", "A", false);
   else if (strcmp(testbase, "testVTAssn") == 0)
-    index_defs(myargs, "", "V1_ind", "", "", "V1", false);
+    index_defs(myargs, "", "V1_ind", "", "V2", "V1", false);
   else if (strcmp(testbase, "testVTSubA") == 0)
-    index_defs(myargs, "", "V1_ind", "", "", "V1", false);
+    index_defs(myargs, "", "V1_ind", "", "V2", "V1", false);
+
+  // operations that use different index patterns, input is vector or matrix
+  else if (strcmp(testbase, "testCAssn") == 0)
+    index_defs(myargs, "CE", "A_row", "", "M", "A", true);
+  else if (strcmp(testbase, "testCSubA") == 0)
+    index_defs(myargs, "CE", "A_row", "", "M", "A", true);
+  else if (strcmp(testbase, "testMAssn") == 0)
+    index_defs(myargs, "ME", "A_row", "A_col", "M", "A", true);
+  else if (strcmp(testbase, "testMSubA") == 0)
+    index_defs(myargs, "ME", "A_row", "A_col", "M", "A", true);
+  else if (strcmp(testbase, "testRAssn") == 0)
+    index_defs(myargs, "CE", "A_col", "", "M", "A", true);
+  else if (strcmp(testbase, "testRSubA") == 0)
+    index_defs(myargs, "CE", "A_col", "", "M", "A", true);
+  else if (strcmp(testbase, "testVAssn") == 0)
+    index_defs(myargs, "VE", "V1_ind", "", "V2", "V1", true);
+  else if (strcmp(testbase, "testVSubA") == 0)
+    index_defs(myargs, "VE", "V1_ind", "", "V2", "V1", true);
 }
