@@ -27,6 +27,7 @@ Mask = sparse (i (p), j (p), ones (length (p),1), m, n) + ...
 
 V1 = A(1,:) ;
 V2 = A(:,1) ;
+S = [ A(1:1) ] ;
 A_row = [2 4 5 7 9];
 A_col = [1 3 6 8 10];
 V1_ind = find(A(1, :)) ;
