@@ -2,5 +2,6 @@
 *.o
 *.a
 octave-workspace
-build
+build*
+data
 __pycache__

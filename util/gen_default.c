@@ -36,7 +36,7 @@ void print_test_spec(testargs *myargs, int **myspec, char *str)
     FILE *listfp = fopen(lfname, "a"); // file with list of spec files
     if (listfp) // write spec name to list file if exists
       { fprintf(listfp, "%s\n", sfile); fclose(listfp); }
-  }
+  } else fclose(infp);
 
   print_spec(myargs, myspec);
 }
@@ -319,7 +319,7 @@ void gen_default(char *testbase)
 
   // operations that take two different op types
   else if (strcmp(testbase, "testMRed") == 0)
-    two_op_defs(myargs, "A", "", "M", "A", 3); // use MIN binops
+    two_op_defs(myargs, "A", "", "V1", "V2", 3); // use MIN binops
 
   // operations that take unops or binops
   else if (strcmp(testbase, "testMAppl") == 0)
@@ -332,10 +332,10 @@ void gen_default(char *testbase)
     loop_defs(myargs, "A", "", "", "M", "A", "C", select_defs);
   else if (strcmp(testbase, "testVSel") == 0)
     loop_defs(myargs, "V1", "", "", "V2", "V1", "C", select_defs);
-  else if (strcmp(testbase, "testMTRed") == 0)
-    loop_defs(myargs, "A", "", "", "M", "A", "C", set_all_monoids);
-  else if (strcmp(testbase, "testVTRed") == 0)
-    loop_defs(myargs, "V1", "", "", "V2", "V1", "C", set_all_monoids);
+  else if (strcmp(testbase, "testMTRed") == 0) // no mask, no initval
+    loop_defs(myargs, "A", "", "", "", "", "C", set_all_monoids);
+  else if (strcmp(testbase, "testVTRed") == 0) // no mask, no initval
+    loop_defs(myargs, "V1", "", "", "", "", "C", set_all_monoids);
   else if (strcmp(testbase, "testmxm") == 0)
     loop_defs(myargs, "A", "B", "", "M", "A", "C", semi_loop_plus_times);
   else if (strcmp(testbase, "testmxv") == 0)
@@ -347,7 +347,7 @@ void gen_default(char *testbase)
 
   // operations that use different index patterns, any input is scalar
   else if (strcmp(testbase, "testCExtr") == 0)
-    index_defs(myargs, "A", "A_row", "", "M", "A", false);
+    index_defs(myargs, "A", "A_row", "", "V1", "V2", false);
   else if (strcmp(testbase, "testVExtr") == 0)
     index_defs(myargs, "V1", "V1_ind", "", "V2", "V1", false);
   else if (strcmp(testbase, "testMExtr") == 0)
@@ -363,17 +363,17 @@ void gen_default(char *testbase)
 
   // operations that use different index patterns, input is vector or matrix
   else if (strcmp(testbase, "testCAssn") == 0)
-    index_defs(myargs, "CE", "A_row", "", "M", "A", true);
+    index_defs(myargs, "CE", "A_row", "", "V1", "V2", true);
   else if (strcmp(testbase, "testCSubA") == 0)
-    index_defs(myargs, "CE", "A_row", "", "M", "A", true);
+    index_defs(myargs, "CE", "A_row", "", "V1", "V2", true);
   else if (strcmp(testbase, "testMAssn") == 0)
     index_defs(myargs, "ME", "A_row", "A_col", "M", "A", true);
   else if (strcmp(testbase, "testMSubA") == 0)
     index_defs(myargs, "ME", "A_row", "A_col", "M", "A", true);
   else if (strcmp(testbase, "testRAssn") == 0)
-    index_defs(myargs, "CE", "A_col", "", "M", "A", true);
+    index_defs(myargs, "CE", "A_col", "", "V2", "V1", true);
   else if (strcmp(testbase, "testRSubA") == 0)
-    index_defs(myargs, "CE", "A_col", "", "M", "A", true);
+    index_defs(myargs, "CE", "A_col", "", "V2", "V1", true);
   else if (strcmp(testbase, "testVAssn") == 0)
     index_defs(myargs, "VE", "V1_ind", "", "V2", "V1", true);
   else if (strcmp(testbase, "testVSubA") == 0)
