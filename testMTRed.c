@@ -36,21 +36,22 @@ bool run_MTRed(testargs *myargs)
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->initvals, ztype, &C));
 
 #define SET_AND_TEST					\
+  GrB_Vector_extractElement(&c, C, 0);			\
   TEST_OK(GrB_reduce(&c, accum, mon, A, desc));		\
   TEST_OK(GrB_Vector_setElement(C, c, 0));
 
   // call reduce based on type
-  if (ztype == GrB_BOOL) { bool c = false; SET_AND_TEST; }
-  else if (ztype == GrB_INT8) { int8_t c = INT8_MAX; SET_AND_TEST; }
-  else if (ztype == GrB_INT16) { int16_t c = INT16_MAX; SET_AND_TEST; }
-  else if (ztype == GrB_INT32) { int32_t c = INT32_MAX; SET_AND_TEST; }
-  else if (ztype == GrB_INT64) { int64_t c = INT64_MAX; SET_AND_TEST; }
-  else if (ztype == GrB_UINT8) { uint8_t c = UINT8_MAX; SET_AND_TEST; }
-  else if (ztype == GrB_UINT16) { uint16_t c = UINT16_MAX; SET_AND_TEST; }
-  else if (ztype == GrB_UINT32) { uint32_t c = UINT32_MAX; SET_AND_TEST; }
-  else if (ztype == GrB_UINT64) { uint64_t c = UINT64_MAX; SET_AND_TEST; }
-  else if (ztype == GrB_FP32) { float c = 1e6; SET_AND_TEST; }
-  else if (ztype == GrB_FP64) { double c = 1e6; SET_AND_TEST; }
+  if (ztype == GrB_BOOL) { bool c; SET_AND_TEST; }
+  else if (ztype == GrB_INT8) { int8_t c; SET_AND_TEST; }
+  else if (ztype == GrB_INT16) { int16_t c; SET_AND_TEST; }
+  else if (ztype == GrB_INT32) { int32_t c; SET_AND_TEST; }
+  else if (ztype == GrB_INT64) { int64_t c; SET_AND_TEST; }
+  else if (ztype == GrB_UINT8) { uint8_t c; SET_AND_TEST; }
+  else if (ztype == GrB_UINT16) { uint16_t c; SET_AND_TEST; }
+  else if (ztype == GrB_UINT32) { uint32_t c; SET_AND_TEST; }
+  else if (ztype == GrB_UINT64) { uint64_t c; SET_AND_TEST; }
+  else if (ztype == GrB_FP32) { float c; SET_AND_TEST; }
+  else if (ztype == GrB_FP64) { double c; SET_AND_TEST; }
   else { printf("bad type\n"); exit(1); }
 
   if (myargs->generate) // if generating, write to file

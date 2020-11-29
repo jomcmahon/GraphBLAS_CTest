@@ -332,10 +332,10 @@ void gen_default(char *testbase)
     loop_defs(myargs, "A", "", "", "M", "A", "C", select_defs);
   else if (strcmp(testbase, "testVSel") == 0)
     loop_defs(myargs, "V1", "", "", "V2", "V1", "C", select_defs);
-  else if (strcmp(testbase, "testMTRed") == 0) // no mask, no initval
-    loop_defs(myargs, "A", "", "", "", "", "C", set_all_monoids);
-  else if (strcmp(testbase, "testVTRed") == 0) // no mask, no initval
-    loop_defs(myargs, "V1", "", "", "", "", "C", set_all_monoids);
+  else if (strcmp(testbase, "testMTRed") == 0) // no mask
+    loop_defs(myargs, "A", "", "", "", "S", "C", set_all_monoids);
+  else if (strcmp(testbase, "testVTRed") == 0) // no mask
+    loop_defs(myargs, "V1", "", "", "", "S", "C", set_all_monoids);
   else if (strcmp(testbase, "testmxm") == 0)
     loop_defs(myargs, "A", "B", "", "M", "A", "C", semi_loop_plus_times);
   else if (strcmp(testbase, "testmxv") == 0)
