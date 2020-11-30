@@ -212,9 +212,9 @@ bool test_L_DA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
   for (int i = 0; i < lim; i++) { // outer loop
     if (lim >= spec_limits(inspec)) myargs->specobj[inspec] = i; // whole range
     else myargs->specobj[inspec] = specptr[inspec][i + 1]; // from spec
-    if (inspec != TYPE) // type will be added to filename by test routines
-      sprintf(myargs->output, "%s_%c%d", bname, fname_chars[inspec],
-	      myargs->specobj[inspec]);
+    if (inspec == TYPE) sprintf(myargs->output, "%s", bname); // don't add type
+    else sprintf(myargs->output, "%s_%c%d", bname, fname_chars[inspec],
+		 myargs->specobj[inspec]);
 
     if (specptr[ACCUM] && (i < specptr[ACCUM][0])) { // if there is accumulator
       myargs->specobj[ACCUM] = specptr[ACCUM][i + 1]; // add it to args
