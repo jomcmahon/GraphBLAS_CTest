@@ -11,7 +11,7 @@
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
 
-void gen_default(char *);
+void gen_default(testargs *);
 
 int main(int argc, char * argv[])
 {
@@ -19,7 +19,7 @@ int main(int argc, char * argv[])
   OK(GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
-  if (myargs->generate) gen_default(myargs->testbase);
+  if (myargs->generate) gen_default(myargs);
 
   OK(GrB_finalize());
   return 0;

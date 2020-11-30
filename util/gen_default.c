@@ -207,9 +207,11 @@ void select_defs(int **sptr)
   set_all_types(sptr);
 }
 
-void loop_defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
+void loop_defs(testargs *inargs, char *i0, char *i1, char *i2, char *m,
 	       char *iv, char *out, void (*f)(int **))
 {
+  testargs *myargs = new_args(inargs->testbase);
+  strcpy(myargs->initvals, inargs->initvals);
   strcpy(myargs->input0, i0);
   strcpy(myargs->input1, i1);
   strcpy(myargs->input2, i2);
@@ -222,17 +224,17 @@ void loop_defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
   testargs *myargsC = malloc(sizeof(testargs)); // copy args
   memcpy(myargsC, myargs, sizeof(testargs));
   print_test_spec(myargsC, myspec, "D"); // default
-  if (strlen(m) > 0) {
+  if ((strlen(m) > 0) && (strlen(inargs->mask) == 0)) {
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->mask, m);
     print_test_spec(myargsC, myspec, "M"); // with mask
   }
-  if (strlen(iv) > 0) {
+  if ((strlen(iv) > 0) && (inargs->specobj[ACCUM] == -1)) {
     accum_iteration_plus(myspec); // add accumulators to spec
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->initvals, iv);
     print_test_spec(myargsC, myspec, "A"); // with accums
-    if (strlen(m) > 0) {
+    if ((strlen(m) > 0) && (strlen(inargs->mask) == 0)) {
       memcpy(myargsC, myargs, sizeof(testargs));
       strcpy(myargsC->mask, m);
       strcpy(myargsC->initvals, iv);
@@ -246,31 +248,25 @@ void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
 		char *iv, bool A_flag)
 {
   char i0str[64], i2str[64]; strcpy(i0str, i0);
-  testargs *myargsC = malloc(sizeof(testargs)); // copy args
   strcpy(myargs->initvals, iv);
 
-  memcpy(myargsC, myargs, sizeof(testargs));
-  loop_defs(myargsC, i0, i1, i2, m, iv, "CD", set_all_types);
+  loop_defs(myargs, i0, i1, i2, m, iv, "CD", set_all_types);
 
-  memcpy(myargsC, myargs, sizeof(testargs));
   if (A_flag) sprintf(i0str, "%sA", i0);
   if (strlen(i2) > 0) strcpy(i2str, "ALL");
-  loop_defs(myargsC, i0str, "ALL", i2str, m, iv, "CA", set_all_types);
+  loop_defs(myargs, i0str, "ALL", i2str, m, iv, "CA", set_all_types);
 
-  memcpy(myargsC, myargs, sizeof(testargs));
   if (A_flag) sprintf(i0str, "%sR", i0);
   if (strlen(i2) > 0) strcpy(i2str, "I_RANGE");
-  loop_defs(myargsC, i0str, "I_RANGE", i2str, m, iv, "CR", set_all_types);
+  loop_defs(myargs, i0str, "I_RANGE", i2str, m, iv, "CR", set_all_types);
 
-  memcpy(myargsC, myargs, sizeof(testargs));
   if (A_flag) sprintf(i0str, "%sS", i0);
   if (strlen(i2) > 0) strcpy(i2str, "I_STRIDE");
-  loop_defs(myargsC, i0str, "I_STRIDE", i2str, m, iv, "CS", set_all_types);
+  loop_defs(myargs, i0str, "I_STRIDE", i2str, m, iv, "CS", set_all_types);
 
-  memcpy(myargsC, myargs, sizeof(testargs));
   if (A_flag) sprintf(i0str, "%sB", i0);
   if (strlen(i2) > 0) strcpy(i2str, "I_BACK");
-  loop_defs(myargsC, i0str, "I_BACK", i2str, m, iv, "CB", set_all_types);
+  loop_defs(myargs, i0str, "I_BACK", i2str, m, iv, "CB", set_all_types);
 }
 
 void unop_binop_defs(testargs *myargs, char *i0, char *m, char *iv)
@@ -299,9 +295,9 @@ void three_op_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
   two_op_defs(myargs, i0, i1, m, iv, op);
 }
 
-void gen_default(char *testbase)
+void gen_default(testargs *myargs)
 {
-  testargs *myargs = new_args(testbase);
+  char testbase[256]; strcpy(testbase, myargs->testbase);
 
   // operations that take three different op types
   if (strcmp(testbase, "testeAddM") == 0)
