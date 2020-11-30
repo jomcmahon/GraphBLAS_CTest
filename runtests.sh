@@ -3,16 +3,16 @@
 # $1 is test executable name; all other args passed
 function singlerun {
     mkdir -p data/specfiles
-    eval "../../CTest/testspec $@ -g" >> out.log
+    eval "../../CTest/testspec $@ -g"
     mkdir -p data/$1
-    eval "../../CTest/$@ -g" >> out.log
+    eval "../../CTest/$@ -g" > data/$1/$1.out
     if [ $? -eq 0 ]; then
 	echo $1 : GENERATED
     else
 	echo $1 : PROBLEM GENERATING DATA
     fi
 
-    eval "./$@" >> out.log
+    eval "./$@" > data/$1/$1.log
     if [ $? -eq 0 ]; then
 	echo $1 : PASSED
     else
@@ -21,7 +21,6 @@ function singlerun {
 #    rm -rf data/$1
 }
 
-rm -f out.log
 shopt -s nullglob
 
 if [ $1 == "ALL" ]; then
