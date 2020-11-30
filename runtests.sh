@@ -1,16 +1,18 @@
 #!/bin/bash
 
-# $1 is test executable name; $2 is location of reference executable
+# $1 is test executable name; all other args passed
 function singlerun {
+    mkdir -p data/specfiles
+    eval "../../CTest/testspec $@ -g" >> out.log
     mkdir -p data/$1
-    eval "$2/$1 -g" >> out.log
+    eval "../../CTest/$@ -g" >> out.log
     if [ $? -eq 0 ]; then
 	echo $1 : GENERATED
     else
 	echo $1 : PROBLEM GENERATING DATA
     fi
 
-    eval "./$1" >> out.log
+    eval "./$@" >> out.log
     if [ $? -eq 0 ]; then
 	echo $1 : PASSED
     else
@@ -21,16 +23,11 @@ function singlerun {
 
 rm -f out.log
 shopt -s nullglob
-if [ $# -eq 0 ]; then
-    d=.
-else
-    d=$1
-fi
 
-if [ $# -gt 1 ]; then
-    singlerun $2 $d
-else
+if [ $1 == "ALL" ]; then
     for t in test*; do
-	singlerun $t $d
+	singlerun $t ${@:2}
     done
+else
+    singlerun $1 ${@:2}
 fi
