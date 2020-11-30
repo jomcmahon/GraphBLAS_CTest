@@ -339,7 +339,7 @@ void gen_default(testargs *myargs)
   else if (strcmp(testbase, "testvxm") == 0)
     loop_defs(myargs, "V1", "A", "", "V1", "V2", "C", semi_loop_plus_times);
   else if (strcmp(testbase, "testtran") == 0)
-    loop_defs(myargs, "A", "", "", "", "", "C", set_all_types);
+    loop_defs(myargs, "A", "", "", "M", "A", "C", set_all_types);
 
   // operations that use different index patterns, any input is scalar
   else if (strcmp(testbase, "testCExtr") == 0)
