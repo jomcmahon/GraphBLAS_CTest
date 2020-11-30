@@ -251,6 +251,13 @@ def gensemi() :
     writelist(ofile, SEMIOP);
     ofile.close()
 
+def getGBobj(olist, item) :
+    if (item.isdigit()) :
+        print olist[int(item)];
+    else :
+        val = [ind for ind, x in enumerate(olist) if x == item]
+        print val[0]
+
 import sys
 
 if __name__ == '__main__' :
@@ -269,22 +276,20 @@ if __name__ == '__main__' :
         gensemi()
     else :
         if (sys.argv[1] == 'Type') :
-            val = [ind for ind, x in enumerate(ALLTYPES) if x == sys.argv[2]]
+            getGBobj(ALLTYPES, sys.argv[2]);
         elif (sys.argv[1] == 'Descriptor') :
-            val = [ind for ind, x in enumerate(ALLDESC) if x == sys.argv[2]]
+            getGBobj(ALLDESC, sys.argv[2]);
         elif (sys.argv[1] == 'SelectOp') :
-            val = [ind for ind, x in enumerate(ALLSELECT) if x == sys.argv[2]]
+            getGBobj(ALLSELECT, sys.argv[2]);
         elif (sys.argv[1] == 'UnaryOp') :
             unoplist()
-            val = [ind for ind, x in enumerate(ALLUNOPS) if x == sys.argv[2]]
+            getGBobj(ALLUNOPS, sys.argv[2]);
         elif (sys.argv[1] == 'BinaryOp') :
             binoplist()
-            val = [ind for ind, x in enumerate(ALLBINOPS) if x == sys.argv[2]]
+            getGBobj(ALLBINOPS, sys.argv[2]);
         elif (sys.argv[1] == 'Monoid') :
             monlist()
-            val = [ind for ind, x in enumerate(ALLMONS) if x == sys.argv[2]]
+            getGBobj(ALLMONS, sys.argv[2]);
         elif (sys.argv[1] == 'Semiring') :
             semilist()
-            val = [ind for ind, x in enumerate(ALLSEMIS) if x == sys.argv[2]]
-        print(val[0])
-            
+            getGBobj(ALLSEMIS, sys.argv[2]);
