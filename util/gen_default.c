@@ -248,7 +248,6 @@ void index_defs(testargs *myargs, char *i0, char *i1, char *i2, char *m,
 		char *iv, bool A_flag)
 {
   char i0str[64], i2str[64]; strcpy(i0str, i0);
-  strcpy(myargs->initvals, iv);
 
   loop_defs(myargs, i0, i1, i2, m, iv, "CD", set_all_types);
 
@@ -311,7 +310,7 @@ void gen_default(testargs *myargs)
   else if (strcmp(testbase, "testeMultV") == 0)
     three_op_defs(myargs, "V1", "V2", "V1", "V2", 2); // use ANY binops
   else if (strcmp(testbase, "testkron") == 0)
-    three_op_defs(myargs, "A", "B", "M", "A", 0); // use PLUS binops
+    three_op_defs(myargs, "A", "B", "", "", 0); // use PLUS binops
 
   // operations that take two different op types
   else if (strcmp(testbase, "testMRed") == 0)
@@ -342,36 +341,73 @@ void gen_default(testargs *myargs)
     loop_defs(myargs, "A", "", "", "M", "A", "C", set_all_types);
 
   // operations that use different index patterns, any input is scalar
-  else if (strcmp(testbase, "testCExtr") == 0)
-    index_defs(myargs, "A", "A_row", "A_col", "CE", "CE", false);
-  else if (strcmp(testbase, "testVExtr") == 0)
-    index_defs(myargs, "V1", "V1_ind", "", "VE", "VE", false);
-  else if (strcmp(testbase, "testMExtr") == 0)
-    index_defs(myargs, "A", "A_row", "A_col", "ME", "ME", false);
-  else if (strcmp(testbase, "testMTAssn") == 0)
-    index_defs(myargs, "V1", "A_row", "A_col", "M", "A", false); // fix mask
-  else if (strcmp(testbase, "testMTSubA") == 0)
-    index_defs(myargs, "V1", "A_row", "A_col", "ME", "A", false); // fix mask
+  else if (strcmp(testbase, "testCExtr") == 0) {
+    loop_defs(myargs, "A", "A_row", "A_col", "CE", "CE", "CD", set_all_types);
+    loop_defs(myargs, "A", "ALL", "A_col", "V1", "V1", "CA", set_all_types);
+    loop_defs(myargs, "A", "I_RANGE", "A_col", "V1", "V1", "CR", set_all_types);
+    loop_defs(myargs, "A", "I_STRIDE", "A_col", "CE", "CE", "CS",set_all_types);
+    loop_defs(myargs, "A", "I_BACK", "A_col", "CE", "CE", "CB", set_all_types);
+  } else if (strcmp(testbase, "testVExtr") == 0) {
+    loop_defs(myargs, "V1", "V1_ind", "", "VE", "VE", "CD", set_all_types);
+    loop_defs(myargs, "V1", "ALL", "", "V2", "V2", "CA", set_all_types);
+    loop_defs(myargs, "V1", "I_RANGE", "", "V2", "V2", "CR", set_all_types);
+    loop_defs(myargs, "V1", "I_STRIDE", "", "VE", "VE", "CS", set_all_types);
+    loop_defs(myargs, "V1", "I_BACK", "", "VE", "VE", "CB", set_all_types);
+  } else if (strcmp(testbase, "testMExtr") == 0) {
+    loop_defs(myargs, "A", "A_row", "A_col", "ME", "ME", "CD", set_all_types);
+    loop_defs(myargs, "A", "ALL", "ALL", "M", "B", "CA", set_all_types);
+    loop_defs(myargs, "A", "I_RANGE", "I_RANGE", "M", "B", "CR", set_all_types);
+    loop_defs(myargs, "A", "I_STRIDE", "I_STRIDE","ME","ME","CS",set_all_types);
+    loop_defs(myargs, "A", "I_BACK", "I_BACK", "ME", "ME", "CB", set_all_types);
+  } else if (strcmp(testbase, "testMTAssn") == 0)
+    index_defs(myargs, "V1", "A_row", "A_col", "M", "A", false);
   else if (strcmp(testbase, "testVTAssn") == 0)
-    index_defs(myargs, "V2", "V1_ind", "", "V2", "V1", false); // fix init
-  else if (strcmp(testbase, "testVTSubA") == 0)
-    index_defs(myargs, "V2", "V1_ind", "", "V2", "V1", false); // fix init
+    index_defs(myargs, "V2", "V1_ind", "", "V2", "V1", false);
+  else if (strcmp(testbase, "testMTSubA") == 0) {
+    loop_defs(myargs, "V1", "A_row", "A_col", "ME", "A", "CD", set_all_types);
+    loop_defs(myargs, "V1", "ALL", "ALL", "M", "A", "CA", set_all_types);
+    loop_defs(myargs, "V1", "I_RANGE", "I_RANGE", "M", "A", "CR",set_all_types);
+    loop_defs(myargs, "V1", "I_STRIDE","I_STRIDE","ME","A","CS",set_all_types);
+    loop_defs(myargs, "V1", "I_BACK", "I_BACK", "ME", "A", "CB",set_all_types);
+  } else if (strcmp(testbase, "testVTSubA") == 0) {
+    loop_defs(myargs, "V2", "V1_ind", "", "VE", "V1", "CD", set_all_types);
+    loop_defs(myargs, "V2", "ALL", "", "V1", "V1", "CA", set_all_types);
+    loop_defs(myargs, "V2", "I_RANGE", "", "V1", "V1", "CR", set_all_types);
+    loop_defs(myargs, "V2", "I_STRIDE", "", "VE", "V1", "CS", set_all_types);
+    loop_defs(myargs, "V2", "I_BACK", "", "VE", "V1", "CB", set_all_types);
 
   // operations that use different index patterns, input is vector or matrix
-  else if (strcmp(testbase, "testCAssn") == 0)
+  } else if (strcmp(testbase, "testMSubA") == 0) {
+    loop_defs(myargs, "ME", "A_row", "A_col", "ME", "A", "CD", set_all_types);
+    loop_defs(myargs, "MEA", "ALL", "ALL", "MEA", "A", "CA", set_all_types);
+    loop_defs(myargs, "MER", "I_RANGE", "I_RANGE","MER","A","CR",set_all_types);
+    loop_defs(myargs, "MES","I_STRIDE","I_STRIDE","MES","A","CS",set_all_types);
+    loop_defs(myargs, "MEB", "I_BACK", "I_BACK", "MEB", "A","CB",set_all_types);
+  } else if (strcmp(testbase, "testCAssn") == 0)
     index_defs(myargs, "CE", "A_row", "A_col", "V2", "A", true);
-  else if (strcmp(testbase, "testCSubA") == 0)
-    index_defs(myargs, "CE", "A_row", "A_col", "CE", "A", true); // fix mask
-  else if (strcmp(testbase, "testRAssn") == 0)
+  else if (strcmp(testbase, "testCSubA") == 0) {
+    loop_defs(myargs, "CE", "A_row", "A_col", "CE", "A", "CD", set_all_types);
+    loop_defs(myargs, "CEA", "ALL", "A_col", "CEA", "A", "CA", set_all_types);
+    loop_defs(myargs, "CER", "I_RANGE", "A_col", "CER", "A","CR",set_all_types);
+    loop_defs(myargs, "CES", "I_STRIDE", "A_col", "CES","A","CS",set_all_types);
+    loop_defs(myargs, "CEB", "I_BACK", "A_col", "CEB", "A", "CB",set_all_types);
+  } else if (strcmp(testbase, "testRAssn") == 0)
     index_defs(myargs, "CE", "A_row", "A_col", "V1", "A", true);
-  else if (strcmp(testbase, "testRSubA") == 0)
-    index_defs(myargs, "CE", "A_row", "A_col", "CE", "A", true); // fix mask
-  else if (strcmp(testbase, "testMAssn") == 0)
+  else if (strcmp(testbase, "testRSubA") == 0) {
+    loop_defs(myargs, "CE", "A_row", "A_col", "CE", "A", "CD", set_all_types);
+    loop_defs(myargs, "CEA", "A_row", "ALL", "CEA", "A", "CA", set_all_types);
+    loop_defs(myargs, "CER", "A_row", "I_RANGE", "CER", "A","CR",set_all_types);
+    loop_defs(myargs, "CES", "A_row", "I_STRIDE", "CES","A","CS",set_all_types);
+    loop_defs(myargs, "CEB", "A_row", "I_BACK", "CEB", "A", "CB",set_all_types);
+  } else if (strcmp(testbase, "testMAssn") == 0)
     index_defs(myargs, "ME", "A_row", "A_col", "M", "A", true);
-  else if (strcmp(testbase, "testMSubA") == 0)
-    index_defs(myargs, "ME", "A_row", "A_col", "ME", "A", true); // fix mask
   else if (strcmp(testbase, "testVAssn") == 0)
     index_defs(myargs, "VE", "V1_ind", "", "V2", "V1", true);
-  else if (strcmp(testbase, "testVSubA") == 0)
-    index_defs(myargs, "VE", "V1_ind", "", "VE", "V1", true); // fix mask
+  else if (strcmp(testbase, "testVSubA") == 0) {
+    loop_defs(myargs, "VE", "V1_ind", "", "VE", "V1", "CD", set_all_types);
+    loop_defs(myargs, "VEA", "ALL", "", "VEA", "V1", "CA", set_all_types);
+    loop_defs(myargs, "VER", "I_RANGE", "", "VER", "V1", "CR", set_all_types);
+    loop_defs(myargs, "VES", "I_STRIDE", "", "VES", "V1", "CS", set_all_types);
+    loop_defs(myargs, "VEB", "I_BACK", "", "VEB", "V1", "CB", set_all_types);
+  }
 }

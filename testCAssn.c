@@ -33,15 +33,21 @@ bool run_CAssn(testargs *myargs)
   TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj));
   GrB_Index cval = J[0]; // column to assign
 
+  if (strlen(myargs->mask) > 0) // read mask if file name given
+    TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
+
   if (strlen(myargs->initvals) == 0) { // initvals file name
-    GrB_Index outR = get_index_dim(I, ni, 0);
+    GrB_Index outR = 0;
+    if (M) TEST_OK(GrB_Vector_size(&outR, M));
+    else {
+      GrB_Index nr = 0;
+      GrB_Vector_size(&nr, A);
+      outR = get_index_dim(I, ni, nr);
+    }
     GrB_Index outC = cval + 1; // minimum size possible
     TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
   } else // read initvals if file name specified
     TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
-
-  if (strlen(myargs->mask) > 0) // read mask if file name given
-    TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 
   TEST_OK(GrB_assign(C, M, accum, A, I, ni, cval, desc)); // do operation
 

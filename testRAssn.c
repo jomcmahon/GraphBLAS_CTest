@@ -33,15 +33,21 @@ bool run_RAssn(testargs *myargs)
   TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj));
   GrB_Index rval = I[0]; // row to assign
 
+  if (strlen(myargs->mask) > 0) // read mask if file name given
+    TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
+
   if (strlen(myargs->initvals) == 0) { // initvals file name
+    GrB_Index outC = 0;
+    if (M) TEST_OK(GrB_Vector_size(&outC, M));
+    else {
+      GrB_Index nc = 0;
+      GrB_Vector_size(&nc, A);
+      outC = get_index_dim(J, nj, nc);
+    }
     GrB_Index outR = rval + 1; // minimum size possible
-    GrB_Index outC = get_index_dim(J, nj, 0);
     TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
   } else // read initvals if file name specified
     TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
-
-  if (strlen(myargs->mask) > 0) // read mask if file name given
-    TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 
   TEST_OK(GrB_assign(C, M, accum, A, rval, J, nj, desc)); // do operation
 

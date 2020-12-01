@@ -32,15 +32,19 @@ bool run_MTAssn(testargs *myargs)
   TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
   TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj));
 
+  if (strlen(myargs->mask) > 0) // read mask if file name given
+    TEST_OK(read_matlab_matrix(myargs->inbase, myargs->mask, GrB_BOOL, &M));
+
   if (strlen(myargs->initvals) == 0) { // initvals file name
-    GrB_Index outR = get_index_dim(I, ni, 0);
-    GrB_Index outC = get_index_dim(J, nj, 0);
+    GrB_Index outR = 0, outC = 0;
+    if (M) { GrB_Matrix_nrows(&outR, M); GrB_Matrix_ncols(&outC, M); }
+    else {
+      outR = get_index_dim(I, ni, 0);
+      outC = get_index_dim(J, nj, 0);
+    }
     TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
   } else // read initvals if file name specified
     TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
-
-  if (strlen(myargs->mask) > 0) // read mask if file name given
-    TEST_OK(read_matlab_matrix(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 
 #define SET_AND_TEST							\
   GrB_Vector_extractElement(&c, A, 0);					\

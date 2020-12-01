@@ -34,8 +34,10 @@ bool run_RSubA(testargs *myargs)
   GrB_Index rval = I[0]; // row to assign
 
   if (strlen(myargs->initvals) == 0) { // initvals file name
+    GrB_Index nc = 0;
+    TEST_OK(GrB_Vector_size(&nc, A));
     GrB_Index outR = rval + 1; // minimum size possible
-    GrB_Index outC = get_index_dim(J, nj, 0);
+    GrB_Index outC = get_index_dim(J, nj, nc);
     TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
   } else // read initvals if file name specified
     TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));

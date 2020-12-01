@@ -34,7 +34,9 @@ bool run_CSubA(testargs *myargs)
   GrB_Index cval = J[0]; // column to assign
 
   if (strlen(myargs->initvals) == 0) { // initvals file name
-    GrB_Index outR = get_index_dim(I, ni, 0);
+    GrB_Index nr = 0;
+    TEST_OK(GrB_Vector_size(&nr, A));
+    GrB_Index outR = get_index_dim(I, ni, nr);
     GrB_Index outC = cval + 1; // minimum size possible
     TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
   } else // read initvals if file name specified
