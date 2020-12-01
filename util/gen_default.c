@@ -343,35 +343,35 @@ void gen_default(testargs *myargs)
 
   // operations that use different index patterns, any input is scalar
   else if (strcmp(testbase, "testCExtr") == 0)
-    index_defs(myargs, "A", "A_row", "", "V1", "V2", false);
+    index_defs(myargs, "A", "A_row", "A_col", "CE", "CE", false);
   else if (strcmp(testbase, "testVExtr") == 0)
-    index_defs(myargs, "V1", "V1_ind", "", "V2", "V1", false);
+    index_defs(myargs, "V1", "V1_ind", "", "VE", "VE", false);
   else if (strcmp(testbase, "testMExtr") == 0)
-    index_defs(myargs, "A", "A_row", "A_col", "M", "A", false);
+    index_defs(myargs, "A", "A_row", "A_col", "ME", "ME", false);
   else if (strcmp(testbase, "testMTAssn") == 0)
-    index_defs(myargs, "", "A_row", "A_col", "M", "A", false);
+    index_defs(myargs, "V1", "A_row", "A_col", "M", "A", false); // fix mask
   else if (strcmp(testbase, "testMTSubA") == 0)
-    index_defs(myargs, "", "A_row", "A_col", "M", "A", false);
+    index_defs(myargs, "V1", "A_row", "A_col", "ME", "A", false); // fix mask
   else if (strcmp(testbase, "testVTAssn") == 0)
-    index_defs(myargs, "", "V1_ind", "", "V2", "V1", false);
+    index_defs(myargs, "V2", "V1_ind", "", "V2", "V1", false); // fix init
   else if (strcmp(testbase, "testVTSubA") == 0)
-    index_defs(myargs, "", "V1_ind", "", "V2", "V1", false);
+    index_defs(myargs, "V2", "V1_ind", "", "V2", "V1", false); // fix init
 
   // operations that use different index patterns, input is vector or matrix
   else if (strcmp(testbase, "testCAssn") == 0)
-    index_defs(myargs, "CE", "A_row", "", "V1", "V2", true);
+    index_defs(myargs, "CE", "A_row", "A_col", "V2", "A", true);
   else if (strcmp(testbase, "testCSubA") == 0)
-    index_defs(myargs, "CE", "A_row", "", "V1", "V2", true);
+    index_defs(myargs, "CE", "A_row", "A_col", "CE", "A", true); // fix mask
+  else if (strcmp(testbase, "testRAssn") == 0)
+    index_defs(myargs, "CE", "A_row", "A_col", "V1", "A", true);
+  else if (strcmp(testbase, "testRSubA") == 0)
+    index_defs(myargs, "CE", "A_row", "A_col", "CE", "A", true); // fix mask
   else if (strcmp(testbase, "testMAssn") == 0)
     index_defs(myargs, "ME", "A_row", "A_col", "M", "A", true);
   else if (strcmp(testbase, "testMSubA") == 0)
-    index_defs(myargs, "ME", "A_row", "A_col", "M", "A", true);
-  else if (strcmp(testbase, "testRAssn") == 0)
-    index_defs(myargs, "CE", "A_col", "", "V2", "V1", true);
-  else if (strcmp(testbase, "testRSubA") == 0)
-    index_defs(myargs, "CE", "A_col", "", "V2", "V1", true);
+    index_defs(myargs, "ME", "A_row", "A_col", "ME", "A", true); // fix mask
   else if (strcmp(testbase, "testVAssn") == 0)
     index_defs(myargs, "VE", "V1_ind", "", "V2", "V1", true);
   else if (strcmp(testbase, "testVSubA") == 0)
-    index_defs(myargs, "VE", "V1_ind", "", "V2", "V1", true);
+    index_defs(myargs, "VE", "V1_ind", "", "VE", "V1", true); // fix mask
 }

@@ -24,13 +24,22 @@ bool run_MSubA(testargs *myargs)
 
   bool testerror = false;
   GrB_Info info = GrB_SUCCESS; // reset for next sub-test
+
+  GrB_Matrix A = NULL, C = NULL, M = NULL; // inputs and outputs
   GrB_Index *I = NULL, ni = 0, *J = NULL, nj = 0; // index vectors
+  TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, thetype, &A));
   TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
   TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj));
 
-  GrB_Matrix A = NULL, C = NULL, M = NULL; // inputs and outputs
-  TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, thetype, &A));
-  TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
+  if (strlen(myargs->initvals) == 0) { // initvals file name
+    GrB_Index nrA = 0, ncA = 0;
+    get_inp_size(desc, A, &nrA, &ncA, GrB_INP0); // input 0, no desc
+    GrB_Index outR = get_index_dim(I, ni, nrA);
+    GrB_Index outC = get_index_dim(J, nj, ncA);
+    TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
+  } else // read initvals if file name specified
+    TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
+
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_matrix(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 

@@ -167,6 +167,15 @@ GrB_Info read_test_index(const char *tname, const char *mat, GrB_Index **Ind,
 }
 
 // get array size based on index vector
+GrB_Index get_index_dim(GrB_Index *I, GrB_Index ni, GrB_Index asize)
+{
+  if (I == GrB_ALL) return asize;
+  else if ((ni == GxB_RANGE) || (ni == GxB_STRIDE)) return I[1] + 1; // max
+  else if (ni == GxB_BACKWARDS) return I[0] + 1; // max index
+  else return I[ni - 1] + 1; // assume sorted and max is at end
+}
+
+// get array size based on index vector
 GrB_Index get_index_size(GrB_Index *I, GrB_Index ni, GrB_Index asize)
 {
   if (I == GrB_ALL) return asize;

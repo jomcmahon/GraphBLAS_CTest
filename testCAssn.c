@@ -24,17 +24,26 @@ bool run_CAssn(testargs *myargs)
 
   bool testerror = false;
   GrB_Info info = GrB_SUCCESS; // reset for next sub-test
-  GrB_Index *I = NULL, ni = 0; // index vector
-  TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
 
   GrB_Matrix C = NULL; // inputs and outputs
   GrB_Vector A = NULL, M = NULL;
+  GrB_Index *I = NULL, *J = NULL, ni = 0, nj = 0; // index vectors
   TEST_OK(read_matlab_vector(myargs->inbase, myargs->input0, thetype, &A));
-  TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
+  TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
+  TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj));
+  GrB_Index cval = J[0]; // column to assign
+
+  if (strlen(myargs->initvals) == 0) { // initvals file name
+    GrB_Index outR = get_index_dim(I, ni, 0);
+    GrB_Index outC = cval + 1; // minimum size possible
+    TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
+  } else // read initvals if file name specified
+    TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
+
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 
-  TEST_OK(GrB_assign(C, M, accum, A, I, ni, 0, desc)); // do operation, col 0
+  TEST_OK(GrB_assign(C, M, accum, A, I, ni, cval, desc)); // do operation
 
   if (myargs->generate) { // if generating, write to file
     TEST_OK(write_typed_matrix(myargs->testbase, myargs->output, thetype, C));

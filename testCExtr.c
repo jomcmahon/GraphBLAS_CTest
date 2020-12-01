@@ -27,24 +27,25 @@ bool run_CExtr(testargs *myargs)
 
   GrB_Matrix A = NULL; // inputs and outputs
   GrB_Vector C = NULL, M = NULL;
+  GrB_Index *I = NULL, ni = 0, *J = NULL, nj = 0;
   TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, thetype, &A));
-
-  GrB_Index nrA = 0, ncA = 0; // rows and columns of inputs
-  GrB_Index *I = NULL, ni = 0; // default for GrB_ALL
-  TEST_OK(get_inp_size(desc, A, &nrA, &ncA, GrB_INP0)); // input0
   TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
+  TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj));
+  GrB_Index cval = J[0]; // column to extract
 
-  GrB_Index outsize = get_index_size(I, ni, nrA); // size of column
+  if (strlen(myargs->initvals) == 0) { // initvals file name
+    GrB_Index nrA = 0, ncA = 0; // rows and columns of inputs
+    TEST_OK(get_inp_size(desc, A, &nrA, &ncA, GrB_INP0)); // input0
+    GrB_Index outsize = get_index_size(I, ni, nrA); // size of column
+    TEST_OK(GrB_Vector_new(&C, thetype, outsize)); // create empty matrix
+  } else // read initvals if file name specified
+    TEST_OK(read_matlab_vector(myargs->inbase, myargs->initvals, thetype, &C));
 
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
-  if (strlen(myargs->initvals) == 0) // initvals file name
-    TEST_OK(GrB_Vector_new(&C, thetype, outsize)); // create empty matrix
-  else // read initvals if file name specified
-    TEST_OK(read_matlab_vector(myargs->inbase, myargs->initvals, thetype, &C));
 
   // do the operation
-  TEST_OK(GrB_extract(C, M, accum, A, I, ni, 0, desc)); // column 0
+  TEST_OK(GrB_extract(C, M, accum, A, I, ni, cval, desc)); // column 0
 
   if (myargs->generate) // if generating, write to file
     TEST_OK(write_typed_vector(myargs->testbase, myargs->output, thetype, C));

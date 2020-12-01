@@ -26,23 +26,22 @@ bool run_MExtr(testargs *myargs)
   GrB_Info info = GrB_SUCCESS; // reset for next sub-test
 
   GrB_Matrix A = NULL, C = NULL, M = NULL; // inputs and outputs
-  TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, thetype, &A));
-
-  GrB_Index nrA = 0, ncA = 0; // rows and columns of inputs
   GrB_Index *I = NULL, ni = 0, *J = NULL, nj = 0;
-  TEST_OK(get_inp_size(desc, A, &nrA, &ncA, GrB_INP0)); // input0
+  TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, thetype, &A));
   TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni)); // input1
   TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj)); // input2
 
-  GrB_Index outR = get_index_size(I, ni, nrA);
-  GrB_Index outC = get_index_size(J, nj, ncA);
+  if (strlen(myargs->initvals) == 0) { // initvals file name
+    GrB_Index nrA = 0, ncA = 0; // rows and columns of inputs
+    TEST_OK(get_inp_size(desc, A, &nrA, &ncA, GrB_INP0)); // input0
+    GrB_Index outR = get_index_size(I, ni, nrA);
+    GrB_Index outC = get_index_size(J, nj, ncA);
+    TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // create empty matrix
+  } else // read initvals if file name specified
+    TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
 
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_matrix(myargs->inbase, myargs->mask, GrB_BOOL, &M));
-  if (strlen(myargs->initvals) == 0) // initvals file name
-    TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // create empty matrix
-  else // read initvals if file name specified
-    TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
 
   // do the operation
   TEST_OK(GrB_extract(C, M, accum, A, I, ni, J, nj, desc));

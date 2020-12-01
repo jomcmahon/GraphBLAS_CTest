@@ -267,25 +267,27 @@ bool test_loop(testargs *myargs, bool (*g)(testargs *))
 // read default file for list of spec files
 bool test_spec_loop(testargs *myargs, bool (*g)(testargs *))
 {
-  if (myargs->generate) { // if spec file given, generate it
-    int **myspec = spec_from_args(myargs);
-    if (strlen(myargs->spectest) > 0) print_spec(myargs, myspec);
-    free_test_spec(myspec);
+  if ((myargs->generate) && (strlen(myargs->spectest) > 0)) { // if file given 
+    int **myspec = spec_from_args(myargs); // get spec from args
+    print_spec(myargs, myspec); // write to file given
+    free_test_spec(myspec); // free spec
   }
 
-  char lfname[256];
-  sprintf(lfname, "data/specfiles/%s.list", myargs->testbase);
-  FILE *infp; // file with list of spec files
-
-  if ((strlen(myargs->spectest) == 0) && (infp = fopen(lfname, "r"))) {
-    bool testerror = false;
-    while (fscanf(infp, "%s", myargs->spectest) == 1) { // loop over lines
-      testargs *myargsC = malloc(sizeof(testargs));
-      memcpy(myargsC, myargs, sizeof(testargs));
-      testerror |= test_loop(myargsC, g);
-      free(myargsC);
-    }
-    fclose(infp); return testerror;
+  // if no spec file and output not specified, use list file
+  if ((strlen(myargs->spectest) == 0) && (strlen(myargs->output) == 0)) {
+    char lfname[256];
+    sprintf(lfname, "data/specfiles/%s.list", myargs->testbase);
+    FILE *infp = fopen(lfname, "r"); // file with list of spec files
+    if (infp) {
+      bool testerror = false;
+      while (fscanf(infp, "%s", myargs->spectest) == 1) { // loop over lines
+	testargs *myargsC = malloc(sizeof(testargs));
+	memcpy(myargsC, myargs, sizeof(testargs));
+	testerror |= test_loop(myargsC, g);
+	free(myargsC);
+      }
+      fclose(infp); return testerror;
+    } return false; // must have output file or spec or list file
   } else return test_loop(myargs, g); // run test loop
 }
 

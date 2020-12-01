@@ -104,6 +104,7 @@ bool check_typed_vector(const char *, const char *, GrB_Type, GrB_Vector);
 // test_matrix index routines
 GrB_Info read_test_index(const char *, const char *, GrB_Index **, GrB_Index *);
 GrB_Index get_index_size(GrB_Index *, GrB_Index, GrB_Index);
+GrB_Index get_index_dim(GrB_Index *, GrB_Index, GrB_Index);
 
 // test_matrix routines to query objects
 GrB_Info get_types_unop(GrB_UnaryOp, GrB_Type *, GrB_Type *);

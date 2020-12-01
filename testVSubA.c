@@ -24,12 +24,20 @@ bool run_VSubA(testargs *myargs)
 
   bool testerror = false;
   GrB_Info info = GrB_SUCCESS; // reset for next sub-test
-  GrB_Index *I = NULL, ni = 0; // index vector
-  TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
 
   GrB_Vector A = NULL, C = NULL, M = NULL; // inputs and outputs
+  GrB_Index *I = NULL, ni = 0; // index vector
   TEST_OK(read_matlab_vector(myargs->inbase, myargs->input0, thetype, &A));
-  TEST_OK(read_matlab_vector(myargs->inbase, myargs->initvals, thetype, &C));
+  TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
+
+  if (strlen(myargs->initvals) == 0) { // initvals file name
+    GrB_Index vsize = 0;
+    TEST_OK(GrB_Vector_size(&vsize, A));
+    GrB_Index outS = get_index_dim(I, ni, vsize);
+    TEST_OK(GrB_Vector_new(&C, thetype, outS)); // assume sorted
+  } else // read initvals if file name specified
+    TEST_OK(read_matlab_vector(myargs->inbase, myargs->initvals, thetype, &C));
+
   if (strlen(myargs->mask) > 0) // read mask if file name given
     TEST_OK(read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M));
 
