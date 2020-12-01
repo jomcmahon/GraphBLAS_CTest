@@ -12,9 +12,9 @@
 
 void free_test_spec(int **);
 int spec_limits(spec);
-void print_spec(testargs *, int **);
 testargs *new_args(char *);
 int **new_spec();
+int **spec_from_args(testargs *);
 
 bool find_in_list(int *list, int f, int size)
 {
@@ -22,6 +22,57 @@ bool find_in_list(int *list, int f, int size)
   return false;
 }
 
+// string for spec, used for spec file output
+void spec_string(spec inspec, char *instr)
+{
+  switch (inspec) {
+  case TYPE: strcpy(instr, "TYPE"); break;
+  case SEMI: strcpy(instr, "SEMI"); break;
+  case MON: strcpy(instr, "MON"); break;
+  case BINOP: strcpy(instr, "BINOP"); break;
+  case UNOP: strcpy(instr, "UNOP"); break;
+  case SELOP: strcpy(instr, "SELOP"); break;
+  case DESC: strcpy(instr, "DESC"); break;
+  case ACCUM: strcpy(instr, "ACCUM"); break;
+  default: break;
+  }
+}
+
+// apply a spec function and write to spec file
+void print_spec(testargs *myargs, int **myspec)
+{
+  sprintf(myargs->spectest, "data/specfiles/%s%s.spec", myargs->testbase,
+	  myargs->output); // spec output file
+  FILE *specfp = fopen(myargs->spectest, "w"); // open spec file for writing
+  if (!specfp) return; // do nothing if can't open file
+  for (int i = 0; i < TOTAL; i++) {
+    if (myspec[i]) {
+      char ss[64];
+      spec_string(i, ss);
+      fprintf(specfp, "%s %d", ss, myspec[i][0]);
+      if (myspec[i][0] < spec_limits(i)) {
+	for (int j = 1; j <= myspec[i][0]; j++)
+	  fprintf(specfp, " %d", myspec[i][j]);
+      }
+      fprintf(specfp, "\n");
+    }
+  }
+  if (strlen(myargs->input0) > 0)
+    fprintf(specfp, "INPUT0 %s\n", myargs->input0);
+  if (strlen(myargs->input1) > 0)
+    fprintf(specfp, "INPUT1 %s\n", myargs->input1);
+  if (strlen(myargs->input2) > 0)
+    fprintf(specfp, "INPUT2 %s\n", myargs->input2);
+  if (strlen(myargs->mask) > 0)
+    fprintf(specfp, "MASK %s\n", myargs->mask);
+  if (strlen(myargs->initvals) > 0)
+    fprintf(specfp, "INIT %s\n", myargs->initvals);
+  if (strlen(myargs->output) > 0)
+    fprintf(specfp, "OUTPUT %s\n", myargs->output);
+  fclose(specfp);
+}
+
+// print test spec and add to list file
 void print_test_spec(testargs *myargs, int **myspec, char *str)
 {
   strcat(myargs->output, str); // output name with string to identify sub-test
@@ -296,6 +347,13 @@ void three_op_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
 
 void gen_default(testargs *myargs)
 {
+  if (strlen(myargs->spectest) > 0) { // if file given 
+    int **myspec = spec_from_args(myargs); // get spec from args
+    print_spec(myargs, myspec); // write to file given
+    free_test_spec(myspec); // free spec
+    return;
+  }
+
   char testbase[256]; strcpy(testbase, myargs->testbase);
 
   // operations that take three different op types

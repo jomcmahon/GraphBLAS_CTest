@@ -27,56 +27,6 @@ int spec_limits(spec inspec)
   }
 }
 
-// string for spec, used for spec file output
-void spec_string(spec inspec, char *instr)
-{
-  switch (inspec) {
-  case TYPE: strcpy(instr, "TYPE"); break;
-  case SEMI: strcpy(instr, "SEMI"); break;
-  case MON: strcpy(instr, "MON"); break;
-  case BINOP: strcpy(instr, "BINOP"); break;
-  case UNOP: strcpy(instr, "UNOP"); break;
-  case SELOP: strcpy(instr, "SELOP"); break;
-  case DESC: strcpy(instr, "DESC"); break;
-  case ACCUM: strcpy(instr, "ACCUM"); break;
-  default: break;
-  }
-}
-
-// apply a spec function and write to spec file
-void print_spec(testargs *myargs, int **myspec)
-{
-  sprintf(myargs->spectest, "data/specfiles/%s%s.spec", myargs->testbase,
-	  myargs->output); // spec output file
-  FILE *specfp = fopen(myargs->spectest, "w"); // open spec file for writing
-  if (!specfp) return; // do nothing if can't open file
-  for (int i = 0; i < TOTAL; i++) {
-    if (myspec[i]) {
-      char ss[64];
-      spec_string(i, ss);
-      fprintf(specfp, "%s %d", ss, myspec[i][0]);
-      if (myspec[i][0] < spec_limits(i)) {
-	for (int j = 1; j <= myspec[i][0]; j++)
-	  fprintf(specfp, " %d", myspec[i][j]);
-      }
-      fprintf(specfp, "\n");
-    }
-  }
-  if (strlen(myargs->input0) > 0)
-    fprintf(specfp, "INPUT0 %s\n", myargs->input0);
-  if (strlen(myargs->input1) > 0)
-    fprintf(specfp, "INPUT1 %s\n", myargs->input1);
-  if (strlen(myargs->input2) > 0)
-    fprintf(specfp, "INPUT2 %s\n", myargs->input2);
-  if (strlen(myargs->mask) > 0)
-    fprintf(specfp, "MASK %s\n", myargs->mask);
-  if (strlen(myargs->initvals) > 0)
-    fprintf(specfp, "INIT %s\n", myargs->initvals);
-  if (strlen(myargs->output) > 0)
-    fprintf(specfp, "OUTPUT %s\n", myargs->output);
-  fclose(specfp);
-}
-
 // print input arguments
 void print_args(testargs *myargs, GrB_Descriptor desc, GrB_BinaryOp accum)
 {
@@ -267,12 +217,6 @@ bool test_loop(testargs *myargs, bool (*g)(testargs *))
 // read default file for list of spec files
 bool test_spec_loop(testargs *myargs, bool (*g)(testargs *))
 {
-  if ((myargs->generate) && (strlen(myargs->spectest) > 0)) { // if file given 
-    int **myspec = spec_from_args(myargs); // get spec from args
-    print_spec(myargs, myspec); // write to file given
-    free_test_spec(myspec); // free spec
-  }
-
   // if no spec file and output not specified, use list file
   if ((strlen(myargs->spectest) == 0) && (strlen(myargs->output) == 0)) {
     char lfname[256];
