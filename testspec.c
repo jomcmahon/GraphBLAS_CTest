@@ -285,7 +285,7 @@ void loop_defs(testargs *inargs, char *i0, char *i1, char *i2, char *m,
   testargs *myargsC = malloc(sizeof(testargs)); // copy args
   memcpy(myargsC, myargs, sizeof(testargs));
   print_test_spec(myargsC, myspec, "D"); // default
-  /*
+
   if ((strlen(m) > 0) && (strlen(inargs->mask) == 0)) {
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->mask, m);
@@ -303,7 +303,7 @@ void loop_defs(testargs *inargs, char *i0, char *i1, char *i2, char *m,
       print_test_spec(myargsC, myspec, "B"); // with mask and accum
     }
   }
-  */
+
   free(myargsC); free_test_spec(myspec);
 }
 
@@ -360,6 +360,17 @@ void three_op_defs(testargs *myargs, char *i0, char *i1, char *m, char *iv,
   two_op_defs(myargs, i0, i1, m, iv, op);
 }
 
+void no_accum(testargs *myargs)
+{
+  myargs->specobj[ACCUM] = 0;
+}
+
+void no_mask_accum(testargs *myargs)
+{
+  no_accum(myargs);
+  strcpy(myargs->mask, "NULL");
+}
+
 void gen_default(testargs *myargs)
 {
   if (strlen(myargs->spectest) > 0) { // if file given 
@@ -372,41 +383,52 @@ void gen_default(testargs *myargs)
   char testbase[256]; strcpy(testbase, myargs->testbase);
 
   // operations that take three different op types
-  if (strcmp(testbase, "testeAddM") == 0)
+  if (strcmp(testbase, "testeAddM") == 0) {
+    no_accum(myargs);
     three_op_defs(myargs, "A", "B", "M", "A", 0); // use PLUS binops
-  else if (strcmp(testbase, "testeAddV") == 0)
+  } else if (strcmp(testbase, "testeAddV") == 0) {
+    no_accum(myargs);
     three_op_defs(myargs, "V1", "V2", "V1", "V2", 1); // use PAIR binops
-  else if (strcmp(testbase, "testeAddVU") == 0)
+  } else if (strcmp(testbase, "testeAddVU") == 0) {
+    no_accum(myargs);
     three_op_defs(myargs, "V1", "V2", "V1", "V2", 1); // use PAIR binops
-  else if (strcmp(testbase, "testeMultM") == 0)
+  } else if (strcmp(testbase, "testeMultM") == 0) {
+    no_accum(myargs);
     three_op_defs(myargs, "A", "B", "M", "A", 2); // use ANY binops
-  else if (strcmp(testbase, "testeMultV") == 0)
+  } else if (strcmp(testbase, "testeMultV") == 0) {
+    no_accum(myargs);
     three_op_defs(myargs, "V1", "V2", "V1", "V2", 2); // use ANY binops
-  else if (strcmp(testbase, "testkron") == 0)
+  } else if (strcmp(testbase, "testkron") == 0)
     three_op_defs(myargs, "A", "B", "", "", 0); // use PLUS binops
 
   // operations that take two different op types
   else if (strcmp(testbase, "testMRed") == 0) { // use MIN binops
+    no_accum(myargs);
     myargs->specobj[DESC] = 2;
     myargs->specobj[MON] = 0; // noany monoids
     two_op_defs(myargs, "A", "", "V1", "V2", 3);
 
   // operations that take unops or binops
-  } else if (strcmp(testbase, "testMAppl") == 0)
+  } else if (strcmp(testbase, "testMAppl") == 0) {
+    no_accum(myargs);
     unop_binop_defs(myargs, "A", "M", "A");
-  else if (strcmp(testbase, "testVAppl") == 0)
+  } else if (strcmp(testbase, "testVAppl") == 0) {
+    no_accum(myargs);
     unop_binop_defs(myargs, "V1", "V2", "V1");
 
   // operations with a single object type
-  else if (strcmp(testbase, "testMSel") == 0)
+  } else if (strcmp(testbase, "testMSel") == 0) {
     loop_defs(myargs, "A", "", "", "M", "A", "C", select_defs);
-  else if (strcmp(testbase, "testVSel") == 0)
+  } else if (strcmp(testbase, "testVSel") == 0) {
+    no_accum(myargs);
     loop_defs(myargs, "V1", "", "", "V2", "V1", "C", select_defs);
-  else if (strcmp(testbase, "testMTRed") == 0) // no mask
+  } else if (strcmp(testbase, "testMTRed") == 0) { // no mask
+    no_accum(myargs);
     loop_defs(myargs, "A", "", "", "", "S", "C", set_all_monoids);
-  else if (strcmp(testbase, "testVTRed") == 0) // no mask
+  } else if (strcmp(testbase, "testVTRed") == 0) { // no mask
+    no_accum(myargs);
     loop_defs(myargs, "V1", "", "", "", "S", "C", set_all_monoids);
-  else if (strcmp(testbase, "testmxm") == 0)
+  } else if (strcmp(testbase, "testmxm") == 0)
     loop_defs(myargs, "A", "B", "", "M", "A", "C", semi_loop_plus_times);
   else if (strcmp(testbase, "testmxv") == 0)
     loop_defs(myargs, "A", "V2", "", "V1", "V2", "C", semi_loop_plus_times);
@@ -424,6 +446,7 @@ void gen_default(testargs *myargs)
     loop_defs(myargs, "A", "I_STRIDE", "A_col", "CE", "CE", "CS",set_all_types);
     loop_defs(myargs, "A", "I_BACK", "A_col", "CE", "CE", "CB", set_all_types);
   } else if (strcmp(testbase, "testVExtr") == 0) {
+    no_mask_accum(myargs);
     loop_defs(myargs, "V1", "V1_ind", "", "VE", "VE", "CD", set_all_types);
     loop_defs(myargs, "V1", "ALL", "", "V2", "V2", "CA", set_all_types);
     loop_defs(myargs, "V1", "I_RANGE", "", "V2", "V2", "CR", set_all_types);
@@ -435,11 +458,13 @@ void gen_default(testargs *myargs)
     loop_defs(myargs, "A", "I_RANGE", "I_RANGE", "M", "B", "CR", set_all_types);
     loop_defs(myargs, "A", "I_STRIDE", "I_STRIDE","ME","ME","CS",set_all_types);
     loop_defs(myargs, "A", "I_BACK", "I_BACK", "ME", "ME", "CB", set_all_types);
-  } else if (strcmp(testbase, "testMTAssn") == 0)
+  } else if (strcmp(testbase, "testMTAssn") == 0) {
+    no_mask_accum(myargs);
     index_defs(myargs, "V1", "A_row", "A_col", "M", "A", false);
-  else if (strcmp(testbase, "testVTAssn") == 0)
+  } else if (strcmp(testbase, "testVTAssn") == 0) {
+    no_mask_accum(myargs);
     index_defs(myargs, "V2", "V1_ind", "", "V2", "V1", false);
-  else if (strcmp(testbase, "testMTSubA") == 0) {
+  } else if (strcmp(testbase, "testMTSubA") == 0) {
     loop_defs(myargs, "V1", "A_row", "A_col", "ME", "A", "CD", set_all_types);
     loop_defs(myargs, "V1", "ALL", "ALL", "M", "A", "CA", set_all_types);
     loop_defs(myargs, "V1", "I_RANGE", "I_RANGE", "M", "A", "CR",set_all_types);
@@ -454,6 +479,7 @@ void gen_default(testargs *myargs)
 
   // operations that use different index patterns, input is vector or matrix
   } else if (strcmp(testbase, "testMAssn") == 0) {
+    no_mask_accum(myargs);
     index_defs(myargs, "ME", "A_row", "A_col", "M", "A", true);
   } else if (strcmp(testbase, "testMSubA") == 0) {
     loop_defs(myargs, "ME", "A_row", "A_col", "ME", "A", "CD", set_all_types);
@@ -462,9 +488,11 @@ void gen_default(testargs *myargs)
     loop_defs(myargs, "MES","I_STRIDE","I_STRIDE","MES","A","CS",set_all_types);
     loop_defs(myargs, "MEB", "I_BACK", "I_BACK", "MEB", "A","CB",set_all_types);
   } else if (strcmp(testbase, "testCAssn") == 0) {
+    no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
     index_defs(myargs, "CE", "A_row", "A_col", "V2", "A", true);
   } else if (strcmp(testbase, "testCSubA") == 0) {
+    no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
     loop_defs(myargs, "CE", "A_row", "A_col", "CE", "A", "CD", set_all_types);
     loop_defs(myargs, "CEA", "ALL", "A_col", "CEA", "A", "CA", set_all_types);
@@ -472,9 +500,11 @@ void gen_default(testargs *myargs)
     loop_defs(myargs, "CES", "I_STRIDE", "A_col", "CES","A","CS",set_all_types);
     loop_defs(myargs, "CEB", "I_BACK", "A_col", "CEB", "A", "CB",set_all_types);
   } else if (strcmp(testbase, "testRAssn") == 0) {
+    no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
     index_defs(myargs, "CE", "A_row", "A_col", "V1", "A", true);
   } else if (strcmp(testbase, "testRSubA") == 0) {
+    no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
     loop_defs(myargs, "CE", "A_row", "A_col", "CE", "A", "CD", set_all_types);
     loop_defs(myargs, "CEA", "A_row", "ALL", "CEA", "A", "CA", set_all_types);
@@ -482,9 +512,11 @@ void gen_default(testargs *myargs)
     loop_defs(myargs, "CES", "A_row", "I_STRIDE", "CES","A","CS",set_all_types);
     loop_defs(myargs, "CEB", "A_row", "I_BACK", "CEB", "A", "CB",set_all_types);
   } else if (strcmp(testbase, "testVAssn") == 0) {
+    no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
     index_defs(myargs, "VE", "V1_ind", "", "V2", "V1", true);
   } else if (strcmp(testbase, "testVSubA") == 0) {
+    no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
     loop_defs(myargs, "VE", "V1_ind", "", "VE", "V1", "CD", set_all_types);
     loop_defs(myargs, "VEA", "ALL", "", "VEA", "V1", "CA", set_all_types);
