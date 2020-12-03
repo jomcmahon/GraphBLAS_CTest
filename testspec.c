@@ -73,21 +73,23 @@ void print_spec(testargs *myargs, int **myspec)
 }
 
 // print test spec and add to list file
-void print_test_spec(testargs *myargs, int **myspec, char *str)
+void print_test_spec(testargs *myargs, int **myspec, char *str, bool lflag)
 {
   strcat(myargs->output, str); // output name with string to identify sub-test
 
-  char sfile[256];
-  sprintf(sfile, "data/specfiles/%s%s.spec", myargs->testbase,
-	  myargs->output); // spec output file
-  FILE *infp = fopen(sfile, "r");
-  if (!infp) {
-    char lfname[256];
-    sprintf(lfname, "data/specfiles/%s.list", myargs->testbase);
-    FILE *listfp = fopen(lfname, "a"); // file with list of spec files
-    if (listfp) // write spec name to list file if exists
-      { fprintf(listfp, "%s\n", sfile); fclose(listfp); }
-  } else fclose(infp);
+  if (lflag) {
+    char sfile[256];
+    sprintf(sfile, "data/specfiles/%s%s.spec", myargs->testbase,
+	    myargs->output); // spec output file
+    FILE *infp = fopen(sfile, "r");
+    if (!infp) {
+      char lfname[256];
+      sprintf(lfname, "data/specfiles/%s.list", myargs->testbase);
+      FILE *listfp = fopen(lfname, "a"); // file with list of spec files
+      if (listfp) // write spec name to list file if exists
+	{ fprintf(listfp, "%s\n", sfile); fclose(listfp); }
+    } else fclose(infp);
+  }
 
   print_spec(myargs, myspec);
 }
@@ -284,23 +286,25 @@ void loop_defs(testargs *inargs, char *i0, char *i1, char *i2, char *m,
 
   testargs *myargsC = malloc(sizeof(testargs)); // copy args
   memcpy(myargsC, myargs, sizeof(testargs));
-  print_test_spec(myargsC, myspec, "D"); // default
+  print_test_spec(myargsC, myspec, "D", true); // default, always add to list
 
-  if ((strlen(m) > 0) && (strlen(inargs->mask) == 0)) {
+  bool btest = (strlen(inargs->mask) == 0);
+  if (strlen(m) > 0) { // mask; only add to list if desired
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->mask, m);
-    print_test_spec(myargsC, myspec, "M"); // with mask
+    print_test_spec(myargsC, myspec, "M", btest);
   }
-  if ((strlen(iv) > 0) && (inargs->specobj[ACCUM] == -1)) {
+  if (strlen(iv) > 0) { // accum; only add to list if desired
+    bool atest = (inargs->specobj[ACCUM] == -1);
     accum_iteration_plus(myspec); // add accumulators to spec
     memcpy(myargsC, myargs, sizeof(testargs));
     strcpy(myargsC->initvals, iv);
-    print_test_spec(myargsC, myspec, "A"); // with accums
-    if ((strlen(m) > 0) && (strlen(inargs->mask) == 0)) {
+    print_test_spec(myargsC, myspec, "A", atest);
+    if (strlen(m) > 0) { // mask and accum; only add to list if desired
       memcpy(myargsC, myargs, sizeof(testargs));
       strcpy(myargsC->mask, m);
       strcpy(myargsC->initvals, iv);
-      print_test_spec(myargsC, myspec, "B"); // with mask and accum
+      print_test_spec(myargsC, myspec, "B", (atest && btest));
     }
   }
 
