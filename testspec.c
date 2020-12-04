@@ -108,21 +108,50 @@ void set_test_spec(spec inspec, int lim, int **myspec)
   }
 }
 
-void accum_iteration_plus(int **myspec)
+void accum_for_obj(int **sptr)
 {
-  set_test_spec(ACCUM, num_Types(), myspec); // allocate array
-  int g = 1;
-  myspec[ACCUM][g++] = find_BinaryOp(GxB_ANY_BOOL);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_INT8);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_UINT8);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_INT16);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_UINT16);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_INT32);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_UINT32);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_INT64);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_UINT64);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_FP32);
-  myspec[ACCUM][g++] = find_BinaryOp(GrB_PLUS_FP64);
+  spec inspec = TOTAL; // pick the first one with values, assumes order
+  for (int i = 0; i < SELOP; i++) if (sptr[i]) { inspec = i; break; }
+  if (inspec == TOTAL) return; // must be one of first five
+
+  int lim = sptr[inspec][0];
+  set_test_spec(ACCUM, lim, sptr); // allocate array
+  for (int i = 0, j = 1; i < lim; i++, j++) { // outer loop
+    int val;
+    if (lim >= spec_limits(inspec)) val = i; // whole range
+    else val = sptr[inspec][j]; // from spec
+
+    GrB_Type xtype, ytype, ztype;
+    GrB_Semiring semi;
+    GrB_Monoid mon;
+    GrB_BinaryOp binop;
+    GrB_UnaryOp unop;
+    switch (inspec) {
+    case TYPE: get_Type(val, &ztype); break;
+    case SEMI: get_Semiring(val, &semi);
+      get_types_semiring(semi, &xtype, &ytype, &ztype); break;
+    case MON: get_Monoid(val, &mon);
+      get_types_monoid(mon, &xtype, &ytype, &ztype); break;
+    case BINOP: get_BinaryOp(val, &binop);
+      get_types_binop(binop, &xtype, &ytype, &ztype); break;
+    case UNOP: get_UnaryOp(val, &unop);
+      get_types_unop(unop, &xtype, &ztype); break;
+    default: return; // do nothing if incorrect spec
+    }
+
+    if (ztype == GrB_BOOL) sptr[ACCUM][j] = find_BinaryOp(GxB_ANY_BOOL);
+    else if (ztype == GrB_INT8) sptr[ACCUM][j] = find_BinaryOp(GrB_PLUS_INT8);
+    else if (ztype == GrB_UINT8) sptr[ACCUM][j] = find_BinaryOp(GrB_PLUS_UINT8);
+    else if (ztype == GrB_INT16) sptr[ACCUM][j] = find_BinaryOp(GrB_PLUS_INT16);
+    else if (ztype == GrB_UINT16) sptr[ACCUM][j]=find_BinaryOp(GrB_PLUS_UINT16);
+    else if (ztype == GrB_INT32) sptr[ACCUM][j] = find_BinaryOp(GrB_PLUS_INT32);
+    else if (ztype == GrB_UINT32) sptr[ACCUM][j]=find_BinaryOp(GrB_PLUS_UINT32);
+    else if (ztype == GrB_INT64) sptr[ACCUM][j] = find_BinaryOp(GrB_PLUS_INT64);
+    else if (ztype == GrB_UINT64) sptr[ACCUM][j]=find_BinaryOp(GrB_PLUS_UINT64);
+    else if (ztype == GrB_FP32) sptr[ACCUM][j] = find_BinaryOp(GrB_PLUS_FP32);
+    else if (ztype == GrB_FP64) sptr[ACCUM][j] = find_BinaryOp(GrB_PLUS_FP64);
+    else sptr[ACCUM][j] = -1; // no accumulator
+  }
 }
 
 void set_noany_monoids(int **myspec)
@@ -144,21 +173,21 @@ void set_noany_monoids(int **myspec)
   set_test_spec(MON, num_Monoids() - b, myspec);
   for (int i = 0, actual = 1; i < num_Monoids(); i++)
     if (!find_in_list(blocked, i, b)) myspec[MON][actual++] = i;
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 // set spec to include all types
 void set_all_monoids(int **myspec)
 {
   set_test_spec(MON, num_Monoids(), myspec);
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 // set spec to include all types
 void set_all_types(int **myspec)
 {
   set_test_spec(TYPE, num_Types(), myspec);
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 void semi_loop_plus_times(int **myspec)
@@ -176,7 +205,7 @@ void semi_loop_plus_times(int **myspec)
   myspec[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_UINT64);
   myspec[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_FP32);
   myspec[SEMI][g++] = find_Semiring(GxB_PLUS_TIMES_FP64);
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 void unop_loop_no_minv(int **myspec)
@@ -197,7 +226,7 @@ void unop_loop_no_minv(int **myspec)
   set_test_spec(UNOP, num_UnaryOps() - b, myspec);
   for (int i = 0, actual = 1; i < num_UnaryOps(); i++)
     if (!find_in_list(blocked, i, b)) myspec[UNOP][actual++] = i;
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 void binop_loop_any(int **myspec)
@@ -215,7 +244,7 @@ void binop_loop_any(int **myspec)
   myspec[BINOP][g++] = find_BinaryOp(GxB_ANY_UINT64);
   myspec[BINOP][g++] = find_BinaryOp(GxB_ANY_FP32);
   myspec[BINOP][g++] = find_BinaryOp(GxB_ANY_FP64);
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 void binop_loop_pair(int **myspec)
@@ -233,7 +262,7 @@ void binop_loop_pair(int **myspec)
   myspec[BINOP][g++] = find_BinaryOp(GxB_PAIR_UINT64);
   myspec[BINOP][g++] = find_BinaryOp(GxB_PAIR_FP32);
   myspec[BINOP][g++] = find_BinaryOp(GxB_PAIR_FP64);
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 void binop_loop_plus(int **myspec)
@@ -251,7 +280,7 @@ void binop_loop_plus(int **myspec)
   myspec[BINOP][g++] = find_BinaryOp(GrB_PLUS_UINT64);
   myspec[BINOP][g++] = find_BinaryOp(GrB_PLUS_FP32);
   myspec[BINOP][g++] = find_BinaryOp(GrB_PLUS_FP64);
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 void binop_loop_min(int **myspec)
@@ -269,7 +298,7 @@ void binop_loop_min(int **myspec)
   myspec[BINOP][g++] = find_BinaryOp(GrB_MIN_UINT64);
   myspec[BINOP][g++] = find_BinaryOp(GrB_MIN_FP32);
   myspec[BINOP][g++] = find_BinaryOp(GrB_MIN_FP64);
-  accum_iteration_plus(myspec); // add accumulators to spec
+  accum_for_obj(myspec); // add accumulators to spec
 }
 
 void select_defs(int **myspec)
