@@ -47,7 +47,7 @@ GrB_Info vec_write(GrB_Vector A, FILE *f)
   OK (GrB_Vector_extractTuples (J, X, &nvals, A));		  \
   if (nz != nvals) { printf("Bad number of vals\n"); exit(1); }	  \
   for (int k = 0 ; k < nvals ; k++)				  \
-    fprintf(f, "%ld %ld %d\n", 1L, J[k]+1, X[k]);
+    fprintf(f, "%lu %lu %d\n", 1LU, J[k]+1, X[k]);
 
   if (thetype == GrB_BOOL) { bool *X = (bool *)Z; SET_ELT; }
   else if (thetype == GrB_INT8) { int8_t *X = (int8_t *)Z; SET_ELT; }
@@ -58,7 +58,7 @@ GrB_Info vec_write(GrB_Vector A, FILE *f)
     OK (GrB_Vector_extractTuples (J, X, &nvals, A));
     if (nz != nvals) { printf("Bad number of vals\n"); exit(1); }
     for (int k = 0 ; k < nvals ; k++)
-      fprintf(f, "%ld %ld %ld\n", 1L, J[k]+1, X[k]);
+      fprintf(f, "%lu %lu %ld\n", 1LU, J[k]+1, X[k]);
   } else if (thetype == GrB_UINT8) { uint8_t *X = (uint8_t *)Z; SET_ELT; }
   else if (thetype == GrB_UINT16) { uint16_t *X = (uint16_t *)Z; SET_ELT; }
   else if (thetype == GrB_UINT32) { uint32_t *X = (uint32_t *)Z; SET_ELT; }
@@ -67,19 +67,21 @@ GrB_Info vec_write(GrB_Vector A, FILE *f)
     OK (GrB_Vector_extractTuples (J, X, &nvals, A));
     if (nz != nvals) { printf("Bad number of vals\n"); exit(1); }
     for (int k = 0 ; k < nvals ; k++)
-      fprintf(f, "%ld %ld %lu\n", 1L, J[k]+1, X[k]);
+      fprintf(f, "%lu %lu %lu\n", 1LU, J[k]+1, X[k]);
   } else if (thetype == GrB_FP32) {
     float *X = (float *)Z;
     OK (GrB_Vector_extractTuples (J, X, &nvals, A));
     if (nz != nvals) { printf("Bad number of vals\n"); exit(1); }
     for (int k = 0 ; k < nvals ; k++)
-      fprintf(f, "%ld %ld %.16f\n", 1L, J[k]+1, X[k]);
+      fprintf(f, "%lu %lu %.16f\n", 1LU, J[k]+1, X[k]);
   } else if (thetype == GrB_FP64) {
     OK (GrB_Vector_extractTuples (J, Z, &nvals, A));
     if (nz != nvals) { printf("Bad number of vals\n"); exit(1); }
     for (int k = 0 ; k < nvals ; k++)
-      fprintf(f, "%ld %ld %.16f\n", 1L, J[k]+1, Z[k]);
+      fprintf(f, "%lu %lu %.16f\n", 1LU, J[k]+1, Z[k]);
   } else { printf("vec_write: bad type\n"); exit(1); }
+
+  free(Z); free(J);
 
   return (GrB_SUCCESS) ;
 }

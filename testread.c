@@ -35,6 +35,7 @@ int main(int argc, char * argv[])
     TEST_OK(read_matlab_vector(myargs->testbase, myargs->input1, thetype, &V1));
     TEST_OK(read_matlab_vector(myargs->testbase, myargs->input2, thetype, &V2));
 
+    sprintf(myargs->output, "%s", ostr);
     TEST_OK(write_typed_matrix(myargs->testbase, myargs->output, thetype, A));
     TEST_COND(check_typed_matrix(myargs->testbase, myargs->output, thetype, A),
 	      myargs->output);
