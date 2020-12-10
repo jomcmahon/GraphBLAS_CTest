@@ -12,7 +12,7 @@
 #include "mmio.h"
 
 // read a GraphBLAS matrix that has been written by the C Test Suite
-GrB_Info mm_read(GrB_Matrix *A, FILE *f, GrB_Type thetype)
+void mm_read(GrB_Matrix *A, FILE *f, GrB_Type thetype)
 {
   GrB_Info info;
   MM_typecode matcode;
@@ -107,6 +107,4 @@ GrB_Info mm_read(GrB_Matrix *A, FILE *f, GrB_Type thetype)
   else if (thetype == GrB_FP64)
     GrB_Matrix_build(*A, I, J, X_f64, nz, GxB_ANY_FP64);
   else { printf("mm_read: bad type\n"); exit(1); }
-
-  return GrB_SUCCESS;
 }

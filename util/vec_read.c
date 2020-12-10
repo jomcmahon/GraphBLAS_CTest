@@ -12,7 +12,7 @@
 #include "mmio.h"
 
 // read a GraphBLAS vector that has been written by the C Test Suite
-GrB_Info vec_read(GrB_Vector *A, FILE *f, GrB_Type thetype)
+void vec_read(GrB_Vector *A, FILE *f, GrB_Type thetype)
 {
   GrB_Info info;
   MM_typecode matcode;
@@ -108,6 +108,4 @@ GrB_Info vec_read(GrB_Vector *A, FILE *f, GrB_Type thetype)
   else if (thetype == GrB_FP64)
     GrB_Vector_build(*A, I, X_f64, nz, GxB_ANY_FP64);
   else { printf("vec_read: bad type\n"); exit(1); }
-
-  return GrB_SUCCESS;
 }

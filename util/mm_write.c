@@ -12,7 +12,7 @@
 #include "mmio.h"
 
 // write a GraphBLAS matrix to matrix market file
-GrB_Info mm_write(GrB_Matrix A, FILE *f)
+void mm_write(GrB_Matrix A, FILE *f)
 {
   GrB_Info info;
   MM_typecode matcode;
@@ -85,6 +85,4 @@ GrB_Info mm_write(GrB_Matrix A, FILE *f)
   } else { printf("mm_write: bad type\n"); exit(1); }
 
   free(Z); free(J); free(I);
-
-  return (GrB_SUCCESS) ;
 }

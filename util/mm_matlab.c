@@ -11,17 +11,8 @@
 #include "test_utils.h"
 #include "mmio.h"
 
-// no dense or complex matrices
-bool gb_is_valid(MM_typecode matcode)
-{
-  if (mm_is_matrix(matcode) && !mm_is_complex(matcode) &&
-      !mm_is_symmetric(matcode) && !mm_is_skew(matcode) &&
-      !mm_is_hermitian(matcode)) return true;
-  else return false;
-}
-
 // read a matrix written by matlab into a GraphBLAS matrix of a certain type
-GrB_Info mm_matlab(GrB_Matrix *A, FILE *f, GrB_Type thetype)
+void mm_matlab(GrB_Matrix *A, FILE *f, GrB_Type thetype)
 {
   GrB_Info info;
   MM_typecode matcode;
@@ -34,7 +25,7 @@ GrB_Info mm_matlab(GrB_Matrix *A, FILE *f, GrB_Type thetype)
   if (mm_read_banner(f, &matcode) != 0)
     { printf("couldn't read mtx banner\n"); exit(1); }
 
-  if (!gb_is_valid(matcode))
+  if (MM_INVALID(matcode) || mm_is_dense(matcode))
     { printf("invalid matrix %s\n", matcode); exit(1); }
 
   if (mm_read_mtx_crd_size(f, &M, &N, &nz) !=0)
@@ -115,6 +106,4 @@ GrB_Info mm_matlab(GrB_Matrix *A, FILE *f, GrB_Type thetype)
   else if (thetype == GrB_FP64)
     GrB_Matrix_build(*A, I, J, X_f64, nz, GxB_ANY_FP64);
   else { printf("mm_matlab: bad type\n"); exit(1); }
-
-  return GrB_SUCCESS;
 }
