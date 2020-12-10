@@ -10,6 +10,12 @@
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
 
+#define SUBTEST_COND(_c, _s) do \
+    { if (!(_c)) { printf("%s\n", _s); testok = false; } } while (0)
+
+#define TEST_COND(_c, _s) do { printf("%s: ", _s); if (_c) printf("PASSED\n"); \
+    else { printf("FAILED\n"); testerror = true; } } while (0)
+
 typedef struct {
   float stuff [4][4];
   char whatstuff [64];
@@ -35,64 +41,64 @@ int main(int argc, char * argv[])
     int8_t sval = 10;
 
 #define TEST_VEC(_v)							\
-    TEST_OK(GrB_Vector_size(&vsize, vec));				\
+    OK (GrB_Vector_size(&vsize, vec));				\
     SUBTEST_COND(sz == vsize, "vector size not equal");			\
-    TEST_OK(GrB_Vector_nvals(&nvals, vec));				\
+    OK (GrB_Vector_nvals(&nvals, vec));				\
     SUBTEST_COND(nv == nvals, "vector values not equal");		\
-    TEST_OK(GxB_Vector_type(&vtype, vec));				\
+    OK (GxB_Vector_type(&vtype, vec));				\
     SUBTEST_COND(thetype == vtype, "vector types not equal");
 
 #define TEST_ELTS(_v)							\
     TEST_VEC(_v);							\
-    TEST_OK(GrB_Vector_extractElement(&r, _v, vind));			\
+    OK (GrB_Vector_extractElement(&r, _v, vind));			\
     SUBTEST_COND(r == s, "extracted not equal first set");		\
-    TEST_OK(GrB_Vector_extractElement(&r, _v, vind + 1));		\
+    OK (GrB_Vector_extractElement(&r, _v, vind + 1));		\
     SUBTEST_COND(r == s, "extracted not equal second set");
 
 #ifdef NOT_YET_SUPPORTED
 #define SET_AND_TEST_TBD						\
     GrB_Vector dupvec;							\
-    TEST_OK(GrB_Vector_dup(&dupvec, vec));				\
+    OK (GrB_Vector_dup(&dupvec, vec));				\
     TEST_ELTS(dupvec);							\
     TEST_ELTS(vec);							\
-    TEST_OK(GrB_Vector_free(&dupvec));					\
+    OK (GrB_Vector_free(&dupvec));					\
     SUBTEST_COND(!dupvec, "duplicated not freed");			\
     GrB_Vector buildvec;						\
     int opind = (i == 0) ? 271 : i - 1;					\
     GrB_BinaryOp binop; get_BinaryOp(opind, &binop);			\
-    TEST_OK(GrB_Vector_new(&buildvec, thetype, sz));			\
-    TEST_OK(GrB_Vector_build(buildvec, I, X, nv, binop));		\
+    OK (GrB_Vector_new(&buildvec, thetype, sz));			\
+    OK (GrB_Vector_build(buildvec, I, X, nv, binop));		\
     TEST_ELTS(buildvec);						\
     TEST_ELTS(vec);							\
-    TEST_OK(GrB_Vector_free(&buildvec));				\
+    OK (GrB_Vector_free(&buildvec));				\
     SUBTEST_COND(!buildvec, "built not freed");
 #else
 #define SET_AND_TEST_TBD
 #endif    
 
 #define SET_AND_TEST							\
-    TEST_OK(GrB_Vector_new(&vec, thetype, sz));				\
+    OK (GrB_Vector_new(&vec, thetype, sz));				\
     TEST_VEC(vec);							\
-    TEST_OK(GrB_Vector_setElement(vec, s, vind));			\
-    TEST_OK(GrB_Vector_setElement(vec, s, vind + 1));			\
+    OK (GrB_Vector_setElement(vec, s, vind));			\
+    OK (GrB_Vector_setElement(vec, s, vind + 1));			\
     nv += 2; TEST_ELTS(vec);						\
-    sz++; TEST_OK(GxB_Vector_resize(vec, sz));				\
+    sz++; OK (GxB_Vector_resize(vec, sz));				\
     TEST_ELTS(vec);							\
-    TEST_OK(GrB_Vector_extractTuples(NULL, X, &nv, vec));		\
+    OK (GrB_Vector_extractTuples(NULL, X, &nv, vec));		\
     bool vtest = ((X[0] == r) && (X[1] == r));				\
     SUBTEST_COND(vtest, "extracted tuples not correct");		\
-    TEST_OK(GrB_Vector_extractTuples(I, X, &nv, vec));			\
+    OK (GrB_Vector_extractTuples(I, X, &nv, vec));			\
     vtest = ((X[0] == r) && (X[1] == r) &&				\
     	     (I[0] == vind) && (I[1] == vind + 1));			\
     SUBTEST_COND(vtest, "extracted tuples not correct");		\
     X = NULL;								\
-    TEST_OK(GrB_Vector_extractTuples(I, X, &nv, vec));			\
+    OK (GrB_Vector_extractTuples(I, X, &nv, vec));			\
     vtest = ((I[0] == vind) && (I[1] == vind + 1));			\
     SUBTEST_COND(vtest, "extracted tuples not correct");		\
     SET_AND_TEST_TBD;							\
-    TEST_OK(GrB_Vector_clear(vec));					\
+    OK (GrB_Vector_clear(vec));					\
     nv = 0; TEST_VEC(vec);						\
-    TEST_OK(GrB_Vector_free(&vec));					\
+    OK (GrB_Vector_free(&vec));					\
     SUBTEST_COND(!vec, "vector not freed");
 
     if (thetype == GrB_BOOL) {
@@ -130,10 +136,10 @@ int main(int argc, char * argv[])
   GrB_Vector vec;
   GrB_Type vtype, thetype;
   GrB_Index vsize, nvals, sz = 8, nv = 0;
-  TEST_OK(GrB_Type_new (&thetype, sizeof(wildtype)));
-  TEST_OK(GrB_Vector_new(&vec, thetype, sz));
+  OK (GrB_Type_new (&thetype, sizeof(wildtype)));
+  OK (GrB_Vector_new(&vec, thetype, sz));
   TEST_VEC(vec);
-  TEST_OK(GrB_Vector_free(&vec));
+  OK (GrB_Vector_free(&vec));
   SUBTEST_COND(!vec, "User-defined not freed");
   TEST_COND(testok, "unit test vector user-defined type");
 #endif

@@ -11,17 +11,8 @@
 #include "test_utils.h"
 #include "mmio.h"
 
-// only dense, non-complex, non pattern matrices allowed
-bool gbi_is_valid(MM_typecode matcode)
-{
-  if (!mm_is_matrix(matcode) || mm_is_sparse(matcode) ||
-      mm_is_complex(matcode) || mm_is_hermitian(matcode) ||
-      mm_is_pattern(matcode) || mm_is_skew(matcode)) return false;
-  else return true;
-}
-
 // read an index array written from matlab as a vector
-GrB_Info ind_read(GrB_Index **Ind, GrB_Index *nInd, FILE *f)
+void ind_read(GrB_Index **Ind, GrB_Index *nInd, FILE *f)
 {
   MM_typecode matcode;
   int M, N, valctr = 0;
@@ -33,7 +24,7 @@ GrB_Info ind_read(GrB_Index **Ind, GrB_Index *nInd, FILE *f)
   if (mm_read_banner(f, &matcode) != 0)
     { printf("couldn't read mtx banner\n"); exit(1); }
 
-  if (!gbi_is_valid(matcode))
+  if (MM_INVALID(matcode) && mm_is_sparse(matcode))
     { printf("invalid index matrix %s\n", matcode); exit(1); }
 
   if (mm_read_mtx_array_size(f, &M, &N) !=0)
@@ -56,6 +47,4 @@ GrB_Info ind_read(GrB_Index **Ind, GrB_Index *nInd, FILE *f)
 
   *Ind = I;  // return values
   *nInd = nz;
-
-  return GrB_SUCCESS;
 }

@@ -16,6 +16,12 @@
 #define MASK_STRUCT(i) (i & 8)
 #define OUTP_REPL(i) (i & 16)
 
+#define SUBTEST_COND(_c, _s) do \
+    { if (!(_c)) { printf("%s\n", _s); testok = false; } } while (0)
+
+#define TEST_COND(_c, _s) do { printf("%s: ", _s); if (_c) printf("PASSED\n"); \
+    else { printf("FAILED\n"); testerror = true; } } while (0)
+
 int main(int argc, char * argv[])
 {
   GrB_Info info;
@@ -31,19 +37,19 @@ int main(int argc, char * argv[])
     GrB_Descriptor desc; get_Descriptor(i, &desc);
     GrB_Desc_Value val;
 
-    TEST_OK(GxB_Desc_get(desc, GrB_OUTP, &val));
+    OK (GxB_Desc_get(desc, GrB_OUTP, &val));
     bool dt0 = ((OUTP_REPL(i) && (val == GrB_REPLACE)) ||
 	       (!OUTP_REPL(i) && (val != GrB_REPLACE)));
     SUBTEST_COND(dt0, "output replace");
-    TEST_OK(GxB_Desc_get(desc, GrB_INP0, &val));
+    OK (GxB_Desc_get(desc, GrB_INP0, &val));
     bool dt1 = ((INP0_TRAN(i) && (val == GrB_TRAN)) ||
 	  (!INP0_TRAN(i) && (val != GrB_TRAN)));
     SUBTEST_COND(dt1, "input 0 transpose");
-    TEST_OK(GxB_Desc_get(desc, GrB_INP1, &val));
+    OK (GxB_Desc_get(desc, GrB_INP1, &val));
     bool dt2 = ((INP1_TRAN(i) && (val == GrB_TRAN)) ||
 	  (!INP1_TRAN(i) && (val != GrB_TRAN)));
     SUBTEST_COND(dt2, "input 1 transpose");
-    TEST_OK(GxB_Desc_get(desc, GrB_MASK, &val));
+    OK (GxB_Desc_get(desc, GrB_MASK, &val));
     bool dt3 = ((MASK_COMP(i) && (val & GrB_COMP)) ||
 	  (!MASK_COMP(i) && !(val & GrB_COMP)));
     SUBTEST_COND(dt3, "mask complement");
@@ -61,14 +67,14 @@ int main(int argc, char * argv[])
   bool testok = true;
   GrB_Descriptor desc;
   GrB_Desc_Value val;
-  TEST_OK(GrB_Descriptor_new(&desc));
-  TEST_OK(GrB_Descriptor_set(desc, GrB_OUTP, GrB_REPLACE));
-  TEST_OK(GxB_Desc_set(desc, GrB_MASK, GrB_COMP));
-  TEST_OK(GxB_Desc_get(desc, GrB_OUTP, &val));
+  OK (GrB_Descriptor_new(&desc));
+  OK (GrB_Descriptor_set(desc, GrB_OUTP, GrB_REPLACE));
+  OK (GxB_Desc_set(desc, GrB_MASK, GrB_COMP));
+  OK (GxB_Desc_get(desc, GrB_OUTP, &val));
   SUBTEST_COND(val == GrB_REPLACE , "replace not correct");
-  TEST_OK(GxB_Desc_get(desc, GrB_MASK, &val));
+  OK (GxB_Desc_get(desc, GrB_MASK, &val));
   SUBTEST_COND(val == GrB_COMP, "mask complement not correct");
-  TEST_OK(GrB_Descriptor_free(&desc));
+  OK (GrB_Descriptor_free(&desc));
   TEST_COND(testok, "unit test user-def descriptor");
 
   OK(GrB_finalize());

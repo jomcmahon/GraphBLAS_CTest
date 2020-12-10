@@ -10,6 +10,12 @@
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
 
+#define SUBTEST_COND(_c, _s) do \
+    { if (!(_c)) { printf("%s\n", _s); testok = false; } } while (0)
+
+#define TEST_COND(_c, _s) do { printf("%s: ", _s); if (_c) printf("PASSED\n"); \
+    else { printf("FAILED\n"); testerror = true; } } while (0)
+
 typedef struct {
   float stuff [4][4];
   char whatstuff [64];
@@ -25,9 +31,9 @@ int main(int argc, char * argv[])
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
 #define TEST_SCAL(_s)						\
-  TEST_OK(GxB_Scalar_nvals(&nvals, _s));			\
+  OK (GxB_Scalar_nvals(&nvals, _s));			\
   SUBTEST_COND(nv == nvals, "scalar nvals not correct");	\
-  TEST_OK(GxB_Scalar_type(&stype, _s));				\
+  OK (GxB_Scalar_type(&stype, _s));				\
   SUBTEST_COND(thetype == stype, "scalar type not correct");
 
   for (int i = 0; i < num_Types(); i++) { // type loop
@@ -39,22 +45,22 @@ int main(int argc, char * argv[])
     GrB_Index nvals, nv = 0;
 
 #define SET_AND_TEST							\
-    TEST_OK(GxB_Scalar_new(&scal, thetype));				\
+    OK (GxB_Scalar_new(&scal, thetype));				\
     TEST_SCAL(scal);							\
-    TEST_OK(GxB_Scalar_setElement(scal, s));				\
+    OK (GxB_Scalar_setElement(scal, s));				\
     nv++; TEST_SCAL(scal);						\
-    TEST_OK(GxB_Scalar_extractElement(&r, scal));			\
+    OK (GxB_Scalar_extractElement(&r, scal));			\
     TEST_SCAL(scal); SUBTEST_COND(r == s, "scalar values not equal") ;	\
-    TEST_OK(GxB_Scalar_dup(&dupscal, scal));				\
+    OK (GxB_Scalar_dup(&dupscal, scal));				\
     TEST_SCAL(dupscal);							\
-    TEST_OK(GxB_Scalar_extractElement(&r, dupscal));			\
+    OK (GxB_Scalar_extractElement(&r, dupscal));			\
     TEST_SCAL(dupscal); SUBTEST_COND(r == s, "scalar values not equal"); \
-    TEST_OK(GxB_Scalar_clear(scal));					\
+    OK (GxB_Scalar_clear(scal));					\
     nv = 0; TEST_SCAL(scal);						\
     nv = 1; TEST_SCAL(dupscal);						\
-    TEST_OK(GxB_Scalar_free(&scal));					\
+    OK (GxB_Scalar_free(&scal));					\
     SUBTEST_COND(!scal, "scalar not freed");				\
-    TEST_OK(GxB_Scalar_free(&dupscal));					\
+    OK (GxB_Scalar_free(&dupscal));					\
     SUBTEST_COND(!dupscal, "scalar not freed");
 
     if (thetype == GrB_BOOL) {
@@ -93,10 +99,10 @@ int main(int argc, char * argv[])
   GxB_Scalar scal;
   GrB_Type stype, thetype;
   GrB_Index nvals, nv = 0;
-  TEST_OK(GrB_Type_new (&thetype, sizeof(wildtype)));
-  TEST_OK(GxB_Scalar_new(&scal, thetype));
+  OK (GrB_Type_new (&thetype, sizeof(wildtype)));
+  OK (GxB_Scalar_new(&scal, thetype));
   TEST_SCAL(scal);
-  TEST_OK(GxB_Scalar_free(&scal));
+  OK (GxB_Scalar_free(&scal));
   SUBTEST_COND(!scal, "User-defined scalar not freed");
   TEST_COND(testok, "unit test user-defined scalar");
 #endif

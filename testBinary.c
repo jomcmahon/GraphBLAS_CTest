@@ -10,6 +10,12 @@
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
 
+#define SUBTEST_COND(_c, _s) do \
+    { if (!(_c)) { printf("%s\n", _s); testok = false; } } while (0)
+
+#define TEST_COND(_c, _s) do { printf("%s: ", _s); if (_c) printf("PASSED\n"); \
+    else { printf("FAILED\n"); testerror = true; } } while (0)
+
 void f_bin_b (void *z, const void *x, const void *y)
 { *(bool *)z = *(bool *)x + *(bool *)y; }
 void f_bin_i8 (void *z, const void *x, const void *y)
@@ -46,11 +52,11 @@ int main(int argc, char * argv[])
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
 #define TEST_OP								\
-  TEST_OK(GxB_BinaryOp_ztype(&ztype, binop));				\
+  OK (GxB_BinaryOp_ztype(&ztype, binop));				\
   SUBTEST_COND(ztype == outtype, "binary op ztypes don't match");	\
-  TEST_OK(GxB_BinaryOp_xtype(&xtype, binop));				\
+  OK (GxB_BinaryOp_xtype(&xtype, binop));				\
   SUBTEST_COND(xtype == intype, "binary op xtypes don't match");	\
-  TEST_OK(GxB_BinaryOp_ytype(&ytype, binop));				\
+  OK (GxB_BinaryOp_ytype(&ytype, binop));				\
   SUBTEST_COND(ytype == intype, "binary op ytypes don't match");
 
   // test type methods of 21 x 11 built-in UnaryOps
@@ -80,9 +86,9 @@ int main(int argc, char * argv[])
     void (*f) (void *, const void *, const void *);
 
 #define SET_AND_TEST						     \
-    TEST_OK(GrB_BinaryOp_new (&binop, f, outtype, intype, intype));  \
+    OK (GrB_BinaryOp_new (&binop, f, outtype, intype, intype));  \
     TEST_OP;							     \
-    TEST_OK(GrB_BinaryOp_free(&binop));				     \
+    OK (GrB_BinaryOp_free(&binop));				     \
     SUBTEST_COND(!binop, "User-defined binary op not freed");
 
     if (intype == GrB_BOOL) { f = f_bin_b; SET_AND_TEST; }

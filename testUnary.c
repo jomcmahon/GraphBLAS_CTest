@@ -10,6 +10,12 @@
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
 
+#define SUBTEST_COND(_c, _s) do \
+    { if (!(_c)) { printf("%s\n", _s); testok = false; } } while (0)
+
+#define TEST_COND(_c, _s) do { printf("%s: ", _s); if (_c) printf("PASSED\n"); \
+    else { printf("FAILED\n"); testerror = true; } } while (0)
+
 void f_un_b (void *z, const void *x) { *(bool *)z = *(bool *)x; }
 void f_un_i8 (void *z, const void *x) { *(int8_t *)z = *(int8_t *)x; }
 void f_un_u8 (void *z, const void *x) { *(uint8_t *)z = *(uint8_t *)x; }
@@ -34,9 +40,9 @@ int main(int argc, char * argv[])
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
 #define TEST_OP								\
-    TEST_OK(GxB_UnaryOp_ztype(&ztype, unop));				\
+    OK (GxB_UnaryOp_ztype(&ztype, unop));				\
     SUBTEST_COND(ztype == thetype, "Unary op ztypes don't match");	\
-    TEST_OK(GxB_UnaryOp_xtype(&xtype, unop));				\
+    OK (GxB_UnaryOp_xtype(&xtype, unop));				\
     SUBTEST_COND(xtype == thetype, "Unary op xtypes don't match");
 
   // test type methods of 67 built-in UnaryOps
@@ -62,9 +68,9 @@ int main(int argc, char * argv[])
     void (*f) (void *, const void *);
 
 #define SET_AND_TEST						\
-    TEST_OK(GrB_UnaryOp_new (&unop, f, thetype, thetype));	\
+    OK (GrB_UnaryOp_new (&unop, f, thetype, thetype));	\
     TEST_OP;							\
-    TEST_OK(GrB_UnaryOp_free(&unop));				\
+    OK (GrB_UnaryOp_free(&unop));				\
     SUBTEST_COND(!unop, "User-defined unary op not freed");
     
     if (thetype == GrB_BOOL) { f = f_un_b; SET_AND_TEST; }

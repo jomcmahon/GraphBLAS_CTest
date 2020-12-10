@@ -10,6 +10,12 @@
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
 
+#define SUBTEST_COND(_c, _s) do \
+    { if (!(_c)) { printf("%s\n", _s); testok = false; } } while (0)
+
+#define TEST_COND(_c, _s) do { printf("%s: ", _s); if (_c) printf("PASSED\n"); \
+    else { printf("FAILED\n"); testerror = true; } } while (0)
+
 void get_Semiring_BinaryOp(int, GrB_BinaryOp *);
 void get_Semiring_Monoid(int, GrB_Monoid *);
 
@@ -23,9 +29,9 @@ int main(int argc, char * argv[])
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
 #define TEST_OP								\
-  TEST_OK(GxB_Semiring_add(&mon, thesemi));				\
+  OK (GxB_Semiring_add(&mon, thesemi));				\
   SUBTEST_COND(mon == themon, "Semiring monoids don't match");		\
-  TEST_OK(GxB_Semiring_multiply(&op, thesemi));				\
+  OK (GxB_Semiring_multiply(&op, thesemi));				\
   SUBTEST_COND(op == thebinop, "Semiring ops don't match");
 
   // test a reasonable subset of 1355 built-in semirings
@@ -49,9 +55,9 @@ int main(int argc, char * argv[])
   GrB_Semiring thesemi;
   GrB_Monoid mon, themon = GxB_PLUS_INT8_MONOID;
   GrB_BinaryOp op, thebinop = GrB_TIMES_INT8;
-  TEST_OK(GrB_Semiring_new(&thesemi, themon, thebinop));
+  OK (GrB_Semiring_new(&thesemi, themon, thebinop));
   TEST_OP;
-  TEST_OK(GrB_Semiring_free(&thesemi));
+  OK (GrB_Semiring_free(&thesemi));
   SUBTEST_COND(!thesemi, "User-defined semiring not freed");
   TEST_COND(testok, "unit test user-defined semiring");
 #endif

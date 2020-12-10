@@ -12,33 +12,31 @@
 
 bool run_MTRed(testargs *myargs)
 {
+  GrB_Info info;
   GrB_Monoid mon; get_Monoid(myargs->specobj[MON], &mon);
-  if (!mon) return false; // required
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
 
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
-    GxB_print(mon, GxB_SUMMARY);
+    OK (GxB_print(mon, GxB_SUMMARY));
   }
 
-  bool testerror = false;
-  GrB_Info info = GrB_SUCCESS; // reset for next sub-test
   GrB_Type xtype = NULL, ytype = NULL, ztype = NULL; // types defined by monoid
-  TEST_OK(get_types_monoid(mon, &xtype, &ytype, &ztype));
+  get_types_monoid(mon, &xtype, &ytype, &ztype);
 
   GrB_Matrix A = NULL; // inputs and outputs
   GrB_Vector C = NULL;
-  TEST_OK(read_matlab_matrix(myargs->inbase, myargs->input0, ztype, &A));
-  if (strlen(myargs->initvals) == 0) // initvals file name
-    TEST_OK(GrB_Vector_new(&C, ztype, 1)); // create empty vector length 1
-  else // read initvals if file name specified
-    TEST_OK(read_matlab_vector(myargs->inbase, myargs->initvals, ztype, &C));
+  read_matlab_matrix(myargs->inbase, myargs->input0, ztype, &A);
+
+  // if initvals file supplied, initialize, otherwise empty matrix
+  if (strlen(myargs->initvals) == 0) OK (GrB_Vector_new(&C, ztype, 1));
+  else read_matlab_vector(myargs->inbase, myargs->initvals, ztype, &C);
 
 #define SET_AND_TEST					\
   GrB_Vector_extractElement(&c, C, 0);			\
-  TEST_OK(GrB_reduce(&c, accum, mon, A, desc));		\
-  TEST_OK(GrB_Vector_setElement(C, c, 0));
+  OK (GrB_reduce(&c, accum, mon, A, desc));		\
+  OK (GrB_Vector_setElement(C, c, 0));
 
   // call reduce based on type
   if (ztype == GrB_BOOL) { bool c; SET_AND_TEST; }
@@ -54,13 +52,12 @@ bool run_MTRed(testargs *myargs)
   else if (ztype == GrB_FP64) { double c; SET_AND_TEST; }
   else { printf("bad type\n"); exit(1); }
 
-  if (myargs->generate) // if generating, write to file
-    TEST_OK(write_typed_vector(myargs->testbase, myargs->output, ztype, C));
-  else TEST_COND(check_typed_vector(myargs->testbase, myargs->output, ztype, C),
-		 myargs->output); // test and print
+  bool testerror = false; // if generating, write to file, otherwise compare
+  if (myargs->generate) write_typed_vector(myargs->testbase, myargs->output, C);
+  else testerror = check_typed_vector(myargs->testbase, myargs->output, C);
 
   // free all data products
-  TEST_OK(GrB_free(&A)); TEST_OK(GrB_free(&C));
+  OK (GrB_free(&A)); OK (GrB_free(&C));
   return testerror;
 }
 

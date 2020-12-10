@@ -162,9 +162,9 @@ bool test_L_DA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
   for (int i = 0; i < lim; i++) { // outer loop
     if (lim >= spec_limits(inspec)) myargs->specobj[inspec] = i; // whole range
     else myargs->specobj[inspec] = specptr[inspec][i + 1]; // from spec
-    if (inspec == TYPE) sprintf(myargs->output, "%s", bname); // don't add type
-    else sprintf(myargs->output, "%s_%c%d", bname, fname_chars[inspec],
-		 myargs->specobj[inspec]);
+
+    sprintf(myargs->output, "%s_%c%d", bname, fname_chars[inspec],
+	    myargs->specobj[inspec]);
 
     if (specptr[ACCUM] && (i < specptr[ACCUM][0])) { // if there is accumulator
       myargs->specobj[ACCUM] = specptr[ACCUM][i + 1]; // add it to args
@@ -231,7 +231,7 @@ bool test_spec_loop(testargs *myargs, bool (*g)(testargs *))
 	free(myargsC);
       }
       fclose(infp); return testerror;
-    } return false; // must have output file or spec or list file
+    } return true; // must have output file or spec or list file
   } else return test_loop(myargs, g); // run test loop
 }
 

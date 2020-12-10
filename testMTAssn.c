@@ -12,43 +12,40 @@
 
 bool run_MTAssn(testargs *myargs)
 {
+  GrB_Info info;
   GrB_Type thetype; get_Type(myargs->specobj[TYPE], &thetype);
-  if (!thetype) return false; // required
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
 
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
-    GxB_print(thetype, GxB_SUMMARY);
+    OK (GxB_print(thetype, GxB_SUMMARY));
   }
-
-  bool testerror = false;
-  GrB_Info info = GrB_SUCCESS; // reset for next sub-test
 
   GrB_Vector A;
   GrB_Matrix C = NULL, M = NULL; // inputs and outputs
   GrB_Index *I = NULL, ni = 0, *J = NULL, nj = 0; // index vectors
-  TEST_OK(read_matlab_vector(myargs->inbase, myargs->input0, thetype, &A));
-  TEST_OK(read_test_index(myargs->inbase, myargs->input1, &I, &ni));
-  TEST_OK(read_test_index(myargs->inbase, myargs->input2, &J, &nj));
+  read_matlab_vector(myargs->inbase, myargs->input0, thetype, &A);
+  read_test_index(myargs->inbase, myargs->input1, &I, &ni);
+  read_test_index(myargs->inbase, myargs->input2, &J, &nj);
 
   if (strlen(myargs->mask) > 0) // read mask if file name given
-    TEST_OK(read_matlab_matrix(myargs->inbase, myargs->mask, GrB_BOOL, &M));
+    read_matlab_matrix(myargs->inbase, myargs->mask, GrB_BOOL, &M);
 
   if (strlen(myargs->initvals) == 0) { // initvals file name
     GrB_Index outR = 0, outC = 0;
-    if (M) { GrB_Matrix_nrows(&outR, M); GrB_Matrix_ncols(&outC, M); }
+    if (M) { OK (GrB_Matrix_nrows(&outR, M)); OK (GrB_Matrix_ncols(&outC, M)); }
     else {
       outR = get_index_dim(I, ni, 0);
       outC = get_index_dim(J, nj, 0);
     }
-    TEST_OK(GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
+    OK (GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
   } else // read initvals if file name specified
-    TEST_OK(read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C));
+    read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C);
 
 #define SET_AND_TEST							\
-  GrB_Vector_extractElement(&c, A, 0);					\
-  TEST_OK(GrB_assign(C, M, accum, c, I, ni, J, nj, desc)); // do operation
+  OK (GrB_Vector_extractElement(&c, A, 0));				\
+  OK (GrB_assign(C, M, accum, c, I, ni, J, nj, desc)); // do operation
 
   // call based on type
   if (thetype == GrB_BOOL) { bool c; SET_AND_TEST; }
@@ -64,16 +61,15 @@ bool run_MTAssn(testargs *myargs)
   else if (thetype == GrB_FP64) { double c; SET_AND_TEST; }
   else { printf("bad type\n"); exit(1); }
 
-  if (myargs->generate) { // if generating, write to file
-    TEST_OK(write_typed_matrix(myargs->testbase, myargs->output, thetype, C));
-  } else TEST_COND(check_typed_matrix(myargs->testbase, myargs->output, thetype,
-				      C), myargs->output); // test and print
+  bool testerror = false; // if generating, write to file, otherwise compare
+  if (myargs->generate) write_typed_matrix(myargs->testbase, myargs->output, C);
+  else testerror = check_typed_matrix(myargs->testbase, myargs->output, C);
 
   // free the inputs and outputs
-  TEST_OK(GrB_free(&C)); if (M) TEST_OK(GrB_free(&M));
+  OK (GrB_free(&C)); if (M) OK (GrB_free(&M));
   if (I != GrB_ALL) free(I);
   if (J != GrB_ALL) free(J);
-  return testerror;
+  return testerror; // false means no error
 }
 
 int main(int argc, char * argv[])

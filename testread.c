@@ -31,26 +31,23 @@ int main(int argc, char * argv[])
     GrB_Matrix A = NULL;
     GrB_Vector V1 = NULL, V2 = NULL;
 
-    TEST_OK(read_matlab_matrix(myargs->testbase, myargs->input0, thetype, &A));
-    TEST_OK(read_matlab_vector(myargs->testbase, myargs->input1, thetype, &V1));
-    TEST_OK(read_matlab_vector(myargs->testbase, myargs->input2, thetype, &V2));
+    read_matlab_matrix(myargs->testbase, myargs->input0, thetype, &A);
+    read_matlab_vector(myargs->testbase, myargs->input1, thetype, &V1);
+    read_matlab_vector(myargs->testbase, myargs->input2, thetype, &V2);
 
-    sprintf(myargs->output, "%s", ostr);
-    TEST_OK(write_typed_matrix(myargs->testbase, myargs->output, thetype, A));
-    TEST_COND(check_typed_matrix(myargs->testbase, myargs->output, thetype, A),
-	      myargs->output);
+    sprintf(myargs->output, "%s_T%d", ostr, i);
+    write_typed_matrix(myargs->testbase, myargs->output, A);
+    testerror |= check_typed_matrix(myargs->testbase, myargs->output, A);
 
-    sprintf(myargs->output, "%s%d", ostr, 1);
-    TEST_OK(write_typed_vector(myargs->testbase, myargs->output, thetype, V1));
-    TEST_COND(check_typed_vector(myargs->testbase, myargs->output, thetype, V1),
-	      myargs->output);
+    sprintf(myargs->output, "%s%d_T%d", ostr, 1, i);
+    write_typed_vector(myargs->testbase, myargs->output, V1);
+    testerror |= check_typed_vector(myargs->testbase, myargs->output, V1);
 
-    sprintf(myargs->output, "%s%d", ostr, 2);
-    TEST_OK(write_typed_vector(myargs->testbase, myargs->output, thetype, V2));
-    TEST_COND(check_typed_vector(myargs->testbase, myargs->output, thetype, V2),
-	      myargs->output);
+    sprintf(myargs->output, "%s%d_T%d", ostr, 2, i);
+    write_typed_vector(myargs->testbase, myargs->output, V2);
+    testerror |= check_typed_vector(myargs->testbase, myargs->output, V2);
 
-    GrB_free (&A); GrB_free (&V1); GrB_free (&V2);
+    OK (GrB_free (&A)); OK (GrB_free (&V1)); OK (GrB_free (&V2));
   }
 
   OK(GrB_finalize());

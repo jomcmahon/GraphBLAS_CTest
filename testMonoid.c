@@ -10,6 +10,12 @@
 #include "GraphBLAS.h"
 #include "util/test_utils.h"
 
+#define SUBTEST_COND(_c, _s) do \
+    { if (!(_c)) { printf("%s\n", _s); testok = false; } } while (0)
+
+#define TEST_COND(_c, _s) do { printf("%s: ", _s); if (_c) printf("PASSED\n"); \
+    else { printf("FAILED\n"); testerror = true; } } while (0)
+
 int get_Monoid_BinaryOp(int, GrB_BinaryOp *);
 void get_Monoid_Type(int, GrB_Type *);
 
@@ -30,10 +36,10 @@ int main(int argc, char * argv[])
   bool mt;
 
 #define SET_AND_TEST							\
-  TEST_OK(GxB_Monoid_operator(&getbinop, themon));			\
+  OK (GxB_Monoid_operator(&getbinop, themon));			\
   SUBTEST_COND(getbinop == thebinop, "monoid ops not equal");		\
-  TEST_OK(GxB_Monoid_identity(I, themon));				\
-  TEST_OK(GxB_Monoid_terminal(&getflag, T, themon));			\
+  OK (GxB_Monoid_identity(I, themon));				\
+  OK (GxB_Monoid_terminal(&getflag, T, themon));			\
   SUBTEST_COND(theflag == getflag, "monoid flags not equal");		\
   SUBTEST_COND(*I == id, "monoid ids not equal");			\
   mt = !getflag || (getflag && (*T == term));				\
@@ -176,14 +182,14 @@ int main(int argc, char * argv[])
   info = GrB_Monoid_new(&themon, thebinop, id);
   SUBTEST_COND(info == GrB_SUCCESS, "user-defined monoid new");
   SET_AND_TEST;
-  TEST_OK(GrB_Monoid_free(&themon));
+  OK (GrB_Monoid_free(&themon));
   SUBTEST_COND(!themon, "monoid not freed");
   id = SCHAR_MAX; term = SCHAR_MIN; theflag = true;
   thebinop = GrB_MIN_INT8;
   info = GxB_Monoid_terminal_new(&themon, thebinop, id, term);
   SUBTEST_COND(info == GrB_SUCCESS, "user-defined monoid term new");
   SET_AND_TEST;
-  TEST_OK(GrB_Monoid_free(&themon));
+  OK (GrB_Monoid_free(&themon));
   SUBTEST_COND(!themon, "monoid not freed");
   TEST_COND(testok, "unit test user-defined monoid");
 #endif
