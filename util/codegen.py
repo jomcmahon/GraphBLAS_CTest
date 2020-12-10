@@ -253,10 +253,10 @@ def gensemi() :
 
 def getGBobj(olist, item) :
     if (item.isdigit()) :
-        print olist[int(item)];
+        print(olist[int(item)]);
     else :
         val = [ind for ind, x in enumerate(olist) if x == item]
-        print val[0]
+        print(val[0])
 
 import sys
 

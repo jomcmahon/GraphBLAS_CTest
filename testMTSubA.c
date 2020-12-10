@@ -35,6 +35,7 @@ bool run_MTSubA(testargs *myargs)
   if (strlen(myargs->initvals) == 0) { // initvals file name
     GrB_Index nr = 0, nc = 0;
     if (M) { GrB_Matrix_nrows(&nr, M); GrB_Matrix_ncols(&nc, M); }
+    else { OK (GrB_Vector_size(&nr, A)); nc = nr; }
     GrB_Index outR = get_index_dim(I, ni, nr);
     GrB_Index outC = get_index_dim(J, nj, nc);
     OK (GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
