@@ -1,10 +1,9 @@
 /*
-   Copyright 2020 by Lucata Corporation.
-   Lucata grants a free license for noncommercial use and requires that this
-   notice not be removed from the source files.
-
    GraphBLAS C Test Suite
-   DESCRIPTION: mm_matlab read double to typed matrix
+   Lucata Corporation/Emu Technology, (c) 2020, All Rights Reserved.
+   SPDX-License-Identifier: Apache-2.0
+
+   DESCRIPTION: support routines to read and write data to/from MM files
 */
 
 #include "GraphBLAS.h"

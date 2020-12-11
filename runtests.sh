@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# GraphBLAS C Test Suite
+# Lucata Corporation/Emu Technology, (c) 2020, All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# DESCRIPTION: script to generate data from reference and then run test
+
 # $1 is test executable name; all other args passed
 function singlerun {
     mkdir -p data/specfiles

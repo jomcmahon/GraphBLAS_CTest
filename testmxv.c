@@ -1,9 +1,8 @@
 /*
-   Copyright 2020 by Lucata Corporation.
-   Lucata grants a free license for noncommercial use and requires that this
-   notice not be removed from the source files.
-
    GraphBLAS C Test Suite
+   Lucata Corporation/Emu Technology, (c) 2020, All Rights Reserved.
+   SPDX-License-Identifier: Apache-2.0
+
    DESCRIPTION: test mxv: default ANY_PAIR_BOOL or PLUS_TIMES, four descriptors
 */
 
