@@ -30,6 +30,7 @@ int spec_limits(spec inspec)
 // print input arguments
 void print_args(testargs *myargs, GrB_Descriptor desc, GrB_BinaryOp accum)
 {
+  GrB_Info info;
   if (strlen(myargs->input0) > 0) printf("%s: %s\n", "input0", myargs->input0);
   if (strlen(myargs->input1) > 0) printf("%s: %s\n", "input1", myargs->input1);
   if (strlen(myargs->input2) > 0) printf("%s: %s\n", "input2", myargs->input2);
@@ -38,8 +39,8 @@ void print_args(testargs *myargs, GrB_Descriptor desc, GrB_BinaryOp accum)
     printf("%s: %s\n", "initvals", myargs->initvals);
   if (strlen(myargs->output) > 0) printf("%s: %s\n", "output", myargs->output);
 
-  if (desc) GxB_print(desc, GxB_SUMMARY);
-  if (accum) GxB_print(accum, GxB_SUMMARY);
+  if (desc) OK (GxB_print(desc, GxB_SUMMARY));
+  if (accum) OK (GxB_print(accum, GxB_SUMMARY));
 }
 
 // read parameters from file into spec array
@@ -298,13 +299,13 @@ testargs *get_test_args(int argc, char **argv)
 bool run_test(int argc, char **argv, bool (*g)(testargs *))
 {
   GrB_Info info;
-  OK(GrB_init(GrB_BLOCKING));
+  OK (GrB_init(GrB_BLOCKING));
   testargs *myargs = get_test_args(argc, argv);
 
   printf("Running %s:\n", myargs->testbase); fflush(stdout);
 
   bool testerror = test_spec_loop(myargs, g);
 
-  OK(GrB_finalize());
+  OK (GrB_finalize());
   return testerror;
 }

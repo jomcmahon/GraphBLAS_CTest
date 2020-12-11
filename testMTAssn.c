@@ -33,13 +33,9 @@ bool run_MTAssn(testargs *myargs)
     read_matlab_matrix(myargs->inbase, myargs->mask, GrB_BOOL, &M);
 
   if (strlen(myargs->initvals) == 0) { // initvals file name
-    GrB_Index vsize = 0, outR = 0, outC = 0;
+    GrB_Index outR = 0, outC = 0;
     if (M) { OK (GrB_Matrix_nrows(&outR, M)); OK (GrB_Matrix_ncols(&outC, M)); }
-    else {
-      OK (GrB_Vector_size(&vsize, A));
-      outR = get_index_dim(I, ni, vsize);
-      outC = get_index_dim(J, nj, vsize);
-    }
+    else { outR = get_index_dim(I, ni, 1); outC = get_index_dim(J, nj, 1); }
     OK (GrB_Matrix_new(&C, thetype, outR, outC)); // assume sorted
   } else // read initvals if file name specified
     read_matlab_matrix(myargs->inbase, myargs->initvals, thetype, &C);

@@ -30,9 +30,8 @@ bool run_VTSubA(testargs *myargs)
     read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M);
 
   if (strlen(myargs->initvals) == 0) { // initvals file name
-    GrB_Index vsize = 0;
+    GrB_Index vsize = 1; // at least one element
     if (M) OK (GrB_Vector_size(&vsize, M));
-    else OK (GrB_Vector_size(&vsize, A));
     GrB_Index outS = get_index_dim(I, ni, vsize);
     OK (GrB_Vector_new(&C, thetype, outS)); // assume sorted
   } else // read initvals if file name specified

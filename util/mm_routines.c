@@ -10,15 +10,17 @@
 #include "GraphBLAS.h"
 #include "test_utils.h"
 
-void mm_setup(FILE *, int *, int *, int *, GrB_Index **, GrB_Index **,
-	      double **);
-void mm_double(FILE *, GrB_Type, int, GrB_Index *, GrB_Index *, double *);
-void mm_type(FILE *, GrB_Type, int, GrB_Index *, GrB_Index *, double *);
-void mm_vecbuild(GrB_Vector, GrB_Type, int, GrB_Index *, double *);
-void mm_matbuild(GrB_Matrix, GrB_Type, int, GrB_Index *, GrB_Index *, double *);
+void mm_setup(FILE *, GrB_Index *, GrB_Index *, GrB_Index *, GrB_Index **,
+	      GrB_Index **, double **);
+void mm_double(FILE *, GrB_Type, GrB_Index, GrB_Index *, GrB_Index *, double *);
+void mm_type(FILE *, GrB_Type, GrB_Index, GrB_Index *, GrB_Index *, double *);
+void mm_vecbuild(GrB_Vector, GrB_Type, GrB_Index, GrB_Index *, double *);
+void mm_matbuild(GrB_Matrix, GrB_Type, GrB_Index, GrB_Index *, GrB_Index *,
+		 double *);
 
-void mm_output(FILE *, int, int, int, GrB_Index **, GrB_Index **, double **);
-void mm_print(FILE *, GrB_Type, int, GrB_Index *, GrB_Index *, double *);
+void mm_output(FILE *, GrB_Index, GrB_Index, GrB_Index, GrB_Index **,
+	       GrB_Index **, double **);
+void mm_print(FILE *, GrB_Type, GrB_Index, GrB_Index *, GrB_Index *, double *);
 void mm_vecextract(GrB_Vector, GrB_Type, GrB_Index, GrB_Index *, double *);
 void mm_matextract(GrB_Matrix, GrB_Type, GrB_Index, GrB_Index *, GrB_Index *,
 		   double *);
@@ -30,8 +32,7 @@ void mm_matlab(GrB_Matrix *A, FILE *f, GrB_Type thetype)
     { printf("file or object pointer is null\n"); exit(1); }
 
   GrB_Info info;
-  int M, N, nz;
-  GrB_Index *I, *J;
+  GrB_Index M, N, nz, *I, *J;
   double *X_f64;
 
   mm_setup(f, &M, &N, &nz, &I, &J, &X_f64);
@@ -47,8 +48,7 @@ void vec_matlab(GrB_Vector *A, FILE *f, GrB_Type thetype)
     { printf("file or object pointer is null\n"); exit(1); }
 
   GrB_Info info;
-  int M, N, nz;
-  GrB_Index *I, *J;
+  GrB_Index M, N, nz, *I, *J;
   double *X_f64;
 
   mm_setup(f, &M, &N, &nz, &I, &J, &X_f64);
@@ -67,8 +67,7 @@ void mm_read(GrB_Matrix *A, FILE *f, GrB_Type thetype)
     { printf("file or object pointer is null\n"); exit(1); }
 
   GrB_Info info;
-  int M, N, nz;
-  GrB_Index *I, *J;
+  GrB_Index M, N, nz, *I, *J;
   double *X_f64;
 
   mm_setup(f, &M, &N, &nz, &I, &J, &X_f64);
@@ -84,8 +83,7 @@ void vec_read(GrB_Vector *A, FILE *f, GrB_Type thetype)
     { printf("file or object pointer is null\n"); exit(1); }
 
   GrB_Info info;
-  int M, N, nz;
-  GrB_Index *I, *J;
+  GrB_Index M, N, nz, *I, *J;
   double *X_f64;
 
   mm_setup(f, &M, &N, &nz, &I, &J, &X_f64);
@@ -105,8 +103,7 @@ void mm_write(GrB_Matrix A, FILE *f)
 
   GrB_Info info;
   GrB_Type thetype;
-  GrB_Index M, N, nz;
-  GrB_Index *I, *J;
+  GrB_Index M, N, nz, *I, *J;
   double *X_f64;
 
   OK (GxB_Matrix_type (&thetype, A));
@@ -127,8 +124,7 @@ void vec_write(GrB_Vector A, FILE *f)
 
   GrB_Info info;
   GrB_Type thetype;
-  GrB_Index M = 1, N, nz;
-  GrB_Index *I, *J;
+  GrB_Index M = 1, N, nz, *I, *J;
   double *X_f64;
 
   OK (GxB_Vector_type (&thetype, A));

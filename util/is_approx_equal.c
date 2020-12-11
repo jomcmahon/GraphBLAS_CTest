@@ -115,7 +115,7 @@ bool is_approx_equal_mat(GrB_Matrix A, GrB_Matrix B)
     OK (GrB_Matrix_nvals (&nvals, C)) ;
     if (nvals != nvals1) { // pattern of A and B are different
       printf(" patterns %ld %ld", nvals, nvals1);
-      GrB_free (&C) ;
+      OK (GrB_free (&C)) ;
       return false;
     }
 
@@ -123,7 +123,7 @@ bool is_approx_equal_mat(GrB_Matrix A, GrB_Matrix B)
     OK (GrB_reduce (&result, NULL, GxB_LAND_BOOL_MONOID, C, NULL)) ;
 
     // free workspace and return result
-    GrB_free (&C) ;
+    OK (GrB_free (&C)) ;
     return result;
 }
 
@@ -181,7 +181,7 @@ bool is_approx_equal_vec(GrB_Vector A, GrB_Vector B)
     OK (GrB_Vector_nvals (&nvals, C)) ;
     if (nvals != nvals1) { // pattern of A and B are different
       printf(" patterns %ld %ld", nvals, nvals1);
-      GrB_free (&C) ;
+      OK (GrB_free (&C)) ;
       return false;
     }
 
@@ -189,6 +189,6 @@ bool is_approx_equal_vec(GrB_Vector A, GrB_Vector B)
     OK (GrB_reduce (&result, NULL, GxB_LAND_BOOL_MONOID, C, NULL)) ;
 
     // free workspace and return result
-    GrB_free (&C) ;
+    OK (GrB_free (&C)) ;
     return result;
 }

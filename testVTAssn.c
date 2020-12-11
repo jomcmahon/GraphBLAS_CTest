@@ -31,12 +31,9 @@ bool run_VTAssn(testargs *myargs)
     read_matlab_vector(myargs->inbase, myargs->mask, GrB_BOOL, &M);
 
   if (strlen(myargs->initvals) == 0) { // initvals file name
-    GrB_Index vsize = 0, outS = 0;
+    GrB_Index outS = 0;
     if (M) OK (GrB_Vector_size(&outS, M));
-    else {
-      OK (GrB_Vector_size(&vsize, A));
-      outS = get_index_dim(I, ni, vsize);
-    }
+    else outS = get_index_dim(I, ni, 1); // assign at least one element
     OK (GrB_Vector_new(&C, thetype, outS)); // assume sorted
   } else // read initvals if file name specified
     read_matlab_vector(myargs->inbase, myargs->initvals, thetype, &C);

@@ -60,7 +60,7 @@ bool check_typed_matrix(const char *base, const char *name, GrB_Matrix A)
   mm_read(&T, fp, type);
   fclose(fp);
   bool eqtest = is_approx_equal_mat(T, A);
-  GrB_free(&T);
+  OK (GrB_free(&T));
   if (eqtest) printf("%s: PASSED\n", name); else printf("%s: FAILED\n", name);
   return !eqtest; // return true if error, false if ok
 }
@@ -101,7 +101,7 @@ bool check_typed_vector(const char *base, const char *name, GrB_Vector A)
   vec_read(&T, fp, type);
   fclose(fp);
   bool eqtest = is_approx_equal_vec(T, A);
-  GrB_free(&T);
+  OK (GrB_free(&T));
   if (eqtest) printf("%s: PASSED\n", name); else printf("%s: FAILED\n", name);
   return !eqtest; // return true if error, false if ok
 }

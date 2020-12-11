@@ -32,17 +32,16 @@ int main(int argc, char * argv[])
     GrB_Vector V1 = NULL, V2 = NULL;
 
     read_matlab_matrix(myargs->testbase, myargs->input0, thetype, &A);
-    read_matlab_vector(myargs->testbase, myargs->input1, thetype, &V1);
-    read_matlab_vector(myargs->testbase, myargs->input2, thetype, &V2);
-
     sprintf(myargs->output, "%s_T%d", ostr, i);
     write_typed_matrix(myargs->testbase, myargs->output, A);
     testerror |= check_typed_matrix(myargs->testbase, myargs->output, A);
 
+    read_matlab_vector(myargs->testbase, myargs->input1, thetype, &V1);
     sprintf(myargs->output, "%s%d_T%d", ostr, 1, i);
     write_typed_vector(myargs->testbase, myargs->output, V1);
     testerror |= check_typed_vector(myargs->testbase, myargs->output, V1);
 
+    read_matlab_vector(myargs->testbase, myargs->input2, thetype, &V2);
     sprintf(myargs->output, "%s%d_T%d", ostr, 2, i);
     write_typed_vector(myargs->testbase, myargs->output, V2);
     testerror |= check_typed_vector(myargs->testbase, myargs->output, V2);

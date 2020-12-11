@@ -12,9 +12,10 @@
 #include "mmio.h"
 
 // read banner and allocate arrays
-void mm_setup(FILE *f, int *M, int *N, int *nz, GrB_Index **I, GrB_Index **J,
-	      double **X_f64)
+void mm_setup(FILE *f, GrB_Index *M, GrB_Index *N, GrB_Index *nz, GrB_Index **I,
+	      GrB_Index **J, double **X_f64)
 {
+  int m, n, nv;
   MM_typecode matcode;
 
   if (mm_read_banner(f, &matcode) != 0)
@@ -23,17 +24,18 @@ void mm_setup(FILE *f, int *M, int *N, int *nz, GrB_Index **I, GrB_Index **J,
   if (MM_INVALID(matcode) || mm_is_dense(matcode))
     { printf("invalid matrix %s\n", matcode); exit(1); }
 
-  if (mm_read_mtx_crd_size(f, M, N, nz) !=0)
+  if (mm_read_mtx_crd_size(f, &m, &n, &nv) !=0)
     { printf("couldn't read sizes\n"); exit(1); }
 
-  *I = malloc(*nz * sizeof(GrB_Index));
-  *J = malloc(*nz * sizeof(GrB_Index));
-  *X_f64 = malloc(*nz * sizeof(double));
+  *nz = nv; *M = m; *N = n;
+  *I = malloc(nv * sizeof(GrB_Index));
+  *J = malloc(nv * sizeof(GrB_Index));
+  *X_f64 = malloc(nv * sizeof(double));
 }
 
 // read values as double and cast to type
-void mm_double(FILE *f, GrB_Type thetype, int nz, GrB_Index *I, GrB_Index *J,
-	       double *X_f64)
+void mm_double(FILE *f, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
+	       GrB_Index *J, double *X_f64)
 {
   int valctr = 0;
   char line[MM_MAX_LINE_LENGTH];
@@ -75,8 +77,8 @@ void mm_double(FILE *f, GrB_Type thetype, int nz, GrB_Index *I, GrB_Index *J,
 }
 
 // read values as given type
-void mm_type(FILE *f, GrB_Type thetype, int nz, GrB_Index *I, GrB_Index *J,
-	     double *X_f64)
+void mm_type(FILE *f, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
+	     GrB_Index *J, double *X_f64)
 {
   int valctr = 0;
   char line[MM_MAX_LINE_LENGTH];
@@ -116,66 +118,70 @@ void mm_type(FILE *f, GrB_Type thetype, int nz, GrB_Index *I, GrB_Index *J,
 }
 
 // build matrix from arrays according to type
-void mm_matbuild(GrB_Matrix A, GrB_Type thetype, int nz, GrB_Index *I,
+void mm_matbuild(GrB_Matrix A, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
 		 GrB_Index *J, double *X_f64)
 {
+  if (nz == 0) return;
+  GrB_Info info;
   if (thetype == GrB_BOOL)
-    GrB_Matrix_build(A, I, J, (bool *)X_f64, nz, GxB_ANY_BOOL);
+    OK (GrB_Matrix_build(A, I, J, (bool *)X_f64, nz, GxB_ANY_BOOL));
   else if (thetype == GrB_INT8)
-    GrB_Matrix_build(A, I, J, (int8_t *)X_f64, nz, GxB_ANY_INT8);
+    OK (GrB_Matrix_build(A, I, J, (int8_t *)X_f64, nz, GxB_ANY_INT8));
   else if (thetype == GrB_INT16)
-    GrB_Matrix_build(A, I, J, (int16_t *)X_f64, nz, GxB_ANY_INT16);
+    OK (GrB_Matrix_build(A, I, J, (int16_t *)X_f64, nz, GxB_ANY_INT16));
   else if (thetype == GrB_INT32)
-    GrB_Matrix_build(A, I, J, (int32_t *)X_f64, nz, GxB_ANY_INT32);
+    OK (GrB_Matrix_build(A, I, J, (int32_t *)X_f64, nz, GxB_ANY_INT32));
   else if (thetype == GrB_INT64)
-    GrB_Matrix_build(A, I, J, (int64_t *)X_f64, nz, GxB_ANY_INT64);
+    OK (GrB_Matrix_build(A, I, J, (int64_t *)X_f64, nz, GxB_ANY_INT64));
   else if (thetype == GrB_UINT8)
-    GrB_Matrix_build(A, I, J, (uint8_t *)X_f64, nz, GxB_ANY_UINT8);
+    OK (GrB_Matrix_build(A, I, J, (uint8_t *)X_f64, nz, GxB_ANY_UINT8));
   else if (thetype == GrB_UINT16)
-    GrB_Matrix_build(A, I, J, (uint16_t *)X_f64, nz, GxB_ANY_UINT16);
+    OK (GrB_Matrix_build(A, I, J, (uint16_t *)X_f64, nz, GxB_ANY_UINT16));
   else if (thetype == GrB_UINT32)
-    GrB_Matrix_build(A, I, J, (uint32_t *)X_f64, nz, GxB_ANY_UINT32);
+    OK (GrB_Matrix_build(A, I, J, (uint32_t *)X_f64, nz, GxB_ANY_UINT32));
   else if (thetype == GrB_UINT64)
-    GrB_Matrix_build(A, I, J, (uint64_t *)X_f64, nz, GxB_ANY_UINT64);
+    OK (GrB_Matrix_build(A, I, J, (uint64_t *)X_f64, nz, GxB_ANY_UINT64));
   else if (thetype == GrB_FP32)
-    GrB_Matrix_build(A, I, J, (float *)X_f64, nz, GxB_ANY_FP32);
+    OK (GrB_Matrix_build(A, I, J, (float *)X_f64, nz, GxB_ANY_FP32));
   else if (thetype == GrB_FP64)
-    GrB_Matrix_build(A, I, J, (double *)X_f64, nz, GxB_ANY_FP64);
+    OK (GrB_Matrix_build(A, I, J, (double *)X_f64, nz, GxB_ANY_FP64));
   else { printf("bad type\n"); exit(1); }
 }
 
 // build vector from arrays according to type
-void mm_vecbuild(GrB_Vector A, GrB_Type thetype, int nz, GrB_Index *I,
+void mm_vecbuild(GrB_Vector A, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
 		 double *X_f64)
 {
+  if (nz == 0) return;
+  GrB_Info info;
   if (thetype == GrB_BOOL)
-    GrB_Vector_build(A, I, (bool *)X_f64, nz, GxB_ANY_BOOL);
+    OK (GrB_Vector_build(A, I, (bool *)X_f64, nz, GxB_ANY_BOOL));
   else if (thetype == GrB_INT8)
-    GrB_Vector_build(A, I, (int8_t *)X_f64, nz, GxB_ANY_INT8);
+    OK (GrB_Vector_build(A, I, (int8_t *)X_f64, nz, GxB_ANY_INT8));
   else if (thetype == GrB_INT16)
-    GrB_Vector_build(A, I, (int16_t *)X_f64, nz, GxB_ANY_INT16);
+    OK (GrB_Vector_build(A, I, (int16_t *)X_f64, nz, GxB_ANY_INT16));
   else if (thetype == GrB_INT32)
-    GrB_Vector_build(A, I, (int32_t *)X_f64, nz, GxB_ANY_INT32);
+    OK (GrB_Vector_build(A, I, (int32_t *)X_f64, nz, GxB_ANY_INT32));
   else if (thetype == GrB_INT64)
-    GrB_Vector_build(A, I, (int64_t *)X_f64, nz, GxB_ANY_INT64);
+    OK (GrB_Vector_build(A, I, (int64_t *)X_f64, nz, GxB_ANY_INT64));
   else if (thetype == GrB_UINT8)
-    GrB_Vector_build(A, I, (uint8_t *)X_f64, nz, GxB_ANY_UINT8);
+    OK (GrB_Vector_build(A, I, (uint8_t *)X_f64, nz, GxB_ANY_UINT8));
   else if (thetype == GrB_UINT16)
-    GrB_Vector_build(A, I, (uint16_t *)X_f64, nz, GxB_ANY_UINT16);
+    OK (GrB_Vector_build(A, I, (uint16_t *)X_f64, nz, GxB_ANY_UINT16));
   else if (thetype == GrB_UINT32)
-    GrB_Vector_build(A, I, (uint32_t *)X_f64, nz, GxB_ANY_UINT32);
+    OK (GrB_Vector_build(A, I, (uint32_t *)X_f64, nz, GxB_ANY_UINT32));
   else if (thetype == GrB_UINT64)
-    GrB_Vector_build(A, I, (uint64_t *)X_f64, nz, GxB_ANY_UINT64);
+    OK (GrB_Vector_build(A, I, (uint64_t *)X_f64, nz, GxB_ANY_UINT64));
   else if (thetype == GrB_FP32)
-    GrB_Vector_build(A, I, (float *)X_f64, nz, GxB_ANY_FP32);
+    OK (GrB_Vector_build(A, I, (float *)X_f64, nz, GxB_ANY_FP32));
   else if (thetype == GrB_FP64)
-    GrB_Vector_build(A, I, (double *)X_f64, nz, GxB_ANY_FP64);
+    OK (GrB_Vector_build(A, I, (double *)X_f64, nz, GxB_ANY_FP64));
   else { printf("bad type\n"); exit(1); }
 }
 
 // read banner and allocate arrays
-void mm_output(FILE *f, int M, int N, int nz, GrB_Index **I, GrB_Index **J,
-	       double **X_f64)
+void mm_output(FILE *f, GrB_Index M, GrB_Index N, GrB_Index nz, GrB_Index **I,
+	       GrB_Index **J, double **X_f64)
 {
   MM_typecode matcode;
 
@@ -196,8 +202,8 @@ void mm_output(FILE *f, int M, int N, int nz, GrB_Index **I, GrB_Index **J,
 }
 
 // read values as given type
-void mm_print(FILE *f, GrB_Type thetype, int nz, GrB_Index *I, GrB_Index *J,
-	      double *X_f64)
+void mm_print(FILE *f, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
+	      GrB_Index *J, double *X_f64)
 {
   for (int k = 0; k < nz; k++) {
     if (thetype == GrB_BOOL) { bool *X = (bool *)X_f64;
@@ -230,29 +236,31 @@ void mm_print(FILE *f, GrB_Type thetype, int nz, GrB_Index *I, GrB_Index *J,
 void mm_matextract(GrB_Matrix A, GrB_Type thetype, GrB_Index nv, GrB_Index *I,
 		   GrB_Index *J, double *X_f64)
 {
-  GrB_Index nz;
+  GrB_Info info;
+  GrB_Index nz = nv;
+  if (nz == 0) return;
   if (thetype == GrB_BOOL)
-    GrB_Matrix_extractTuples(I, J, (bool *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (bool *)X_f64, &nz, A));
   else if (thetype == GrB_INT8)
-    GrB_Matrix_extractTuples(I, J, (int8_t *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (int8_t *)X_f64, &nz, A));
   else if (thetype == GrB_INT16)
-    GrB_Matrix_extractTuples(I, J, (int16_t *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (int16_t *)X_f64, &nz, A));
   else if (thetype == GrB_INT32)
-    GrB_Matrix_extractTuples(I, J, (int32_t *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (int32_t *)X_f64, &nz, A));
   else if (thetype == GrB_INT64)
-    GrB_Matrix_extractTuples(I, J, (int64_t *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (int64_t *)X_f64, &nz, A));
   else if (thetype == GrB_UINT8)
-    GrB_Matrix_extractTuples(I, J, (uint8_t *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (uint8_t *)X_f64, &nz, A));
   else if (thetype == GrB_UINT16)
-    GrB_Matrix_extractTuples(I, J, (uint16_t *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (uint16_t *)X_f64, &nz, A));
   else if (thetype == GrB_UINT32)
-    GrB_Matrix_extractTuples(I, J, (uint32_t *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (uint32_t *)X_f64, &nz, A));
   else if (thetype == GrB_UINT64)
-    GrB_Matrix_extractTuples(I, J, (uint64_t *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (uint64_t *)X_f64, &nz, A));
   else if (thetype == GrB_FP32)
-    GrB_Matrix_extractTuples(I, J, (float *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (float *)X_f64, &nz, A));
   else if (thetype == GrB_FP64)
-    GrB_Matrix_extractTuples(I, J, (double *)X_f64, &nz, A);
+    OK (GrB_Matrix_extractTuples(I, J, (double *)X_f64, &nz, A));
   else { printf("bad type\n"); exit(1); }
   if (nz != nv) { printf("Bad number of vals %lu %lu\n", nz, nv); exit(1); }
 }
@@ -261,29 +269,31 @@ void mm_matextract(GrB_Matrix A, GrB_Type thetype, GrB_Index nv, GrB_Index *I,
 void mm_vecextract(GrB_Vector A, GrB_Type thetype, GrB_Index nv, GrB_Index *I,
 		   double *X_f64)
 {
-  GrB_Index nz;
+  GrB_Info info;
+  GrB_Index nz = nv;
+  if (nz == 0) return;
   if (thetype == GrB_BOOL)
-    GrB_Vector_extractTuples(I, (bool *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (bool *)X_f64, &nz, A));
   else if (thetype == GrB_INT8)
-    GrB_Vector_extractTuples(I, (int8_t *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (int8_t *)X_f64, &nz, A));
   else if (thetype == GrB_INT16)
-    GrB_Vector_extractTuples(I, (int16_t *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (int16_t *)X_f64, &nz, A));
   else if (thetype == GrB_INT32)
-    GrB_Vector_extractTuples(I, (int32_t *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (int32_t *)X_f64, &nz, A));
   else if (thetype == GrB_INT64)
-    GrB_Vector_extractTuples(I, (int64_t *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (int64_t *)X_f64, &nz, A));
   else if (thetype == GrB_UINT8)
-    GrB_Vector_extractTuples(I, (uint8_t *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (uint8_t *)X_f64, &nz, A));
   else if (thetype == GrB_UINT16)
-    GrB_Vector_extractTuples(I, (uint16_t *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (uint16_t *)X_f64, &nz, A));
   else if (thetype == GrB_UINT32)
-    GrB_Vector_extractTuples(I, (uint32_t *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (uint32_t *)X_f64, &nz, A));
   else if (thetype == GrB_UINT64)
-    GrB_Vector_extractTuples(I, (uint64_t *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (uint64_t *)X_f64, &nz, A));
   else if (thetype == GrB_FP32)
-    GrB_Vector_extractTuples(I, (float *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (float *)X_f64, &nz, A));
   else if (thetype == GrB_FP64)
-    GrB_Vector_extractTuples(I, (double *)X_f64, &nz, A);
+    OK (GrB_Vector_extractTuples(I, (double *)X_f64, &nz, A));
   else { printf("bad type\n"); exit(1); }
   if (nz != nv) { printf("Bad number of vals %lu %lu\n", nz, nv); exit(1); }
 }
