@@ -25,7 +25,7 @@ bool run_MSel(testargs *myargs)
   }
 
   GrB_Matrix A = NULL, C = NULL, M = NULL; // inputs and outputs
-  GrB_Vector T;
+  GrB_Vector T = NULL;
   GrB_Index nrA = 0, ncA = 0;
   read_matlab_matrix(myargs->inbase, myargs->input0, thetype, &A);
   if (strlen(myargs->input1) > 0) {
