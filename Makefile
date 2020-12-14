@@ -75,7 +75,7 @@ genall: $(EXES)
 unit: $(UNITS)
 	for x in $(UNITS); do ./$$x; done
 
-specall: testspec
+specall: $(EXES)
 	mkdir -p ./data/specfiles
 	for x in $(EXES); do ./testspec -g $$x; done
 
