@@ -535,7 +535,11 @@ void gen_default(testargs *myargs)
   } else if (strcmp(testbase, "testCAssn") == 0) {
     no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
-    index_defs(myargs, "CE", "A_row", "A_col", "V2", "A", true);
+    loop_defs(myargs, "CE", "A_row", "A_col", "V2", "A", "CD", set_all_types);
+    loop_defs(myargs, "CEA", "ALL", "A_col", "V2", "A", "CA", set_all_types);
+    loop_defs(myargs, "CER", "I_RANGE", "I_RANGE", "V2","A","CR",set_all_types);
+    loop_defs(myargs, "CES", "I_STRIDE","I_STRIDE","V2","A","CS",set_all_types);
+    loop_defs(myargs, "CEB", "I_BACK", "I_BACK", "V2", "A", "CB",set_all_types);
   } else if (strcmp(testbase, "testCSubA") == 0) {
     no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
@@ -547,7 +551,11 @@ void gen_default(testargs *myargs)
   } else if (strcmp(testbase, "testRAssn") == 0) {
     no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
-    index_defs(myargs, "CE", "A_row", "A_col", "V1", "A", true);
+    loop_defs(myargs, "CE", "A_row", "A_col", "V1", "A", "CD", set_all_types);
+    loop_defs(myargs, "CEA", "A_col", "ALL", "V1", "A", "CA", set_all_types);
+    loop_defs(myargs, "CER", "I_RANGE", "I_RANGE", "V1","A","CR",set_all_types);
+    loop_defs(myargs, "CES", "I_STRIDE","I_STRIDE","V1","A","CS",set_all_types);
+    loop_defs(myargs, "CEB", "I_BACK", "I_BACK", "V1", "A", "CB",set_all_types);
   } else if (strcmp(testbase, "testRSubA") == 0) {
     no_mask_accum(myargs);
     myargs->specobj[DESC] = 2;
