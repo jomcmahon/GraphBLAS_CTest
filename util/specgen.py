@@ -156,55 +156,66 @@ def semilist() :
             SEMIOP.append(find_binop('_'+b, 'BOOL'))
 
 import sys
+from itertools import cycle
 
 def writeline(instr, nlist, sfile) :
     nstr = ' '.join([str(x) for x in nlist])
     sfile.write(instr+' '+str(len(nlist))+' '+nstr+'\n')
 
-def getacclist(ilist, acc, tind) :
-    alist = []
-    if (acc != "") :
-        if (len(ALLBINOPS) == 0) : binoplist()
-        for t in ilist :
-            x = t.split('_')
-            astr = acc+'_'+x[tind]
-            val = [ind for ind, x in enumerate(ALLBINOPS) if x == astr]
-            if (len(val) > 0) : alist += [val[0]]
-            else : alist += [-1]
-    return alist
+def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
+    if (len(ALLBINOPS) == 0) : binoplist()
+    if (len(ALLUNOPS) == 0) : unoplist()
+    if (len(ALLMONS) == 0) : monlist()
+    if (len(ALLSEMIS) == 0) : semilist()
 
-def specgen(testf, out, i0, i1, i2, iv, m, acc, obj, name, dlim) :
     sfile = open(testf+out+'.spec', 'w')
-    if (obj[0] == '_') : objstr = obj[1:]
-    else : objstr = obj
-    ilist = []
-    if (objstr == 'TYPE') : ilist = ALLTYPES ; tind = 1
-    elif (objstr == 'UNOP') : unoplist() ; ilist = ALLUNOPS ; tind = 2
-    elif (objstr == 'BINOP') : binoplist() ; ilist = ALLBINOPS ; tind = 2
-    elif (objstr == 'MON') : monlist() ; ilist = ALLMONS ; tind = 2
-    elif (objstr == 'SEMI') : semilist() ; ilist = ALLSEMIS ; tind = 3
-    elif (objstr == 'SELOP') :
-        ilist = ALLSELECT
-        alist = getacclist(ALLTYPES, acc, 1)
-        sfile.write('TYPE '+str(len(ALLTYPES))+'\n')
+    if (obj == 'TYPE') : llist = ALLTYPES ; tind = 1
+    elif (obj == 'SELOP') : llist = ALLTYPES ; tind = 1
+    elif (obj == 'UNOP') : llist = ALLUNOPS ; tind = 2
+    elif (obj == 'BINOP') : llist = ALLBINOPS ; tind = 2
+    elif (obj == 'MON') : llist = ALLMONS ; tind = 2
+    elif (obj == 'SEMI') : llist = ALLSEMIS ; tind = 3
+    else : return
 
-    if (name == 'ALL') :
-        if (objstr != 'SELOP') : alist = getacclist(ilist, acc, tind)
-        sfile.write(objstr+' '+str(len(ilist))+'\n')
+    acclst = accstr.split(',')
+    alist = [] ; ilist = [] ; vlist = [] ; anew = []
+    for ac in acclst :
+        if (ac != '') :
+            alist += [x for i, x in enumerate(ALLBINOPS) if (x.find(ac) != -1)]
+    if (namestr == 'ALL') : 
+        if (obj == 'SELOP') :
+            sfile.write('TYPE '+str(len(ALLTYPES))+'\n')
+            sfile.write('SELOP '+str(len(ALLSELECT))+'\n')
+        else : sfile.write(obj+' '+str(len(llist))+'\n')
+        vlist = llist
     else :
-        if (obj[0] == '_') :
-            v = [(i, x) for i, x in enumerate(ilist) if (x.find(name) == -1)]
-        else :
-            v = [(i, x) for i, x in enumerate(ilist) if (x.find(name) != -1)]
+        namelst = namestr.split(',')
+        for nm in namelst :
+            if (nm[0] == '-') :
+                v = [(i, x) for i, x in enumerate(llist) if (x.find(nm[1:]) == -1)]
+            else :
+                v = [(i, x) for i, x in enumerate(llist) if (x.find(nm) != -1)]
+            il, vl = map(list, zip(*v))
+            ilist += il
+            vlist += vl
+    if (len(ilist) > 0) : writeline(obj, ilist, sfile)
+    for t in vlist :
+        y = t.split('_')
+        if (tind < len(y)) : fstr = y[tind]
+        else : fstr = 'BOOL'
+        v = [x for x in alist if (x.find(fstr) != -1)]
+        if (len(v) > 0) : anew += [ALLBINOPS.index(v[0])]
 
-        il, vl = map(list, zip(*v))
-        alist = getacclist(vl, acc, tind)
-        writeline(objstr, il, sfile)
+    if (dstr == 'ALL') : sfile.write('DESC '+str(len(ALLDESC))+'\n')
+    elif (dstr.isdigit()) : writeline('DESC', range(int(dstr)), sfile)
+    elif (dstr != "") :
+        desclst = dstr.split(",")
+        il = []
+        for dsc in desclist :
+            il += [i for i, x in enumerate(ALLDESC) if (x.find(dsc) != -1)]
+        if (len(il) != 0) : writeline('DESC', il, sfile)
 
-    if (dlim != "") :
-        if (dlim == 'ALL') : sfile.write('DESC '+dlim+'\n')
-        else : writeline('DESC', range(int(dlim)), sfile)
-    if (len(alist) != 0) : writeline('ACCUM', alist, sfile)
+    if (len(anew) > 0) : writeline('ACCUM', anew, sfile)
     if (i0 != "") : sfile.write('INPUT0 '+i0+'\n')
     if (i1 != "") : sfile.write('INPUT1 '+i1+'\n')
     if (i2 != "") : sfile.write('INPUT2 '+i2+'\n')
@@ -218,6 +229,6 @@ if __name__ == '__main__' :
     if (len(sys.argv) < 12) :
         print('args: funct out i0 i1 i2 iv m acc obj name dlim')
     else :
-        specgen(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5],
-                sys.argv[6], sys.argv[7], sys.argv[8], sys.argv[9], sys.argv[10],
-                sys.argv[11])
+        specgen(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4],
+                sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8],
+                sys.argv[9], sys.argv[10], sys.argv[11])
