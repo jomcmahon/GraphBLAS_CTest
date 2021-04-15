@@ -59,7 +59,7 @@ gen: test$(N)
 	mkdir -p ./data/test$(N)
 	./test$(N) -g $(INPUTS) > data/test$(N)/test$(N)$(fstr).out
 
-spec: testspec test$(N)
+spec: testspec
 	mkdir -p ./data/specfiles
 	./testspec -g test$(N)
 
@@ -67,17 +67,15 @@ runall: $(EXES)
 	for x in $(EXES); do ./$$x; done
 
 genall: $(EXES)
-	mkdir -p ./data/specfiles
-	for x in $(EXES); do ./testspec -g $$x; done
 	for x in $(EXES); do mkdir -p ./data/$$x ; done
 	for x in $(EXES); do ./$$x -g > ./data/$$x/$$x.out ; done
-
-unit: $(UNITS)
-	for x in $(UNITS); do ./$$x; done
 
 specall: $(EXES)
 	mkdir -p ./data/specfiles
 	for x in $(EXES); do ./testspec -g $$x; done
+
+unit: $(UNITS)
+	for x in $(UNITS); do ./$$x; done
 
 test%: test%.o $(UTILLIB)
 	$(CXX) $(CXXFLAGS) $^ $(LOADLIBS) -o $@
