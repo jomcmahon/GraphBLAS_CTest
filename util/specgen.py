@@ -297,12 +297,12 @@ if __name__ == '__main__' :
                    'MIN_','-ANY','2')
         if ((len(sys.argv) == 1) or (sys.argv[1] == 'MAppl')) :
             fname = specdir+'testMAppl'
-            binun(fname,'C','A','','','A','M','ANY_BOOL,PLUS',
-                  'MIN_','-MINV','4')
+            onespec(fname,'C','A','','','A','M','ANY_BOOL,PLUS',
+                    'UNOP','-MINV','4')
         if ((len(sys.argv) == 1) or (sys.argv[1] == 'VAppl')) :
-            fname = specdir+'testeVAppl'
-            binun(fname,'C','V1','','','V1','V2','ANY_BOOL,PLUS',
-                  'MIN_','-MINV','4')
+            fname = specdir+'testVAppl'
+            onespec(fname,'C','V1','','','V1','V2','ANY_BOOL,PLUS',
+                    'UNOP','-MINV','4')
         if ((len(sys.argv) == 1) or (sys.argv[1] == 'MSel')) :
             fname = specdir+'testMSel'
             onespec(fname,'C','A','','','A','M','ANY_BOOL,PLUS',
@@ -316,7 +316,7 @@ if __name__ == '__main__' :
             onespec(fname,'C','A','','','S','A','ANY_BOOL,PLUS',
                     'MON','ALL','4')
         if ((len(sys.argv) == 1) or (sys.argv[1] == 'VTRed')) :
-            fname = specdir+'testeVTRed'
+            fname = specdir+'testVTRed'
             onespec(fname,'C','V1','','','S','V2','ANY_BOOL,PLUS',
                     'MON','ALL','4')
         if ((len(sys.argv) == 1) or (sys.argv[1] == 'mxm')) :
