@@ -208,7 +208,7 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
 
     if (dstr == 'ALL') : sfile.write('DESC '+str(len(ALLDESC))+'\n')
     elif (dstr.isdigit()) : writeline('DESC', range(int(dstr)), sfile)
-    elif (dstr != "") :
+    elif (dstr != '') :
         desclst = dstr.split(",")
         il = []
         for dsc in desclist :
@@ -216,12 +216,12 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
         if (len(il) != 0) : writeline('DESC', il, sfile)
 
     if (len(anew) > 0) : writeline('ACCUM', anew, sfile)
-    if (i0 != "") : sfile.write('INPUT0 '+i0+'\n')
-    if (i1 != "") : sfile.write('INPUT1 '+i1+'\n')
-    if (i2 != "") : sfile.write('INPUT2 '+i2+'\n')
-    if (m != "") : sfile.write('MASK '+m+'\n')
-    if (iv != "") : sfile.write('INIT '+iv+'\n')
-    if (out != "") : sfile.write('OUTPUT '+out+'\n')
+    if (i0 != '') : sfile.write('INPUT0 '+i0+'\n')
+    if (i1 != '') : sfile.write('INPUT1 '+i1+'\n')
+    if (i2 != '') : sfile.write('INPUT2 '+i2+'\n')
+    if (m != '') : sfile.write('MASK '+m+'\n')
+    if (iv != '') : sfile.write('INIT '+iv+'\n')
+    if (out != '') : sfile.write('OUTPUT '+out+'\n')
     sfile.close()
     lfile = open(testf+'.list', 'a+')
     specstr = testf+out+'.spec'
@@ -232,12 +232,15 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
 def onespec(testf, out, i0, i1, i2, iv, m, acc, obj, name, d) :
     specgen(testf, out+'D', i0, i1, i2, '', '', '',
             obj, name, d)
-    specgen(testf, out+'M', i0, i1, i2, '', m, '',
-            obj, name, d)
-    specgen(testf, out+'A', i0, i1, i2, iv, '', acc,
-            obj, name, d)
-    specgen(testf, out+'B', i0, i1, i2, iv, m, acc,
-            obj, name, d)
+    if (m != '') :
+        specgen(testf, out+'M', i0, i1, i2, '', m, '',
+                obj, name, d)
+    if ((acc != '') and (iv != '')) :
+        specgen(testf, out+'A', i0, i1, i2, iv, '', acc,
+                obj, name, d)
+    if ((m != '') and (acc != '')) :
+        specgen(testf, out+'B', i0, i1, i2, iv, m, acc,
+                obj, name, d)
 
 # for operations that take either binary ops or monoids
 def binmon(testf, out, i0, i1, i2, iv, m, acc, bname, mname, d) :
