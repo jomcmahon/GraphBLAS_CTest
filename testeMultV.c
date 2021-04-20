@@ -20,6 +20,7 @@ bool run_eMultV(testargs *myargs)
 
   if (semi) OK (GxB_Semiring_multiply(&binop, semi));
   else if (mon) OK (GxB_Monoid_operator(&binop, mon));
+  if (!binop) get_User_BinaryOp(&binop);
 
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);

@@ -18,6 +18,9 @@ bool run_VSel(testargs *myargs)
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
   GxB_Scalar scal = NULL; // thunk
 
+  if (!thetype) thetype = GrB_FP32;
+  if (!selop) get_User_SelectOp(&selop, thetype);
+
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
     OK (GxB_print(thetype, GxB_SUMMARY));

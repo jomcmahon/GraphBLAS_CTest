@@ -17,6 +17,8 @@ bool run_VAppl(testargs *myargs)
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
 
+  if (!unop && !binop) get_User_UnaryOp(&unop);
+
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
     if (unop) OK (GxB_print(unop, GxB_SUMMARY));

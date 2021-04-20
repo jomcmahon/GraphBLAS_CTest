@@ -257,261 +257,482 @@ def binun(testf, out, i0, i1, i2, iv, m, acc, bname, uname, d) :
     onespec(testf, out+'B', i0, i1, i2, iv, m, acc, 'BINOP', bname, d)
     onespec(testf, out+'U', i0, i1, i2, iv, m, acc, 'UNOP', uname, d)
 
+def fullspec(specdir) :
+    fn = specdir+'testeAddM'
+    binmonsem(fn,'C','A','B','','A','M','ANY_BOOL,PLUS',
+              'ALL','ALL','ALL','ALL')
+    fn = specdir+'testeAddV'
+    binmonsem(fn,'C','V1','V2','','V2','V1','ANY_BOOL,PLUS',
+              'ALL','ALL','ALL','ALL')
+    fn = specdir+'testeMultM'
+    binmonsem(fn,'C','A','B','','A','M','ANY_BOOL,PLUS',
+              'ALL','ALL','ALL','ALL')
+    fn = specdir+'testeMultV'
+    binmonsem(fn,'C','V1','V2','','V2','V1','ANY_BOOL,PLUS',
+              'ALL','ALL','ALL','ALL')
+    fn = specdir+'testkron'
+    binmonsem(fn,'C','A','B','','','','',
+              'ALL','ALL','ALL','ALL')
+    fn = specdir+'testMRed'
+    binmon(fn,'C','A','','', 'V2','V1',"ANY_BOOL,PLUS",
+           'ALL','ALL','ALL')
+    fn = specdir+'testMAppl'
+    onespec(fn,'C','A','','','A','M','ANY_BOOL,PLUS',
+            'UNOP','ALL','ALL')
+    fn = specdir+'testVAppl'
+    onespec(fn,'C','V1','','','V1','V2','ANY_BOOL,PLUS',
+            'UNOP','ALL','ALL')
+    fn = specdir+'testMSel'
+    onespec(fn,'C','A','','','A','M','ANY_BOOL,PLUS',
+            'SELOP','ALL','ALL')
+    fn = specdir+'testVSel'
+    onespec(fn,'C','V1','','','V1','V2','ANY_BOOL,PLUS',
+            'SELOP','ALL','ALL')
+    fn = specdir+'testMTRed'
+    onespec(fn,'C','A','','','S','A','ANY_BOOL,PLUS',
+            'MON','ALL','ALL')
+    fn = specdir+'testVTRed'
+    onespec(fn,'C','V1','','','S','V2','ANY_BOOL,PLUS',
+            'MON','ALL','ALL')
+    fn = specdir+'testmxm'
+    onespec(fn,'C','A','B','','A','M','ANY_BOOL,PLUS',
+            'SEMI','ALL','ALL')
+    fn = specdir+'testmxv'
+    onespec(fn,'C','A','V2','','V2','V1','ANY_BOOL,PLUS',
+            'SEMI','ALL','ALL')
+    fn = specdir+'testvxm'
+    onespec(fn,'C','V1','A','','V2','V1','ANY_BOOL,PLUS',
+            'SEMI','ALL','ALL')
+    fn = specdir+'testtran'
+    onespec(fn,'C','A','','','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testCExtr'
+    onespec(fn,'CD','A','A_row','A_col','CE','CE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','A','ALL','A_col','V1','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','A','I_RANGE','A_col','V1','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','A','I_STRIDE','A_col','CE','CE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','A','I_BACK','A_col','CE','CE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testVExtr'
+    onespec(fn,'CD','V1','V1_ind','','VE','VE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','V1','ALL','','V2','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','V1','I_RANGE','','V2','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','V1','I_STRIDE','','VE','VE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','V1','I_BACK','','VE','VE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testMExtr'
+    onespec(fn,'CD','A','A_row','A_col','ME','ME','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','A','ALL','ALL','B','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','A','I_RANGE','I_RANGE','B','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','A','I_STRIDE','I_STRIDE','ME','ME','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','A','I_BACK','I_BACK','ME','ME','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testMTAssn'
+    onespec(fn,'CD','V1','A_row','A_col','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','V1','ALL','ALL','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','V1','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','V1','I_STRIDE','I_STRIDE','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','V1','I_BACK','I_BACK','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testVTAssn'
+    onespec(fn,'CD','V2','V1_ind','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','V2','ALL','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','V2','I_RANGE','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','V2','I_STRIDE','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','V2','I_BACK','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testMTSubA'
+    onespec(fn,'CD','V1','A_row','A_col','A','ME','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','V1','ALL','ALL','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','V1','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','V1','I_STRIDE','I_STRIDE','A','ME','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','V1','I_BACK','I_BACK','A','ME','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testVTSubA'
+    onespec(fn,'CD','V2','V1_ind','','V1','VE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','V2','ALL','','V1','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','V2','I_RANGE','','V1','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','V2','I_STRIDE','','V1','VE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','V2','I_BACK','','V1','VE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testMAssn'
+    onespec(fn,'CD','ME','A_row','A_col','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','MEA','ALL','ALL','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','MER','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','MES','I_STRIDE','I_STRIDE','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','MEB','I_BACK','I_BACK','A','M','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testMSubA'
+    onespec(fn,'CD','ME','A_row','A_col','A','ME','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','MEA','ALL','ALL','A','MEA','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','MER','I_RANGE','I_RANGE','A','MER','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','MES','I_STRIDE','I_STRIDE','A','MES','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','MEB','I_BACK','I_BACK','A','MEB','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testCAssn'
+    onespec(fn,'CD','CE','A_row','A_col','A','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','CEA','ALL','A_col','A','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','CER','I_RANGE','I_RANGE','A','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','CES','I_STRIDE','I_STRIDE','A','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','CEB','I_BACK','I_BACK','A','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testCSubA'
+    onespec(fn,'CD','CE','A_row','A_col','A','CE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','CEA','ALL','A_col','A','CEA','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','CER','I_RANGE','A_col','A','CER','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','CES','I_STRIDE','A_col','A','CES','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','CEB','I_BACK','A_col','A','CEB','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testRAssn'
+    onespec(fn,'CD','CE','A_row','A_col','A','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','CEA','A_col','ALL','A','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','CER','I_RANGE','I_RANGE','A','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','CES','I_STRIDE','I_STRIDE','A','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','CEB','I_BACK','I_BACK','A','V1','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testRSubA'
+    onespec(fn,'CD','CE','A_row','A_col','A','CE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','CEA','A_row','ALL','A','CEA','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','CER','A_row','I_RANGE','A','CER','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','CES','A_row','I_STRIDE','A','CES','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','CEB','A_row','I_BACK','A','CEB','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testVAssn'
+    onespec(fn,'CD','VE','V1_ind','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','VEA','ALL','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','VER','I_RANGE','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','VES','I_STRIDE','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','VEB','I_BACK','','V1','V2','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    fn = specdir+'testVSubA'
+    onespec(fn,'CD','VE','V1_ind','','V1','VE','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CA','VEA','ALL','','V1','VEA','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CR','VER','I_RANGE','','V1','VER','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CS','VES','I_STRIDE','','V1','VES','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+    onespec(fn,'CB','VEB','I_BACK','','V1','VEB','ANY_BOOL,PLUS',
+            'TYPE','ALL','ALL')
+
+def defaultspec(numargs, intest, specdir) :
+    if ((numargs == 1) or (intest == 'eAddM')) :
+        fn = specdir+'testeAddM'
+        binmonsem(fn,'C','A','B','','A','M','ANY_BOOL,PLUS',
+                  'PLUS','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
+    if ((numargs == 1) or (intest == 'eAddV')) :
+        fn = specdir+'testeAddV'
+        binmonsem(fn,'C','V1','V2','','V2','V1','ANY_BOOL,PLUS',
+                  'PAIR','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
+    if ((numargs == 1) or (intest == 'eMultM')) :
+        fn = specdir+'testeMultM'
+        binmonsem(fn,'C','A','B','','A','M','ANY_BOOL,PLUS',
+                  'ANY','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
+    if ((numargs == 1) or (intest == 'eMultV')) :
+        fn = specdir+'testeMultV'
+        binmonsem(fn,'C','V1','V2','','V2','V1','ANY_BOOL,PLUS',
+                  'ANY','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
+    if ((numargs == 1) or (intest == 'kron')) :
+        fn = specdir+'testkron'
+        binmonsem(fn,'C','A','B','','','','',
+                  'PLUS','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
+    if ((numargs == 1) or (intest == 'MRed')) :
+        fn = specdir+'testMRed'
+        binmon(fn,'C','A','','', 'V2','V1',"ANY_BOOL,PLUS",
+               'MIN_','-ANY','2')
+    if ((numargs == 1) or (intest == 'MAppl')) :
+        fn = specdir+'testMAppl'
+        onespec(fn,'C','A','','','A','M','ANY_BOOL,PLUS',
+                'UNOP','-MINV','4')
+    if ((numargs == 1) or (intest == 'VAppl')) :
+        fn = specdir+'testVAppl'
+        onespec(fn,'C','V1','','','V1','V2','ANY_BOOL,PLUS',
+                'UNOP','-MINV','4')
+    if ((numargs == 1) or (intest == 'MSel')) :
+        fn = specdir+'testMSel'
+        onespec(fn,'C','A','','','A','M','ANY_BOOL,PLUS',
+                'SELOP','ALL','4')
+    if ((numargs == 1) or (intest == 'VSel')) :
+        fn = specdir+'testVSel'
+        onespec(fn,'C','V1','','','V1','V2','ANY_BOOL,PLUS',
+                'SELOP','ALL','4')
+    if ((numargs == 1) or (intest == 'MTRed')) :
+        fn = specdir+'testMTRed'
+        onespec(fn,'C','A','','','S','A','ANY_BOOL,PLUS',
+                'MON','ALL','4')
+    if ((numargs == 1) or (intest == 'VTRed')) :
+        fn = specdir+'testVTRed'
+        onespec(fn,'C','V1','','','S','V2','ANY_BOOL,PLUS',
+                'MON','ALL','4')
+    if ((numargs == 1) or (intest == 'mxm')) :
+        fn = specdir+'testmxm'
+        onespec(fn,'C','A','B','','A','M','ANY_BOOL,PLUS',
+                'SEMI','ANY_PAIR_BOOL,PLUS_TIMES','4')
+    if ((numargs == 1) or (intest == 'mxv')) :
+        fn = specdir+'testmxv'
+        onespec(fn,'C','A','V2','','V2','V1','ANY_BOOL,PLUS',
+                'SEMI','ANY_PAIR_BOOL,PLUS_TIMES','4')
+    if ((numargs == 1) or (intest == 'vxm')) :
+        fn = specdir+'testvxm'
+        onespec(fn,'C','V1','A','','V2','V1','ANY_BOOL,PLUS',
+                'SEMI','ANY_PAIR_BOOL,PLUS_TIMES','4')
+    if ((numargs == 1) or (intest == 'tran')) :
+        fn = specdir+'testtran'
+        onespec(fn,'C','A','','','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+    if ((numargs == 1) or (intest == 'CExtr')) :
+        fn = specdir+'testCExtr'
+        onespec(fn,'CD','A','A_row','A_col','CE','CE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','A','ALL','A_col','V1','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','A','I_RANGE','A_col','V1','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','A','I_STRIDE','A_col','CE','CE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','A','I_BACK','A_col','CE','CE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'VExtr')) :
+        fn = specdir+'testVExtr'
+        onespec(fn,'CD','V1','V1_ind','','VE','VE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','V1','ALL','','V2','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','V1','I_RANGE','','V2','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','V1','I_STRIDE','','VE','VE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','V1','I_BACK','','VE','VE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'MExtr')) :
+        fn = specdir+'testMExtr'
+        onespec(fn,'CD','A','A_row','A_col','ME','ME','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','A','ALL','ALL','B','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','A','I_RANGE','I_RANGE','B','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','A','I_STRIDE','I_STRIDE','ME','ME','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','A','I_BACK','I_BACK','ME','ME','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'MTAssn')) :
+        fn = specdir+'testMTAssn'
+        onespec(fn,'CD','V1','A_row','A_col','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','V1','ALL','ALL','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','V1','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','V1','I_STRIDE','I_STRIDE','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','V1','I_BACK','I_BACK','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'VTAssn')) :
+        fn = specdir+'testVTAssn'
+        onespec(fn,'CD','V2','V1_ind','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','V2','ALL','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','V2','I_RANGE','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','V2','I_STRIDE','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','V2','I_BACK','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'MTSubA')) :
+        fn = specdir+'testMTSubA'
+        onespec(fn,'CD','V1','A_row','A_col','A','ME','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','V1','ALL','ALL','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','V1','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','V1','I_STRIDE','I_STRIDE','A','ME','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','V1','I_BACK','I_BACK','A','ME','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'VTSubA')) :
+        fn = specdir+'testVTSubA'
+        onespec(fn,'CD','V2','V1_ind','','V1','VE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','V2','ALL','','V1','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','V2','I_RANGE','','V1','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','V2','I_STRIDE','','V1','VE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','V2','I_BACK','','V1','VE','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'MAssn')) :
+        fn = specdir+'testMAssn'
+        onespec(fn,'CD','ME','A_row','A_col','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','MEA','ALL','ALL','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','MER','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','MES','I_STRIDE','I_STRIDE','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','MEB','I_BACK','I_BACK','A','M','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'MSubA')) :
+        fn = specdir+'testMSubA'
+        onespec(fn,'CD','ME','A_row','A_col','A','ME','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CA','MEA','ALL','ALL','A','MEA','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CR','MER','I_RANGE','I_RANGE','A','MER','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CS','MES','I_STRIDE','I_STRIDE','A','MES','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+        onespec(fn,'CB','MEB','I_BACK','I_BACK','A','MEB','ANY_BOOL,PLUS',
+                'TYPE','ALL','4')
+    if ((numargs == 1) or (intest == 'CAssn')) :
+        fn = specdir+'testCAssn'
+        onespec(fn,'CD','CE','A_row','A_col','A','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CA','CEA','ALL','A_col','A','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CR','CER','I_RANGE','I_RANGE','A','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CS','CES','I_STRIDE','I_STRIDE','A','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CB','CEB','I_BACK','I_BACK','A','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+    if ((numargs == 1) or (intest == 'CSubA')) :
+        fn = specdir+'testCSubA'
+        onespec(fn,'CD','CE','A_row','A_col','A','CE','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CA','CEA','ALL','A_col','A','CEA','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CR','CER','I_RANGE','A_col','A','CER','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CS','CES','I_STRIDE','A_col','A','CES','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CB','CEB','I_BACK','A_col','A','CEB','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+    if ((numargs == 1) or (intest == 'RAssn')) :
+        fn = specdir+'testRAssn'
+        onespec(fn,'CD','CE','A_row','A_col','A','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CA','CEA','A_col','ALL','A','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CR','CER','I_RANGE','I_RANGE','A','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CS','CES','I_STRIDE','I_STRIDE','A','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CB','CEB','I_BACK','I_BACK','A','V1','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+    if ((numargs == 1) or (intest == 'RSubA')) :
+        fn = specdir+'testRSubA'
+        onespec(fn,'CD','CE','A_row','A_col','A','CE','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CA','CEA','A_row','ALL','A','CEA','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CR','CER','A_row','I_RANGE','A','CER','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CS','CES','A_row','I_STRIDE','A','CES','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CB','CEB','A_row','I_BACK','A','CEB','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+    if ((numargs == 1) or (intest == 'VAssn')) :
+        fn = specdir+'testVAssn'
+        onespec(fn,'CD','VE','V1_ind','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CA','VEA','ALL','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CR','VER','I_RANGE','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CS','VES','I_STRIDE','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CB','VEB','I_BACK','','V1','V2','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+    if ((numargs == 1) or (intest == 'VSubA')) :
+        fn = specdir+'testVSubA'
+        onespec(fn,'CD','VE','V1_ind','','V1','VE','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CA','VEA','ALL','','V1','VEA','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CR','VER','I_RANGE','','V1','VER','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CS','VES','I_STRIDE','','V1','VES','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+        onespec(fn,'CB','VEB','I_BACK','','V1','VEB','ANY_BOOL,PLUS',
+                'TYPE','ALL','2')
+
 if __name__ == '__main__' :
 
-    if ((len(sys.argv) == 2) and (sys.argv[1] == 'H')) :
-        sys.stdout.write('args: test [out i0 i1 i2 iv m acc obj name d]\n')
-        sys.exit(0)
+    numargs = len(sys.argv)
+    specdir = 'data/specfiles/'
 
-    if (len(sys.argv) == 13) : specdir = 'data/'+sys.argv[12]+'/'
-    else : specdir = 'data/specfiles/'
-
-    if ((len(sys.argv) == 13) or (len(sys.argv) == 12)):
+    if (numargs == 1) : defaultspec(numargs, '', specdir)
+    elif (numargs == 2) :
+        if (sys.argv[1] == 'H') :
+            sys.stdout.write('args: test [out i0 i1 i2 iv m acc obj name d]\n')
+            sys.exit(0)
+        elif (sys.argv[1] == 'FULL') : fullspec('data/fullspec/')
+        else : defaultspec(numargs, sys.argv[1], specdir)
+    elif (numargs == 3) : defaultspec(numargs, sys.argv[1], sys.argv[2])
+    elif (numargs == 12) :
         specgen(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4],
                 sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8],
                 sys.argv[9], sys.argv[10], sys.argv[11])
-    elif (len(sys.argv) <= 2) :
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'eAddM')) :
-            fname = specdir+'testeAddM'
-            binmonsem(fname,'C','A','B','','A','M','ANY_BOOL,PLUS',
-                      'PLUS','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'eAddV')) :
-            fname = specdir+'testeAddV'
-            binmonsem(fname,'C','V1','V2','','V2','V1','ANY_BOOL,PLUS',
-                      'PAIR','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'eMultM')) :
-            fname = specdir+'testeMultM'
-            binmonsem(fname,'C','A','B','','A','M','ANY_BOOL,PLUS',
-                      'ANY','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'eMultV')) :
-            fname = specdir+'testeMultV'
-            binmonsem(fname,'C','V1','V2','','V2','V1','ANY_BOOL,PLUS',
-                      'ANY','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'kron')) :
-            fname = specdir+'testkron'
-            binmonsem(fname,'C','A','B','','','','',
-                      'PLUS','ALL','ANY_PAIR_BOOL,PLUS_TIMES','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MRed')) :
-            fname = specdir+'testMRed'
-            binmon(fname,'C','A','','', 'V2','V1',"ANY_BOOL,PLUS",
-                   'MIN_','-ANY','2')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MAppl')) :
-            fname = specdir+'testMAppl'
-            onespec(fname,'C','A','','','A','M','ANY_BOOL,PLUS',
-                    'UNOP','-MINV','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'VAppl')) :
-            fname = specdir+'testVAppl'
-            onespec(fname,'C','V1','','','V1','V2','ANY_BOOL,PLUS',
-                    'UNOP','-MINV','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MSel')) :
-            fname = specdir+'testMSel'
-            onespec(fname,'C','A','','','A','M','ANY_BOOL,PLUS',
-                    'SELOP','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'VSel')) :
-            fname = specdir+'testVSel'
-            onespec(fname,'C','V1','','','V1','V2','ANY_BOOL,PLUS',
-                    'SELOP','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MTRed')) :
-            fname = specdir+'testMTRed'
-            onespec(fname,'C','A','','','S','A','ANY_BOOL,PLUS',
-                    'MON','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'VTRed')) :
-            fname = specdir+'testVTRed'
-            onespec(fname,'C','V1','','','S','V2','ANY_BOOL,PLUS',
-                    'MON','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'mxm')) :
-            fname = specdir+'testmxm'
-            onespec(fname,'C','A','B','','A','M','ANY_BOOL,PLUS',
-                    'SEMI','ANY_PAIR_BOOL,PLUS_TIMES','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'mxv')) :
-            fname = specdir+'testmxv'
-            onespec(fname,'C','A','V2','','V2','V1','ANY_BOOL,PLUS',
-                    'SEMI','ANY_PAIR_BOOL,PLUS_TIMES','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'vxm')) :
-            fname = specdir+'testvxm'
-            onespec(fname,'C','V1','A','','V2','V1','ANY_BOOL,PLUS',
-                    'SEMI','ANY_PAIR_BOOL,PLUS_TIMES','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'tran')) :
-            fname = specdir+'testtran'
-            onespec(fname,'C','A','','','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'CExtr')) :
-            fname = specdir+'testCExtr'
-            onespec(fname,'CD','A','A_row','A_col','CE','CE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','A','ALL','A_col','V1','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','A','I_RANGE','A_col','V1','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','A','I_STRIDE','A_col','CE','CE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','A','I_BACK','A_col','CE','CE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'VExtr')) :
-            fname = specdir+'testVExtr'
-            onespec(fname,'CD','V1','V1_ind','','VE','VE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','V1','ALL','','V2','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','V1','I_RANGE','','V2','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','V1','I_STRIDE','','VE','VE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','V1','I_BACK','','VE','VE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MExtr')) :
-            fname = specdir+'testMExtr'
-            onespec(fname,'CD','A','A_row','A_col','ME','ME','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','A','ALL','ALL','B','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','A','I_RANGE','I_RANGE','B','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','A','I_STRIDE','I_STRIDE','ME','ME','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','A','I_BACK','I_BACK','ME','ME','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MTAssn')) :
-            fname = specdir+'testMTAssn'
-            onespec(fname,'CD','V1','A_row','A_col','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','V1','ALL','ALL','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','V1','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','V1','I_STRIDE','I_STRIDE','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','V1','I_BACK','I_BACK','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'VTAssn')) :
-            fname = specdir+'testVTAssn'
-            onespec(fname,'CD','V2','V1_ind','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','V2','ALL','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','V2','I_RANGE','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','V2','I_STRIDE','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','V2','I_BACK','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MTSubA')) :
-            fname = specdir+'testMTSubA'
-            onespec(fname,'CD','V1','A_row','A_col','A','ME','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','V1','ALL','ALL','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','V1','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','V1','I_STRIDE','I_STRIDE','A','ME','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','V1','I_BACK','I_BACK','A','ME','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'VTSubA')) :
-            fname = specdir+'testVTSubA'
-            onespec(fname,'CD','V2','V1_ind','','V1','VE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','V2','ALL','','V1','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','V2','I_RANGE','','V1','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','V2','I_STRIDE','','V1','VE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','V2','I_BACK','','V1','VE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MAssn')) :
-            fname = specdir+'testMAssn'
-            onespec(fname,'CD','ME','A_row','A_col','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','MEA','ALL','ALL','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','MER','I_RANGE','I_RANGE','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','MES','I_STRIDE','I_STRIDE','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','MEB','I_BACK','I_BACK','A','M','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'MSubA')) :
-            fname = specdir+'testMSubA'
-            onespec(fname,'CD','ME','A_row','A_col','A','ME','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CA','MEA','ALL','ALL','A','MEA','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CR','MER','I_RANGE','I_RANGE','A','MER','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CS','MES','I_STRIDE','I_STRIDE','A','MES','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-            onespec(fname,'CB','MEB','I_BACK','I_BACK','A','MEB','ANY_BOOL,PLUS',
-                    'TYPE','ALL','4')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'CAssn')) :
-            fname = specdir+'testCAssn'
-            onespec(fname,'CD','CE','A_row','A_col','A','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CA','CEA','ALL','A_col','A','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CR','CER','I_RANGE','I_RANGE','A','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CS','CES','I_STRIDE','I_STRIDE','A','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CB','CEB','I_BACK','I_BACK','A','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'CSubA')) :
-            fname = specdir+'testCSubA'
-            onespec(fname,'CD','CE','A_row','A_col','A','CE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CA','CEA','ALL','A_col','A','CEA','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CR','CER','I_RANGE','A_col','A','CER','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CS','CES','I_STRIDE','A_col','A','CES','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CB','CEB','I_BACK','A_col','A','CEB','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'RAssn')) :
-            fname = specdir+'testRAssn'
-            onespec(fname,'CD','CE','A_row','A_col','A','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CA','CEA','A_col','ALL','A','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CR','CER','I_RANGE','I_RANGE','A','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CS','CES','I_STRIDE','I_STRIDE','A','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CB','CEB','I_BACK','I_BACK','A','V1','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'RSubA')) :
-            fname = specdir+'testRSubA'
-            onespec(fname,'CD','CE','A_row','A_col','A','CE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CA','CEA','A_row','ALL','A','CEA','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CR','CER','A_row','I_RANGE','A','CER','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CS','CES','A_row','I_STRIDE','A','CES','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CB','CEB','A_row','I_BACK','A','CEB','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'VAssn')) :
-            fname = specdir+'testVAssn'
-            onespec(fname,'CD','VE','V1_ind','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CA','VEA','ALL','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CR','VER','I_RANGE','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CS','VES','I_STRIDE','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CB','VEB','I_BACK','','V1','V2','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-        if ((len(sys.argv) == 1) or (sys.argv[1] == 'VSubA')) :
-            fname = specdir+'testVSubA'
-            onespec(fname,'CD','VE','V1_ind','','V1','VE','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CA','VEA','ALL','','V1','VEA','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CR','VER','I_RANGE','','V1','VER','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CS','VES','I_STRIDE','','V1','VES','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
-            onespec(fname,'CB','VEB','I_BACK','','V1','VEB','ANY_BOOL,PLUS',
-                    'TYPE','ALL','2')
+    else : sys.stdout.write('wrong # args\n')

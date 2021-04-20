@@ -89,3 +89,12 @@ void get_types_monoid(GrB_Monoid, GrB_Type *, GrB_Type *, GrB_Type *);
 void get_types_semiring(GrB_Semiring, GrB_Type *, GrB_Type *, GrB_Type *);
 void get_inp_size(GrB_Descriptor, GrB_Matrix, GrB_Index *, GrB_Index *,
 		  GrB_Desc_Field);
+
+// user-defined objects for tests
+void get_User_Type(GrB_Type *type);
+void get_User_Semiring(GrB_Semiring *semi);
+void get_User_Monoid(GrB_Monoid *mon);
+void get_User_BinaryOp(GrB_BinaryOp *binop);
+void get_User_UnaryOp(GrB_UnaryOp *unop);
+void get_User_SelectOp(GxB_SelectOp *selop, GrB_Type type);
+void get_User_Scalar(GxB_Scalar *scal);

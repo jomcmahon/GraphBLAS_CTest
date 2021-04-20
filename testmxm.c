@@ -16,6 +16,8 @@ bool run_mxm(testargs *myargs)
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
 
+  if (!semi) get_User_Semiring(&semi);
+
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
     OK (GxB_print(semi, GxB_SUMMARY));

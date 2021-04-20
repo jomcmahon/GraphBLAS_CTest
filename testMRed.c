@@ -17,6 +17,8 @@ bool run_MRed(testargs *myargs)
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
 
+  if (!mon && !binop) get_User_BinaryOp(&binop);
+
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
     if (mon) OK (GxB_print(mon, GxB_SUMMARY));

@@ -207,10 +207,17 @@ void free_test_spec(int **myspec)
 bool test_loop(testargs *myargs, bool (*g)(testargs *))
 {
   int **myspec = read_test_spec(myargs); // get the spec
+  bool single_case = true;
+  for (int i = 0; i < TOTAL; i++)
+    if ((myspec[i]) && (myspec[i][0] > 1)) { single_case = false; break; }
+
   bool testerror;
-  if (myspec[SELOP]) testerror = test_L_TDA_loop(myargs, myspec, g);
-  else testerror = test_L_DA_loop(myargs, myspec, g); // run test
-  free_test_spec(myspec);
+  if (single_case) testerror = g(myargs);
+  else {
+    if (myspec[SELOP]) testerror = test_L_TDA_loop(myargs, myspec, g);
+    else testerror = test_L_DA_loop(myargs, myspec, g); // run test
+    free_test_spec(myspec);
+  }
   return testerror;
 }
 

@@ -16,6 +16,8 @@ bool run_MTAssn(testargs *myargs)
   GrB_BinaryOp accum; get_BinaryOp(myargs->specobj[ACCUM], &accum);
   GrB_Descriptor desc; get_Descriptor(myargs->specobj[DESC], &desc);
 
+  if (!thetype) get_User_Type(&thetype);
+
   if (myargs->generate)  { // if generating, show accum, desc and semi
     print_args(myargs, desc, accum);
     OK (GxB_print(thetype, GxB_SUMMARY));
