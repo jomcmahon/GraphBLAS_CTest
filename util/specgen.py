@@ -246,6 +246,8 @@ def onespec(testf, out, i0, i1, i2, iv, m, acc, obj, name, d) :
     if ((m != '') and (acc != '')) :
         specgen(testf, out+'B', i0, i1, i2, iv, m, acc,
                 obj, name, d)
+#    specgen(testf, out+'T', i0, i1, i2, iv, m, acc,
+#            '', '', d)
 
 # for operations that take either binary ops or monoids
 def binmon(testf, out, i0, i1, i2, iv, m, acc, bname, mname, d) :
