@@ -155,13 +155,15 @@ bool test_L_DA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
 {
   spec inspec = TOTAL;
   for (int i = 0; i < TOTAL; i++) if (specptr[i]) { inspec = i; break; }
-  if (inspec == TOTAL) return true; // error: must have outer loop
+
   bool testerror = false;
   char bname[64]; strcpy(bname, myargs->output); // base from args
-  int lim = specptr[inspec][0];
+  int lim = 1;
+  if (inspec != TOTAL) lim = specptr[inspec][0];
   for (int i = 0; i < lim; i++) { // outer loop
     if (lim >= spec_limits(inspec)) myargs->specobj[inspec] = i; // whole range
-    else myargs->specobj[inspec] = specptr[inspec][i + 1]; // from spec
+    else if (inspec != TOTAL)
+      myargs->specobj[inspec] = specptr[inspec][i + 1]; // from spec
 
     sprintf(myargs->output, "%s_%c%d", bname, fname_chars[inspec],
 	    myargs->specobj[inspec]);
@@ -181,13 +183,14 @@ bool test_L_DA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
 // loop over object: type, descriptor and accumulator
 bool test_L_TDA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
 {
-  assert (specptr[SELOP]); // must have outer loop
   bool testerror = false;
   char bname[64]; strcpy(bname, myargs->output); // base from args
-  int lim = specptr[SELOP][0];
+  int lim = 1;
+  if (specptr[SELOP]) lim = specptr[SELOP][0];
   for (int i = 0; i < lim; i++) { // outer loop
     if (lim >= spec_limits(SELOP)) myargs->specobj[SELOP] = i; // whole range
-    else myargs->specobj[SELOP] = specptr[SELOP][i + 1]; // from spec
+    else if (specptr[SELOP])
+      myargs->specobj[SELOP] = specptr[SELOP][i + 1]; // from spec
     sprintf(myargs->output, "%s_%c%d", bname, fname_chars[SELOP], // filename
 	    myargs->specobj[SELOP]);
     testerror |= test_L_DA_loop(myargs, specptr, f);
