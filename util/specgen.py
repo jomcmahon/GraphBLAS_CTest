@@ -175,35 +175,40 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
     elif (obj == 'BINOP') : llist = ALLBINOPS ; tind = 2
     elif (obj == 'MON') : llist = ALLMONS ; tind = 2
     elif (obj == 'SEMI') : llist = ALLSEMIS ; tind = 3
-    else : return
+    else : llist = []
 
     acclst = accstr.split(',')
     alist = [] ; ilist = [] ; vlist = [] ; anew = []
     for ac in acclst :
         if (ac != '') :
             alist += [x for i, x in enumerate(ALLBINOPS) if (x.find(ac) != -1)]
-    if (namestr == 'ALL') : 
-        if (obj == 'SELOP') :
-            sfile.write('TYPE '+str(len(ALLTYPES))+'\n')
-            sfile.write('SELOP '+str(len(ALLSELECT))+'\n')
-        else : sfile.write(obj+' '+str(len(llist))+'\n')
-        vlist = llist
-    else :
-        namelst = namestr.split(',')
-        for nm in namelst :
-            if (nm[0] == '-') :
-                v = [(i, x) for i, x in enumerate(llist) if (x.find(nm[1:]) == -1)]
-            else :
-                v = [(i, x) for i, x in enumerate(llist) if (x.find(nm) != -1)]
-            il, vl = map(list, zip(*v))
-            ilist += il
-            vlist += vl
+    if (obj != '') :
+        if (namestr == 'ALL') : 
+            if (obj == 'SELOP') :
+                sfile.write('TYPE '+str(len(ALLTYPES))+'\n')
+                sfile.write('SELOP '+str(len(ALLSELECT))+'\n')
+            else : sfile.write(obj+' '+str(len(llist))+'\n')
+            vlist = llist
+        else :
+            namelst = namestr.split(',')
+            for nm in namelst :
+                if (nm[0] == '-') :
+                    v = [(i, x) for i, x in enumerate(llist) if (x.find(nm[1:]) == -1)]
+                else :
+                    v = [(i, x) for i, x in enumerate(llist) if (x.find(nm) != -1)]
+                il, vl = map(list, zip(*v))
+                ilist += il
+                vlist += vl
     if (len(ilist) > 0) : writeline(obj, ilist, sfile)
-    for t in vlist :
-        y = t.split('_')
-        if (tind < len(y)) : fstr = y[tind]
-        else : fstr = 'BOOL'
-        v = [x for x in alist if (x.find(fstr) != -1)]
+    if (len(vlist) > 0) :
+        for t in vlist :
+            y = t.split('_')
+            if (tind < len(y)) : fstr = y[tind]
+            else : fstr = 'BOOL'
+            v = [x for x in alist if (x.find(fstr) != -1)]
+            if (len(v) > 0) : anew += [ALLBINOPS.index(v[0])]
+    else :
+        v = [x for x in alist if (x.find('FP32') != -1)]
         if (len(v) > 0) : anew += [ALLBINOPS.index(v[0])]
 
     if (dstr == 'ALL') : sfile.write('DESC '+str(len(ALLDESC))+'\n')
