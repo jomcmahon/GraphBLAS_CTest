@@ -53,7 +53,7 @@ void get_User_Monoid(GrB_Monoid *mon)
   GrB_BinaryOp binop;
   get_User_BinaryOp(&binop);
   float id = 0; float term = 1;
-  GxB_Monoid_terminal_new(mon, binop, (void *)&id, (void *)&term);
+  GxB_Monoid_terminal_new(mon, binop, id, term);
 }
   
 void get_User_BinaryOp(GrB_BinaryOp *binop)

@@ -132,95 +132,74 @@ int **read_test_spec(testargs *myargs)
 
 static char fname_chars[TOTAL] = { 'T', 'S', 'M', 'B', 'U', 'L', 'D', 'A' };
 
-// descriptor loop: innermost
-bool test_D_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
-{
-  bool testerror = false;
-  if (specptr[DESC]) {
-    char bname[64]; strcpy(bname, myargs->output); // base from args
-    int lim = specptr[DESC][0];
-    for (int i = 0; i < lim; i++) { // descriptor loop
-      if (lim >= spec_limits(DESC)) myargs->specobj[DESC] = i; // whole range
-      else myargs->specobj[DESC] = specptr[DESC][i + 1]; // from spec
-      sprintf(myargs->output, "%s_D%d", bname, myargs->specobj[DESC]);
-      testerror |= f(myargs); // run the test
-    }
-    strcpy(myargs->output, bname); // restore output name
-  } else { myargs->specobj[DESC] = -1; testerror |= f(myargs); } // run the test
-  return testerror;
-}
-
-// loop over object then descriptor and accumulator
-bool test_L_DA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
-{
-  spec inspec = TOTAL;
-  for (int i = 0; i < TOTAL; i++) if (specptr[i]) { inspec = i; break; }
-
-  bool testerror = false;
-  char bname[64]; strcpy(bname, myargs->output); // base from args
-  int lim = 1;
-  if (inspec != TOTAL) lim = specptr[inspec][0];
-  for (int i = 0; i < lim; i++) { // outer loop
-    if (lim >= spec_limits(inspec)) myargs->specobj[inspec] = i; // whole range
-    else if (inspec != TOTAL)
-      myargs->specobj[inspec] = specptr[inspec][i + 1]; // from spec
-
-    sprintf(myargs->output, "%s_%c%d", bname, fname_chars[inspec],
-	    myargs->specobj[inspec]);
-
-    if (specptr[ACCUM] && (i < specptr[ACCUM][0])) { // if there is accumulator
-      myargs->specobj[ACCUM] = specptr[ACCUM][i + 1]; // add it to args
-      char aname[64]; strcpy(aname, myargs->output); // add to filename
-      sprintf(myargs->output, "%s_A%d", aname, myargs->specobj[ACCUM]);
-    } else myargs->specobj[ACCUM] = -1; // otherwise, none
-
-    testerror |= test_D_loop(myargs, specptr, f); // descriptor loop
-  }
-  strcpy(myargs->output, bname); // restore output name
-  return testerror;
-}
-
-// loop over object: type, descriptor and accumulator
-bool test_L_TDA_loop(testargs *myargs, int **specptr, bool (*f)(testargs *))
-{
-  bool testerror = false;
-  char bname[64]; strcpy(bname, myargs->output); // base from args
-  int lim = 1;
-  if (specptr[SELOP]) lim = specptr[SELOP][0];
-  for (int i = 0; i < lim; i++) { // outer loop
-    if (lim >= spec_limits(SELOP)) myargs->specobj[SELOP] = i; // whole range
-    else if (specptr[SELOP])
-      myargs->specobj[SELOP] = specptr[SELOP][i + 1]; // from spec
-    sprintf(myargs->output, "%s_%c%d", bname, fname_chars[SELOP], // filename
-	    myargs->specobj[SELOP]);
-    testerror |= test_L_DA_loop(myargs, specptr, f);
-  }
-  strcpy(myargs->output, bname);
-  return testerror;
-}
-
 // free test spec
-void free_test_spec(int **myspec)
-{
-  for (int j = 0; j < TOTAL; j++) if (myspec[j]) free(myspec[j]);
-  free(myspec);
+void free_test_spec(int **myspec) {
+    for (int j = 0; j < TOTAL; j++)
+        if (myspec[j])
+            free(myspec[j]);
+    free(myspec);
 }
 
-// if select, loop over type for each select operator
-bool test_loop(testargs *myargs, bool (*g)(testargs *))
+// set the argument in the test args structure based on spec
+void set_spec_arg(spec inspec, int **specptr, int lim, testargs *myargs, int i)
 {
-  int **myspec = read_test_spec(myargs); // get the spec
-  bool single_case = true;
-  for (int i = 0; i < TOTAL; i++)
-    if ((myspec[i]) && (myspec[i][0] > 1)) { single_case = false; break; }
+  int val = -1; // default no argument
+  if (inspec != TOTAL) { // valid spec
+    if (lim >= spec_limits(inspec)) val = i; // whole range
+    else if (specptr[inspec]) val = specptr[inspec][i + 1]; // from spec
 
-  bool testerror;
-  if (single_case) testerror = g(myargs);
-  else {
-    if (myspec[SELOP]) testerror = test_L_TDA_loop(myargs, myspec, g);
-    else testerror = test_L_DA_loop(myargs, myspec, g); // run test
-    free_test_spec(myspec);
+    if (val >= 0) { // if there is arg, add to file name
+      char sname[64];
+      sprintf(sname, "_%c%d", fname_chars[inspec], val);
+      strcat(myargs->output, sname);
+    }
+    myargs->specobj[inspec] = val;
   }
+}
+
+// get loop limit for current iteration
+int get_loop_limit(spec inspec, int **specptr)
+{
+  if ((inspec != TOTAL) && specptr[inspec]) return specptr[inspec][0];
+  else return 1;
+}
+
+// loop over selectors, primary object, then descriptors
+bool test_loop(testargs *myargs, bool (*f)(testargs *))
+{
+  int **specptr = read_test_spec(myargs); // get the spec
+  bool testerror = false;
+
+  char name1[64];
+  strcpy(name1, myargs->output); // save the file name for next iteration
+  int lim1 = get_loop_limit(SELOP, specptr); // get select op limit
+  for (int i = 0; i < lim1; i++) { // loop over selector if there are any
+    set_spec_arg(SELOP, specptr, lim1, myargs, i);
+
+    spec inspec = TOTAL; // get first available spec from enumerator
+    for (int i = 0; i < TOTAL; i++) // order determines precedence
+      if (specptr[i]) { inspec = i; break; }
+
+    char name2[64];
+    strcpy(name2, myargs->output); // save the file name for next iteration
+    int lim2 = get_loop_limit(inspec, specptr); // get spec limit
+    for (int j = 0; j < lim2; j++) { // loop over spec if there are any
+      set_spec_arg(inspec, specptr, lim2, myargs, j);
+      set_spec_arg(ACCUM, specptr, 0, myargs, j); // no full range for accum
+
+      char name3[64];
+      strcpy(name3, myargs->output); // base from args
+      int lim3 = get_loop_limit(DESC, specptr); // get descriptor limit
+      for (int k = 0; k < lim3; k++) { // descriptor loop
+	set_spec_arg(DESC, specptr, lim3, myargs, k);
+	testerror |= f(myargs); // run the test
+	strcpy(myargs->output, name3); // restore output name
+      }
+      strcpy(myargs->output, name2); // restore output name
+    }
+    strcpy(myargs->output, name1); // restore output name
+  }
+  free_test_spec(specptr);
   return testerror;
 }
 
