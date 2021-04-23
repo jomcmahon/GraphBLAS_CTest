@@ -10,8 +10,15 @@
 -include make.inc
 
 # GraphBLAS location
-HOMEDIR ?= /home1/mcmahon
-GBDIR ?= $(HOMEDIR)/SuiteSparse/GraphBLAS
+GBDIR ?= $(HOME)/SuiteSparse/GraphBLAS
+ifdef TEST
+LOADLIBS ?= $(HOME)/LucataGraphBLAS/build_x86/src/lib/libLucataGraphBLAS.a
+INCDIR ?= $(HOME)/LucataGraphBLAS/src/include
+else
+LOADLIBS ?= -lm $(GBDIR)/build/libgraphblas.a
+INCDIR ?= $(GBDIR)/Include
+endif
+
 # cd $(GBDIR) ; make static
 
 # each test needs a wholly contained test<N>.c file created using the template
@@ -26,10 +33,10 @@ ifdef F
 NOT_YET = -DNOT_YET_SUPPORTED
 endif
 
-CFLAGS ?= -Wall -Werror -I$(GBDIR)/Include $(NOT_YET)
+CC ?= g++-7
+CFLAGS ?= -Wall -Werror -I$(INCDIR) $(NOT_YET)
 CXX ?= g++-7
 CXXFLAGS += -fopenmp
-LOADLIBS ?= -lm $(GBDIR)/build/libgraphblas.a
 
 N ?= read
 SRCS = $(wildcard test*.c)
@@ -65,6 +72,13 @@ runall: $(EXES)
 genall: $(EXES)
 	for x in $(EXES); do mkdir -p ./data/$$x ; done
 	for x in $(EXES); do ./$$x -g > ./data/$$x/$$x.out ; done
+
+specall:
+	mkdir -p ./data/working
+	python util/specgen.py WORKING
+	mkdir -p ./data/regression
+	python util/specgen.py REGRESSION
+	cd data && ln -s regression specfiles
 
 unit: $(UNITS)
 	for x in $(UNITS); do ./$$x; done

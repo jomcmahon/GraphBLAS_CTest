@@ -48,9 +48,12 @@ bool run_kron(testargs *myargs)
     OK (GrB_Matrix_new(&C, ztype, nrows, ncols));
   else read_matlab_matrix(myargs->inbase, myargs->initvals, ztype, &C);
 
+#ifdef NOT_YET_SUPPORTED
   if (semi) OK (GrB_kronecker(C, M, accum, semi, A, B, desc));
   else if (mon) OK (GrB_kronecker(C, M, accum, mon, A, B, desc));
-  else OK (GrB_kronecker(C, M, accum, binop, A, B, desc));
+  else
+#endif
+    OK (GrB_kronecker(C, M, accum, binop, A, B, desc));
 
   bool testerror = false; // if generating, write to file, otherwise compare
   if (myargs->generate) write_typed_matrix(myargs->testbase, myargs->output, C);
