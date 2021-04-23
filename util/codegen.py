@@ -48,14 +48,14 @@ def writelist(ofile, olist) :
 
 def gennovars(gbobj, prefix, olist) :
     numstr = 'NUM_'+gbobj.upper()+'S'
-    ofile = open(gbobj+'s.c', 'w')
+    ofile = open('util/'+gbobj+'s.c', 'w')
     preamble(ofile, gbobj, prefix, numstr, len(olist))
     ofile.write('\n'+prefix+'_'+gbobj+' *All'+gbobj+'s['+numstr+'] = ')
     writelist(ofile, olist)
     ofile.close()
 
 def genunop() :
-    ofile = open('UnaryOps.c', 'w')
+    ofile = open('util/UnaryOps.c', 'w')
     preamble(ofile, 'UnaryOp', 'GrB', 'NUM_UNARYOPS', NUM_UNARYOPS)
     getmethod(ofile, 'UnaryOp', 'GrB', 'NUM_UNARYOPS', 'Type', '')
     ofile.write('\nGrB_UnaryOp *AllUnaryOps[NUM_UNARYOPS] = ')
@@ -65,7 +65,7 @@ def genunop() :
     ofile.close()
 
 def genbinop() :
-    ofile = open('BinaryOps.c', 'w')
+    ofile = open('util/BinaryOps.c', 'w')
     preamble(ofile, 'BinaryOp', 'GrB', 'NUM_BINARYOPS', NUM_BINARYOPS)
     getmethod(ofile, 'BinaryOp', 'GrB', 'NUM_BINARYOPS', 'Type', 'in')
     getmethod(ofile, 'BinaryOp', 'GrB', 'NUM_BINARYOPS', 'Type', 'out')
@@ -78,7 +78,7 @@ def genbinop() :
     ofile.close()
 
 def genmon() :
-    ofile = open('Monoids.c', 'w')
+    ofile = open('util/Monoids.c', 'w')
     preamble(ofile, 'Monoid', 'GrB', 'NUM_MONOIDS', NUM_MONOIDS)
     getmethod(ofile, 'Monoid', 'GrB', 'NUM_MONOIDS', 'Type', '')
     getmethod(ofile, 'Monoid', 'GrB', 'NUM_MONOIDS', 'BinaryOp', '')
@@ -91,7 +91,7 @@ def genmon() :
     ofile.close()
 
 def gensemi() :
-    ofile = open('Semirings.c', 'w')
+    ofile = open('util/Semirings.c', 'w')
     preamble(ofile, 'Semiring', 'GrB', 'NUM_SEMIRINGS', NUM_SEMIRINGS)
     getmethod(ofile, 'Semiring', 'GrB', 'NUM_SEMIRINGS', 'Monoid', '')
     getmethod(ofile, 'Semiring', 'GrB', 'NUM_SEMIRINGS', 'BinaryOp', '')

@@ -26,14 +26,14 @@ arguments can change the iteration space as desired.
 
 INSTRUCTIONS:
 
-1) tar -xvf GB_CTest.tar && cd CTest
-2) edit Makefile so that GBDIR points to stable, verified GraphBLAS
-3) "make setup" to  link Demo directory
-4) "cd util && python codegen.py" to create database of GraphBLAS objects
-5) "octave testread.m" to create input data
-6) "make genall" to generate answers for default iteration in data dir
-7) edit Makefile so that GBDIR points to GraphBLAS version under test
-8) "make runall" to run all tests in default iteration on that version
+-- tar -xvf GB_CTest.tar && cd CTest
+-- edit Makefile so that the test variables are set correctly
+-- "make setup" to  link Demo directory, create database and input files
+-- "make specall" to genereate spec and list files
+-- "make genall" to generate answers for the regression test suite
+-- "make runall" to run tests with SuiteSparse library
+-- "make clean" to remove executables
+-- "make TEST=1 runall" to run tests with test library
 
 INDIVIDUAL TESTS:
 

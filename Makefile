@@ -56,6 +56,8 @@ info:
 
 setup:
 	ln -s $(GBDIR)/Demo
+	python util/codegen.py
+	octave testread.m
 
 lib: $(UTILLIB)
 
