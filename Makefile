@@ -59,10 +59,6 @@ gen: test$(N)
 	mkdir -p ./data/test$(N)
 	./test$(N) -g $(INPUTS) > data/test$(N)/test$(N)$(fstr).out
 
-spec: util/specgen.py
-	mkdir -p ./data/specfiles
-	python util/specgen.py $(N)
-
 runall: $(EXES)
 	for x in $(EXES); do ./$$x; done
 
@@ -70,12 +66,13 @@ genall: $(EXES)
 	for x in $(EXES); do mkdir -p ./data/$$x ; done
 	for x in $(EXES); do ./$$x -g > ./data/$$x/$$x.out ; done
 
-specall: $(EXES)
-	mkdir -p ./data/specfiles
-	python util/specgen.py
-
 unit: $(UNITS)
 	for x in $(UNITS); do ./$$x; done
+
+%spec: util/specgen.py
+	mkdir -p ./data/$*
+	rm -f data/specfiles
+	cd data && ln -s $* specfiles
 
 test%: test%.o $(UTILLIB)
 	$(CXX) $(CXXFLAGS) $^ $(LOADLIBS) -o $@
