@@ -66,14 +66,14 @@ run: test$(N)
 
 gen: test$(N)
 	mkdir -p ./data/test$(N)
-	./test$(N) -g $(INPUTS) > data/test$(N)/test$(N)$(fstr).out
+	./test$(N) -g $(INPUTS) > data/specfiles/test$(N)$(fstr).out
 
 runall: $(EXES)
 	for x in $(EXES); do ./$$x; done
 
 genall: $(EXES)
 	for x in $(EXES); do mkdir -p ./data/$$x ; done
-	for x in $(EXES); do ./$$x -g > ./data/$$x/$$x.out ; done
+	for x in $(EXES); do ./$$x -g > ./data/specfiles/$$x.out ; done
 
 specall:
 	mkdir -p ./data/working
