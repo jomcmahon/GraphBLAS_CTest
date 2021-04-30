@@ -46,7 +46,9 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
                     v = [(i, x) for i, x in enumerate(llist) if (x.find(nm[1:]) == -1)]
                 else :
                     v = [(i, x) for i, x in enumerate(llist) if (x.find(nm) != -1)]
-                il, vl = map(list, zip(*v))
+                il = []
+                vl = []
+                if (len(v) > 0) : il, vl = map(list, zip(*v))
                 ilist += il
                 vlist += vl
     if (len(ilist) > 0) : writeline(obj, ilist, sfile)
@@ -66,7 +68,7 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
     elif (dstr != '') :
         desclst = dstr.split(",")
         il = []
-        for dsc in desclist :
+        for dsc in desclst :
             il += [i for i, x in enumerate(ALLDESC) if (x.find(dsc) != -1)]
         if (len(il) != 0) : writeline('DESC', il, sfile)
 
@@ -97,26 +99,26 @@ if __name__ == '__main__' :
         with open(sys.argv[1]) as fp :
             specdir = ''
             for line in fp :
-                xread = line.strip().split()
-                x = [sub.replace('NONE','') for sub in xread]
+                x = [sub.replace('NONE','') for sub in line.strip().split()]
                 if (len(x) == 1) : specdir = x[0]
                 elif (len(x) == 12) :
                     tf = specdir + '/test' + x[1]
+                    doacc = (x[6] != '') and (x[8] != '')
                     if ('D' in x[0]) :
                         specgen(tf, x[2]+'D', x[3], x[4], x[5], '', '', '',
                                 x[9], x[10], x[11])
-                    if ('M' in x[0]) :
+                    if (('M' in x[0]) and (x[7] != '')) :
                         specgen(tf, x[2]+'M', x[3], x[4], x[5], '', x[7], '',
                                 x[9], x[10], x[11])
-                    if ('A' in x[0]) :
+                    if (('A' in x[0]) and doacc) :
                         specgen(tf, x[2]+'A', x[3], x[4], x[5], x[6], '', x[8],
                                 x[9], x[10], x[11])
-                    if ('B' in x[0]) :
-                        specgen(tf, x[2]+'B', x[3], x[4], x[5], x[6], x[7], x[8],
-                                x[9], x[10], x[11])
+                    if (('B' in x[0])  and (x[7] != '') and doacc) :
+                        specgen(tf, x[2]+'B', x[3], x[4], x[5], x[6], x[7],
+                                x[8], x[9], x[10], x[11])
             fp.close()
     elif (numargs == 12) :
-        specgen(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4],
-                sys.argv[5], sys.argv[6], sys.argv[7], sys.argv[8],
-                sys.argv[9], sys.argv[10], sys.argv[11])
+        x = [sub.replace('NONE','') for sub in sys.argv]
+        specgen(x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10],
+                x[11])
     else : sys.stdout.write('wrong # args\n')
