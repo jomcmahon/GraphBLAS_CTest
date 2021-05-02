@@ -29,7 +29,8 @@ INSTRUCTIONS:
 -- tar -xvf GB_CTest.tar && cd CTest
 -- edit Makefile so that the test variables are set correctly
 -- "make setup" to  link Demo directory, create database and input files
--- "make specall" to genereate spec and list files
+-- "make regressionspec" to generate spec and list files for REGRESSION
+-- "make regressionlink" to link the regression test suite
 -- "make genall" to generate answers for the regression test suite
 -- "make runall" to run tests with SuiteSparse library
 -- "make clean" to remove executables
@@ -39,7 +40,7 @@ INDIVIDUAL TESTS:
 
 running test<N> where test<N>.c exists: "make N=<N> run"
 generating for test<N> where test<N>.c exists: "make N=<N> gen"
-to view options, run with -h or "make N=<N> -INPUTS=-h run"
+to view options, run with -h or "make N=<N> INPUTS=-h run"
 
 options: hgt:u:b:s:n:l:d:a:m:0:1:2:o:i:p:
 

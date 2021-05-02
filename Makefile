@@ -65,28 +65,25 @@ run: test$(N)
 	./test$(N) $(INPUTS)
 
 gen: test$(N)
-	mkdir -p ./data/test$(N)
+	mkdir -p data/test$(N)
 	./test$(N) -g $(INPUTS) > data/specfiles/test$(N)$(fstr).out
 
 runall: $(EXES)
 	for x in $(EXES); do ./$$x; done
 
 genall: $(EXES)
-	for x in $(EXES); do mkdir -p ./data/$$x ; done
-	for x in $(EXES); do ./$$x -g > ./data/specfiles/$$x.out ; done
-
-specall:
-	mkdir -p ./data/working
-	python util/specgen.py WORKING
-	mkdir -p ./data/regression
-	python util/specgen.py REGRESSION
-	cd data && ln -s regression specfiles
+	for x in $(EXES); do mkdir -p data/$$x ; done
+	for x in $(EXES); do ./$$x -g > data/specfiles/$$x.out ; done
 
 unit: $(UNITS)
 	for x in $(UNITS); do ./$$x; done
 
+%spec: SPEC = $(shell echo '$*' | tr '[:lower:]' '[:upper:]')
 %spec: util/specgen.py
-	mkdir -p ./data/$*
+	mkdir -p data/$*
+	python util/specgen.py $(SPEC)
+
+%link:
 	rm -f data/specfiles
 	cd data && ln -s $* specfiles
 
