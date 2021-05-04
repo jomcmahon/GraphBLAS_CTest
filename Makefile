@@ -39,7 +39,7 @@ CXX ?= g++-7
 CXXFLAGS += -fopenmp
 
 N ?= read
-SRCS = $(wildcard test*.c)
+SRCS = $(sort $(wildcard test*.c))
 EXES = $(SRCS:%.c=%)
 UNITS = testBinary testDesc testMatrix testMonoid testScalar testSelect testSemi testTypes testUnary testVector
 

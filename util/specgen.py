@@ -80,9 +80,9 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
     if (iv != '') : sfile.write('INIT '+iv+'\n')
     if (out != '') : sfile.write('OUTPUT '+out+'\n')
     sfile.close()
-    lfile = open(testf+'.list', 'a+')
+    lfile = open(testf+'.list', 'a')
     specstr = testf+out+'.spec'
-    if not specstr in lfile.read() : lfile.write(specstr+'\n')
+    lfile.write(specstr+'\n')
     lfile.close()
 
 if __name__ == '__main__' :
