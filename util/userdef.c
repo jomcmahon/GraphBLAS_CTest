@@ -27,11 +27,19 @@ void user_unop_f32(void *z, const void *x)
   *((float *)z) = 2 * delta;
 }
 
+#ifdef VERSION4
+bool user_selop(const GrB_Index i, const GrB_Index j, const void *z,
+		const void *thunk)
+{
+  return (i == j);
+}
+#else
 bool user_selop(const GrB_Index i, const GrB_Index j, const GrB_Index nrows,
 		const GrB_Index ncols, const void *z, const void *thunk)
 {
   return (i == j);
 }
+#endif
 
 void get_User_Type(GrB_Type *type) {
   GrB_Info info;

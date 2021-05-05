@@ -15,10 +15,17 @@
 			mm_is_hermitian(_m) || mm_is_pattern(_m))
 
 // macros for use in tests
+#ifdef VERSION4
 #define OK(method) do { info = method;					\
     if (info != GrB_SUCCESS) {						\
-      printf("%s:%d:GB: %d: %s\n", __FILE__, __LINE__, info, GrB_error()); \
+      printf("%s:%d:GB: %d\n", __FILE__, __LINE__, info);		\
       exit(info); } } while (0)
+#else
+#define OK(method) do { info = method;					\
+    if (info != GrB_SUCCESS) {						\
+      printf("%s:%d: GB: %d: %s\n", __FILE__, __LINE__, info, GrB_error()); \
+      exit(info); } } while (0)
+#endif
 
 // test argument parsing
 typedef enum { TYPE, SEMI, MON, BINOP, UNOP, SELOP, DESC, ACCUM, TOTAL } spec;
