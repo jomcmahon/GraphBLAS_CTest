@@ -15,9 +15,13 @@
 #define TEST_COND(_c, _s) do { printf("%s: ", _s); if (_c) printf("PASSED\n"); \
     else { printf("FAILED\n"); testerror = true; } } while (0)
 
-bool f_sel (const GrB_Index i, const GrB_Index j, const GrB_Index nrows,
-	const GrB_Index ncols, const void *z, const void *thunk)
-{ return (i == j); }
+#if GxB_IMPLEMENTATION >= GxB_VERSION (4,0,0)
+bool f_sel(const GrB_Index i, const GrB_Index j, const void *z,
+	   const void *thunk) { return (i == j); }
+#else
+bool f_sel(const GrB_Index i, const GrB_Index j, const GrB_Index nrows,
+           const GrB_Index ncols, const void *z, const void *thunk) { return (i == j); }
+#endif
 
 int main(int argc, char * argv[])
 {

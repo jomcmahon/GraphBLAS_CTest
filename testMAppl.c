@@ -42,7 +42,7 @@ bool run_MAppl(testargs *myargs)
 
   if (unop) OK (GrB_apply(C, M, accum, unop, A, desc)); // do the operation
   else { // create scalar of type and do 1st and 2nd
-#ifdef NOT_YET_SUPPORTED
+#if GxB_IMPLEMENTATION >= GxB_VERSION (4,0,0)
     GxB_Scalar scal;
     OK (GxB_Scalar_new(&scal, xtype));
     OK (GxB_Scalar_setElement(scal, 0));
