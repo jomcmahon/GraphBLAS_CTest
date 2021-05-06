@@ -29,16 +29,12 @@ UTILSRC = $(wildcard util/*.c)
 UTILOBJ = $(UTILSRC:.c=.o)
 UTILLIB = util/libtest_utils.a
 
-ifdef V
-VERSION4 = -DVERSION4
-endif
-
 ifdef F
 NOT_YET = -DNOT_YET_SUPPORTED
 endif
 
 CC ?= g++-7
-CFLAGS ?= -Wall -Werror -I$(INCDIR) $(NOT_YET) $(VERSION4)
+CFLAGS ?= -Wall -Werror -I$(INCDIR) $(NOT_YET)
 CXX ?= g++-7
 CXXFLAGS += -fopenmp
 

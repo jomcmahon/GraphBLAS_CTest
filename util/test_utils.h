@@ -15,7 +15,7 @@
 			mm_is_hermitian(_m) || mm_is_pattern(_m))
 
 // macros for use in tests
-#ifdef VERSION4
+#if GxB_IMPLEMENTATION >= GxB_VERSION (4,0,0)
 #define OK(method) do { info = method;					\
     if (info != GrB_SUCCESS) {						\
       printf("%s:%d:GB: %d\n", __FILE__, __LINE__, info);		\

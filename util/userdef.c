@@ -27,7 +27,7 @@ void user_unop_f32(void *z, const void *x)
   *((float *)z) = 2 * delta;
 }
 
-#ifdef VERSION4
+#if GxB_IMPLEMENTATION >= GxB_VERSION (4,0,0)
 bool user_selop(const GrB_Index i, const GrB_Index j, const void *z,
 		const void *thunk)
 {
