@@ -4,6 +4,4 @@
 *.pyc
 octave-workspace
 build*
-data
-Demo
 __pycache__

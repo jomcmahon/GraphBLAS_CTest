@@ -11,6 +11,7 @@
 
 # GraphBLAS location
 GBDIR ?= $(HOME)/SuiteSparse/GraphBLAS
+V ?= 3.2.0
 ifdef TEST
 LOADLIBS ?= $(HOME)/LucataGraphBLAS/build_x86/src/lib/libLucataGraphBLAS.a
 INCDIR ?= $(HOME)/LucataGraphBLAS/src/include
@@ -42,6 +43,7 @@ N ?= read
 SRCS = $(sort $(wildcard test*.c))
 EXES = $(SRCS:%.c=%)
 UNITS = testBinary testDesc testMatrix testMonoid testScalar testSelect testSemi testTypes testUnary testVector
+DBOBJ = BinaryOps Descriptors Monoids SelectOps Semirings Types UnaryOps
 
 empty :=
 space := $(empty) $(empty)
@@ -56,6 +58,7 @@ info:
 
 setup:
 	ln -s $(GBDIR)/Demo
+	cd util && ln -s GBlists$(V).py GBlists.py
 	python util/codegen.py
 	octave testread.m
 
@@ -101,3 +104,7 @@ clean:
 
 cleanlib:
 	rm -f $(UTILLIB) util/*.o
+
+reset:
+	rm -rf data
+	rm -f Demo util/GBlists.py $(DBOBJ:%=util/%.c)
