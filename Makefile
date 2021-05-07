@@ -10,7 +10,7 @@
 -include make.inc
 
 # GraphBLAS location
-GBDIR ?= $(HOME)/SuiteSparse/GraphBLAS
+GBDIR ?= $(HOME)/GraphBLAS
 V ?= 3.2.0
 ifdef TEST
 LOADLIBS ?= $(HOME)/LucataGraphBLAS/build_x86/src/lib/libLucataGraphBLAS.a

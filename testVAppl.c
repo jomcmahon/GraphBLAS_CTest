@@ -41,8 +41,8 @@ bool run_VAppl(testargs *myargs)
   else read_matlab_vector(myargs->inbase, myargs->initvals, ztype, &C);
 
   if (unop) OK (GrB_apply(C, M, accum, unop, A, desc)); // do the operation
-  else { // create scalar of type and do 1st and 2nd
 #if GxB_IMPLEMENTATION >= GxB_VERSION (4,0,0)
+  else { // create scalar of type and do 1st and 2nd
     GxB_Scalar scal;
     OK (GxB_Scalar_new(&scal, xtype));
     OK (GxB_Scalar_setElement(scal, 0));
@@ -50,10 +50,8 @@ bool run_VAppl(testargs *myargs)
     OK (GxB_Scalar_new(&scal, ytype));
     OK (GxB_Scalar_setElement(scal, 0));
     OK (GrB_apply(C, M, accum, binop, A, scal, desc));
-#else
-    return false;
-#endif
   }
+#endif
 
   bool testerror = false; // if generating, write to file, otherwise compare
   if (myargs->generate) write_typed_vector(myargs->testbase, myargs->output, C);

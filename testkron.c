@@ -49,11 +49,11 @@ bool run_kron(testargs *myargs)
   else read_matlab_matrix(myargs->inbase, myargs->initvals, ztype, &C);
 
 #if GxB_IMPLEMENTATION >= GxB_VERSION (4,0,0)
-    if (semi) OK(GrB_kronecker(C, M, accum, semi, A, B, desc));
-    else if (mon) OK(GrB_kronecker(C, M, accum, mon, A, B, desc));
-    else OK(GrB_kronecker(C, M, accum, binop, A, B, desc));
+  if (semi) OK(GrB_kronecker(C, M, accum, semi, A, B, desc));
+  else if (mon) OK(GrB_kronecker(C, M, accum, mon, A, B, desc));
+  else OK(GrB_kronecker(C, M, accum, binop, A, B, desc));
 #else
-    OK(GxB_kron(C, M, accum, binop, A, B, desc));
+  OK(GxB_kron(C, M, accum, binop, A, B, desc));
 #endif
 
   bool testerror = false; // if generating, write to file, otherwise compare

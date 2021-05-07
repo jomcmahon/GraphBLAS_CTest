@@ -43,7 +43,9 @@ bool run_MRed(testargs *myargs)
   else read_matlab_vector(myargs->inbase, myargs->initvals, ztype, &C);
 
   if (mon) OK (GrB_reduce(C, M, accum, mon, A, desc)); // do the operation
+#if GxB_IMPLEMENTATION < GxB_VERSION (5,0,0)
   else OK (GrB_reduce(C, M, accum, binop, A, desc));
+#endif
 
   bool testerror = false; // if generating, write to file, otherwise compare
   if (myargs->generate) write_typed_vector(myargs->testbase, myargs->output, C);
