@@ -84,6 +84,7 @@ unit: $(UNITS)
 %spec: SPEC = $(shell echo '$*' | tr '[:lower:]' '[:upper:]')
 %spec: util/specgen.py
 	mkdir -p data/$*
+	rm -f data/$*/*.list
 	python util/specgen.py $(SPEC)
 
 %link:
