@@ -8,8 +8,6 @@
 
 # $1 is test executable name; all other args passed
 function singlerun {
-    mkdir -p data/specfiles
-    eval "../../CTest/testspec $@ -g"
     mkdir -p data/$1
     eval "../../CTest/$@ -g" > data/$1/$1.out
     if [ $? -eq 0 ]; then
@@ -24,7 +22,7 @@ function singlerun {
     else
 	echo $1 : FAILED ====================================
     fi
-#    rm -rf data/$1
+    rm -rf data/$1/*.mm
 }
 
 shopt -s nullglob
