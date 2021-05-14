@@ -6,11 +6,38 @@
 #   DESCRIPTION: spec generator for test suites
 
 import sys
+import re
 from GBlists import *
 
 def writeline(instr, nlist, sfile) :
     nstr = ' '.join([str(x) for x in nlist])
     sfile.write(instr+' '+str(len(nlist))+' '+nstr+'\n')
+
+def findobj(sfile, obj, namestr, llist) :
+    if (obj == 'SELOP') : sfile.write('TYPE '+str(len(ALLTYPES))+'\n')
+    vlist = []
+    if (namestr == 'ALL') : 
+        sfile.write(obj+' '+str(len(llist))+'\n')
+        vlist = llist
+    elif (namestr.isdigit()) :
+        rg = int(namestr)
+        writeline(obj, range(rg), sfile)
+        vlist = llist[0:rg]
+    else :
+        namelst = namestr.split(',')
+        addlist = [] ; rmlist = []
+        for nm in namelst :
+            if (nm[0] == '-') : snm = nm[1:]
+            else : snm = nm
+            v = [x for x in llist if re.search(snm,x)]
+            if (nm[0] == '-') : rmlist += v
+            else : addlist += v
+        if (len(addlist) == 0) : addlist = llist
+        vlist = [x for x in addlist if x not in rmlist]
+        ilist = [llist.index(x) for x in vlist]
+        if (len(ilist) > 0) : writeline(obj, ilist, sfile)
+    if (obj == 'SELOP') : vlist = ALLTYPES
+    return vlist
 
 def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
     if (len(ALLBINOPS) == 0) : binoplist()
@@ -20,38 +47,19 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
 
     sfile = open(testf+out+'.spec', 'w')
     if (obj == 'TYPE') : llist = ALLTYPES ; tind = 1
-    elif (obj == 'SELOP') : llist = ALLTYPES ; tind = 1
+    elif (obj == 'SELOP') : llist = ALLSELECT ; tind = 1
     elif (obj == 'UNOP') : llist = ALLUNOPS ; tind = 2
     elif (obj == 'BINOP') : llist = ALLBINOPS ; tind = 2
     elif (obj == 'MON') : llist = ALLMONS ; tind = 2
     elif (obj == 'SEMI') : llist = ALLSEMIS ; tind = 3
     else : llist = []
 
-    acclst = accstr.split(',')
     alist = [] ; ilist = [] ; vlist = [] ; anew = []
-    for ac in acclst :
-        if (ac != '') :
-            alist += [x for i, x in enumerate(ALLBINOPS) if (x.find(ac) != -1)]
-    if (obj != '') :
-        if (namestr == 'ALL') : 
-            if (obj == 'SELOP') :
-                sfile.write('TYPE '+str(len(ALLTYPES))+'\n')
-                sfile.write('SELOP '+str(len(ALLSELECT))+'\n')
-            else : sfile.write(obj+' '+str(len(llist))+'\n')
-            vlist = llist
-        else :
-            namelst = namestr.split(',')
-            for nm in namelst :
-                if (nm[0] == '-') :
-                    v = [(i, x) for i, x in enumerate(llist) if (x.find(nm[1:]) == -1)]
-                else :
-                    v = [(i, x) for i, x in enumerate(llist) if (x.find(nm) != -1)]
-                il = []
-                vl = []
-                if (len(v) > 0) : il, vl = map(list, zip(*v))
-                ilist += il
-                vlist += vl
-    if (len(ilist) > 0) : writeline(obj, ilist, sfile)
+    if (accstr != '') :
+        acclst = accstr.split(',')
+        for ac in acclst :
+            alist += [x for x in ALLBINOPS if re.search(ac,x)]
+    if (obj != '') : vlist = findobj(sfile, obj, namestr, llist)
     if (len(vlist) > 0) :
         for t in vlist :
             y = t.split('_')
@@ -62,15 +70,7 @@ def specgen(testf, out, i0, i1, i2, iv, m, accstr, obj, namestr, dstr) :
     else :
         v = [x for x in alist if (x.find('FP32') != -1)]
         if (len(v) > 0) : anew += [ALLBINOPS.index(v[0])]
-
-    if (dstr == 'ALL') : sfile.write('DESC '+str(len(ALLDESC))+'\n')
-    elif (dstr.isdigit()) : writeline('DESC', range(int(dstr)), sfile)
-    elif (dstr != '') :
-        desclst = dstr.split(",")
-        il = []
-        for dsc in desclst :
-            il += [i for i, x in enumerate(ALLDESC) if (x.find(dsc) != -1)]
-        if (len(il) != 0) : writeline('DESC', il, sfile)
+    if (dstr != '') : vlist = findobj(sfile, 'DESC', dstr, ALLDESC)
 
     if (len(anew) > 0) : writeline('ACCUM', anew, sfile)
     if (i0 != '') : sfile.write('INPUT0 '+i0+'\n')
