@@ -48,7 +48,7 @@ void read_params(FILE *infp, spec inspec, int **myspec)
   int lim, rval;
   assert (fscanf(infp, "%d", &lim) == 1); // get number of values
 
-  if (lim >= spec_limits(inspec)) { // one value for whole range
+  if ((inspec != ACCUM) && (lim >= spec_limits(inspec))) { // whole range
     if (!myspec[inspec]) {
       myspec[inspec] = malloc(sizeof(int));
       myspec[inspec][0] = spec_limits(inspec);
@@ -106,7 +106,7 @@ int **read_test_spec(testargs *myargs)
   if (strlen(myargs->spectest) > 0) { // if spec file supplied
     FILE *infp; // if no file, run the default function and return spec
     if ((infp = fopen(myargs->spectest, "r")))  { // if spec file opened
-      char str[64];
+      char str[8192];
       while (fscanf(infp, "%s", str) == 1) { // loop over spec lines
 	if (!strcmp(str, "TYPE")) read_params(infp, TYPE, myspec);
 	else if (!strcmp(str, "SEMI")) read_params(infp, SEMI, myspec);
@@ -143,10 +143,11 @@ void free_test_spec(int **myspec) {
 // set the argument in the test args structure based on spec
 void set_spec_arg(spec inspec, int **specptr, int lim, testargs *myargs, int i)
 {
-  int val = -1; // default no argument
   if (inspec != TOTAL) { // valid spec
-    if (lim >= spec_limits(inspec)) val = i; // whole range
-    else if (specptr[inspec]) val = specptr[inspec][i + 1]; // from spec
+    int val = -1; // default no argument
+    if ((inspec != ACCUM) && (lim >= spec_limits(inspec))) val = i; // range
+    else if (specptr[inspec] && (i < specptr[inspec][0]))
+      val = specptr[inspec][i + 1]; // from spec
 
     if (val >= 0) { // if there is arg, add to file name
       char sname[64];
