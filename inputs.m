@@ -55,3 +55,5 @@ VEA = V1(:) ;
 VER = V1(r) ;
 VES = V1(s) ;
 VEB = V1(b) ;
+K = sprand(100, 100, .0522) ;
+KM = sprand(100, 100, .0522) ;

@@ -37,3 +37,5 @@ mmwrite("data/testread/VEA.mm", VEA) ;
 mmwrite("data/testread/VER.mm", VER) ;
 mmwrite("data/testread/VES.mm", VES) ;
 mmwrite("data/testread/VEB.mm", VEB) ;
+mmwrite("data/testread/K.mm", K) ;
+mmwrite("data/testread/KM.mm", KM) ;
