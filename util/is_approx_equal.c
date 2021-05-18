@@ -11,6 +11,8 @@
 
 #define EPS 1e-12
 
+void get_UDT_BinaryOp(GrB_BinaryOp *, GrB_Type);
+
 // approximate equality for double
 void approx_equal_d(void *zin, const void *xin, const void *yin)
 {
@@ -106,7 +108,7 @@ bool is_approx_equal_mat(GrB_Matrix A, GrB_Matrix B)
       OK (GrB_BinaryOp_new (&approx, approx_equal_f, GrB_BOOL, atype, atype));
     } else if (atype == GrB_FP64) {
       OK (GrB_BinaryOp_new (&approx, approx_equal_d, GrB_BOOL, atype, atype));
-    } else { printf("Bad type\n"); exit(1); }
+    } else get_UDT_BinaryOp(&approx, atype);
 
     OK (GrB_eWiseMult (C, NULL, NULL, approx, A, B, NULL)) ;
 
@@ -172,7 +174,7 @@ bool is_approx_equal_vec(GrB_Vector A, GrB_Vector B)
       OK (GrB_BinaryOp_new (&approx, approx_equal_f, GrB_BOOL, atype, atype));
     } else if (atype == GrB_FP64) {
       OK (GrB_BinaryOp_new (&approx, approx_equal_d, GrB_BOOL, atype, atype));
-    } else { printf("Bad type\n"); exit(1); }
+    } else get_UDT_BinaryOp(&approx, atype);
 
     OK (GrB_eWiseMult (C, NULL, NULL, approx, A, B, NULL)) ;
 

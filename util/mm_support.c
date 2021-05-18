@@ -10,6 +10,14 @@
 #include "test_utils.h"
 #include "mmio.h"
 
+void build_Matrix_UDT(GrB_Matrix, GrB_Type, GrB_Index *, GrB_Index *, double *,
+		      GrB_Index);
+void build_Vector_UDT(GrB_Vector, GrB_Type, GrB_Index *, double *, GrB_Index);
+void extract_Matrix_UDT(GrB_Index *, GrB_Index *, double *, GrB_Index,
+			GrB_Index *, GrB_Matrix);
+void extract_Vector_UDT(GrB_Index *, double *, GrB_Index, GrB_Index *,
+			GrB_Vector);
+
 // read banner and allocate arrays
 void mm_setup(FILE *f, GrB_Index *M, GrB_Index *N, GrB_Index *nz, GrB_Index **I,
 	      GrB_Index **J, double **X_f64)
@@ -65,9 +73,7 @@ void mm_double(FILE *f, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
       { uint64_t *X = (uint64_t *)X_f64; X[valctr] = (uint64_t)(fabs(zd)); }
     else if (thetype == GrB_FP32)
       { float *X = (float *)X_f64; X[valctr] = (float)zd; }
-    else if (thetype == GrB_FP64)
-      { double *X = (double *)X_f64; X[valctr] = (double)zd; }
-    else { printf("bad type\n"); exit(1); }
+    else { double *X = (double *)X_f64; X[valctr] = (double)zd; }
 
     valctr++; // increment the number of values read
   }
@@ -104,9 +110,9 @@ void mm_type(FILE *f, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
       n = sscanf(line, "%lu %lu %lu", &ival, &jval, &X[valctr]);
     } else if (thetype == GrB_FP32) { float *X = (float *)X_f64;
       n = sscanf(line, "%lu %lu %g", &ival, &jval, &X[valctr]);
-    } else if (thetype == GrB_FP64) { double *X = (double *)X_f64;
+    } else { double *X = (double *)X_f64;
       n = sscanf(line, "%lu %lu %lg", &ival, &jval, &X[valctr]);
-    } else { printf("bad type\n"); exit(1); }
+    }
 
     if (n != 3) { printf("couldn't scan data %d\n", valctr); exit(1); }
     I[valctr] = ival - 1; J[valctr] = jval - 1; // adjust indices
@@ -144,7 +150,7 @@ void mm_matbuild(GrB_Matrix A, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
     OK (GrB_Matrix_build(A, I, J, (float *)X_f64, nz, GxB_ANY_FP32));
   else if (thetype == GrB_FP64)
     OK (GrB_Matrix_build(A, I, J, (double *)X_f64, nz, GxB_ANY_FP64));
-  else { printf("bad type\n"); exit(1); }
+  else build_Matrix_UDT(A, thetype, I, J, X_f64, nz);
 }
 
 // build vector from arrays according to type
@@ -175,7 +181,7 @@ void mm_vecbuild(GrB_Vector A, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
     OK (GrB_Vector_build(A, I, (float *)X_f64, nz, GxB_ANY_FP32));
   else if (thetype == GrB_FP64)
     OK (GrB_Vector_build(A, I, (double *)X_f64, nz, GxB_ANY_FP64));
-  else { printf("bad type\n"); exit(1); }
+  else build_Vector_UDT(A, thetype, I, X_f64, nz);
 }
 
 // read banner and allocate arrays
@@ -225,9 +231,9 @@ void mm_print(FILE *f, GrB_Type thetype, GrB_Index nz, GrB_Index *I,
       fprintf(f, "%lu %lu %lu\n", I[k]+1, J[k]+1, X[k]);
     } else if (thetype == GrB_FP32) { float *X = (float *)X_f64;
       fprintf(f, "%lu %lu %.16f\n", I[k]+1, J[k]+1, X[k]);
-    } else if (thetype == GrB_FP64) { double *X = (double *)X_f64;
+    } else { double *X = (double *)X_f64;
       fprintf(f, "%lu %lu %.16f\n", I[k]+1, J[k]+1, X[k]);
-    } else { printf("bad type\n"); exit(1); }
+    }
   }
 }
 
@@ -260,7 +266,7 @@ void mm_matextract(GrB_Matrix A, GrB_Type thetype, GrB_Index nv, GrB_Index *I,
     OK (GrB_Matrix_extractTuples(I, J, (float *)X_f64, &nz, A));
   else if (thetype == GrB_FP64)
     OK (GrB_Matrix_extractTuples(I, J, (double *)X_f64, &nz, A));
-  else { printf("bad type\n"); exit(1); }
+  else extract_Matrix_UDT(I, J, X_f64, nv, &nz, A);
   if (nz != nv) { printf("Bad number of vals %lu %lu\n", nz, nv); exit(1); }
 }
 
@@ -293,6 +299,6 @@ void mm_vecextract(GrB_Vector A, GrB_Type thetype, GrB_Index nv, GrB_Index *I,
     OK (GrB_Vector_extractTuples(I, (float *)X_f64, &nz, A));
   else if (thetype == GrB_FP64)
     OK (GrB_Vector_extractTuples(I, (double *)X_f64, &nz, A));
-  else { printf("bad type\n"); exit(1); }
+  else extract_Vector_UDT(I, X_f64, nv, &nz, A);
   if (nz != nv) { printf("Bad number of vals %lu %lu\n", nz, nv); exit(1); }
 }
