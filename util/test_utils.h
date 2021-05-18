@@ -105,3 +105,4 @@ void get_User_BinaryOp(GrB_BinaryOp *binop);
 void get_User_UnaryOp(GrB_UnaryOp *unop);
 void get_User_SelectOp(GxB_SelectOp *selop, GrB_Type type);
 void get_User_Scalar(GxB_Scalar *scal);
+void get_UDT_Scalar(void **);

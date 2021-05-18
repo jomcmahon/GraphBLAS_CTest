@@ -57,7 +57,12 @@ bool run_MTAssn(testargs *myargs)
   else if (thetype == GrB_UINT64) { uint64_t c; SET_AND_TEST; }
   else if (thetype == GrB_FP32) { float c; SET_AND_TEST; }
   else if (thetype == GrB_FP64) { double c; SET_AND_TEST; }
-  else { printf("bad type\n"); exit(1); }
+  else {
+    void *c;
+    get_UDT_Scalar(&c);
+    OK(GrB_Vector_extractElement(c, A, 0));
+    OK(GrB_assign(C, M, accum, c, I, ni, J, nj, desc)); // do operation
+  }
 
   bool testerror = false; // if generating, write to file, otherwise compare
   if (myargs->generate) write_typed_matrix(myargs->testbase, myargs->output, C);

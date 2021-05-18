@@ -104,6 +104,12 @@ void get_User_Scalar(GxB_Scalar *scal)
   OK(GxB_Scalar_new(scal, type));
 }
 
+void get_UDT_Scalar(void **p)
+{
+  wildtype *XW = malloc(sizeof(wildtype));
+  *p = XW;
+}
+
 void build_Matrix_UDT(GrB_Matrix A, GrB_Type thetype, GrB_Index *I,
 		      GrB_Index *J, double *X, GrB_Index nz)
 {
